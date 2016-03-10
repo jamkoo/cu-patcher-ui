@@ -29,6 +29,10 @@ class Info extends React.Component<InfoProps, InfoState> {
   constructor(props: InfoProps) {
     super(props);
     this.select = this.select.bind(this);
+    this.getRooms = this.getRooms.bind(this);
+  }
+  getRooms() {
+    this.props.chat.getRooms();   // handle callback
   }
   render() {
     let content : JSX.Element[] = [];
@@ -49,7 +53,7 @@ class Info extends React.Component<InfoProps, InfoState> {
             leave={this.props.leaveRoom}
           />
         );
-        content.push(<JoinRoomButton key="join-button" join={this.props.selectRoom}/>);
+        content.push(<JoinRoomButton key="join-button" join={this.props.selectRoom} getRooms={this.getRooms}/>);
         break;
     }
     return (

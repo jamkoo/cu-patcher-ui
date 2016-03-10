@@ -10,6 +10,13 @@ import Message from './Message'
 import Sender from './Sender'
 import messageType from './messageType';
 
+const NS_DISCO_ITEMS : string = 'http://jabber.org/protocol/disco#items';
+
+interface Room {
+  name: string,
+  jid: string
+}
+
 class CSEChat  {
 
   client: xmpp.Client;
@@ -17,7 +24,9 @@ class CSEChat  {
   eventEmitter: EventEmitter = new EventEmitter();
   private _reconnect: boolean = true;
   private _idCounter: number = 0;
-  private _pingc: number = 0;
+  private _iqc: number = 0;
+  private _msgs: any = {};
+  private _inFlight: number = 0;
   private _pings: any = {};
   private _pingsInFlight: number = 0;
   private _pinger: number;
@@ -26,13 +35,18 @@ class CSEChat  {
     this.config = config;
   }
 
+  // generate an id using an id generator  
+  _nextId(prefix: string) : string {
+    return prefix + (this._iqc++);
+  }
+
   connect() {
     if (this.client) return;
     this.config.init();
     this.client = new Client({
       websocket: {url: this.config.websocketUrl},
-        jid: this.config.jid,
-        password: this.config.getPassword(),
+      jid: this.config.jid,
+      password: this.config.getPassword(),
     });
     this._initializeEvents();
     return this.client;
@@ -82,6 +96,19 @@ class CSEChat  {
       to: roomName + '/' + this.config.getNick(),
       type: 'unavailable'
     }));
+  }
+
+  getRooms() {
+    if (!this.client) return;
+    const id : string = this._nextId('room');
+    this.client.send(new Element('iq', {
+      from: this.config.jid,
+      to: this.config.serviceAddress.substr(1),
+      id: id,
+      type: 'get'
+    }).c('query', { xmlns: NS_DISCO_ITEMS }));
+    this._msgs[id] = { type: 'rooms', id: id, now: Date.now() };
+    this._inFlight ++;
   }
 
   // alias eventEmitter
@@ -170,10 +197,10 @@ class CSEChat  {
     }
 
     // Create a new ping message
-    const id = this._pingc++;
+    const id : string = this._nextId('ping');
     this.client.send(new Element('iq', {
       from: this.config.jid,
-      to: this.config.serviceAddress,
+      to: this.config.serviceAddress.substr(1),
       id: id,
       type: 'get'
     }).c('ping', { xmlns: 'urn:xmpp:ping' }));
@@ -234,9 +261,29 @@ class CSEChat  {
         if (ping) {
           this._pong(stanza);
         }
+        const query = stanza.getChild('query');
+        if (query) {
+          if (query.attrs.xmlns === NS_DISCO_ITEMS) {
+            this._gotRooms(stanza.attrs.id, query); 
+          }          
+        }
       }
     }
       
+  }
+  
+  _gotRooms(id: string, stanza: Element) : void {
+    const items : Element[] = stanza.getChildren('item');
+    const info : any = this._msgs[id];
+    if (info) {
+      this._inFlight --;
+      delete this._msgs[id]; 
+      const rooms : Room[] = [];
+      items.forEach((item: Element) => {
+        rooms.push({ name: item.attrs['name'], jid: item.attrs['jid'] });
+      });
+      this.eventEmitter.emit('rooms', rooms);
+    }
   }
     
   _parseMessageGroup(stanza:Element) {
@@ -295,6 +342,7 @@ class CSEChat  {
 
 export {
   Config,
-  CSEChat
+  CSEChat,
+  Room
 }
 export default CSEChat;

@@ -5,7 +5,7 @@
  */
 
 import * as events from '../../core/events';
-import { CSEChat, Config } from '../../chat/CSEChat';
+import { CSEChat, Config, Room } from '../../chat/CSEChat';
 import { ChatMessage, chatType } from './ChatMessage';
 import { UserInfo } from './User';
 import ChatRoomInfo from './ChatRoomInfo';
@@ -33,6 +33,7 @@ class ChatSession {
       this.onping = this.onping.bind(this);
       this.onchat = this.onchat.bind(this);
       this.ondisconnect = this.ondisconnect.bind(this);
+      this.onrooms = this.onrooms.bind(this);
       
       window.onblur = () => this.windowActive = false;
       window.onfocus = () => {
@@ -52,6 +53,7 @@ class ChatSession {
       this.client.on('message', this.onchat);
       this.client.on('groupmessage', this.onchat);
       this.client.on('disconnect', this.ondisconnect);
+      this.client.on('rooms', this.onrooms);
       this.client.connect(username, password);
     }
   }
@@ -125,6 +127,14 @@ class ChatSession {
 
   simulateDisconnect() {
     this.client.disconnect();
+  }
+  
+  getRooms() {
+    this.client.getRooms();
+  }
+  
+  onrooms(items: Room[]) {
+    events.fire('chat-room-list', items);
   }
 
   // Broadcast a message to all rooms

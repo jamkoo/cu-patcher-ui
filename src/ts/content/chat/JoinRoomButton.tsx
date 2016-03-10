@@ -17,32 +17,33 @@ export interface JoinRoomButtonState {
 export interface JoinRoomButtonProps {
   key: string;
   join: (roomId: RoomId) => void;
+  getRooms: () => void;
 }
 
 class JoinRoomButton extends React.Component<JoinRoomButtonProps, JoinRoomButtonState> {
   constructor(props : JoinRoomButtonProps) {
     super(props);
     this.promptRoom = this.promptRoom.bind(this);
-    this.state = {showJoinRoomModal: false};
+    this.state = { showJoinRoomModal: false };
   }
 
   showModal = () => {
-    this.setState({showJoinRoomModal: true});
+    this.setState({ showJoinRoomModal: true } as any);
   }
 
   closeModal = () => {
-    this.setState({showJoinRoomModal: false});
+    this.setState({ showJoinRoomModal: false } as any);
   }
 
   joinRoom = (room: string) => {
     this.props.join(new RoomId(room, chatType.GROUP));
-    this.setState({showJoinRoomModal: false});
+    this.setState({ showJoinRoomModal: false } as any);
   }
 
   generateJoinRoomModal = () => {
     return (
       <div className='fullscreen-blackout' key='join-room'>
-        <JoinRoomModal closeModal={this.closeModal} joinRoom={this.joinRoom} />
+        <JoinRoomModal closeModal={this.closeModal} joinRoom={this.joinRoom} getRooms={this.props.getRooms} />
       </div>
     );
   }
