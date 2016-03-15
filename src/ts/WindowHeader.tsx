@@ -5,12 +5,16 @@
  */
 
 import * as React from 'react';
-import {patcher} from './core/PatcherAPI';
+import {patcher} from './api/PatcherAPI';
 import Animate from './Animate';
 
-export interface WindowHeaderProps {};
+export interface WindowHeaderProps {
+  soundMuted: boolean;
+  musicMuted: boolean;
+  onMuteSounds: () => void;
+  onMuteMusic: () => void;
+};
 export interface WindowHeaderState {
-  muted: boolean;
   settingsOpen: boolean;
 };
 
@@ -20,48 +24,48 @@ class WindowHeader extends React.Component<WindowHeaderProps, WindowHeaderState>
   constructor(props: WindowHeaderProps) {
     super(props);
     this.state = {
-      muted: false, // get this from local storage
       settingsOpen: false
     }
   }
   
   closeSettings = () => {
     this.setState({
-      muted: this.state.muted,
       settingsOpen: false
     });
   }
 
   openSettings = () => {
     this.setState({
-      muted: this.state.muted,
       settingsOpen: true
     });
   }
   
-  mute = () => {
-    this.setState({
-      muted: !this.state.muted,
-      settingsOpen: this.state.settingsOpen
-    });
+  muteSounds = () => {
+    this.props.onMuteSounds();
+  }
+  
+  muteMusic = () => {
+    this.props.onMuteMusic();
   }
 
   render() {
-    let muteIcon = this.state.muted ? <img src='images/muted.png' /> : <img src='images/mute.png' />;
-    let muteTooltip = this.state.muted ? 'un-mute sound' : 'mute sound';
+    let soundMuteIcon = this.props.soundMuted ? <img src='images/muted.png' /> : <img src='images/mute.png' />;
+    let musicMuteIcon = this.props.musicMuted ? <img src='images/muted.png' /> : <img src='images/mute.png' />;
+    let muteSoundsTooltip = this.props.soundMuted ? 'un-mute sound effects' : 'mute sound effects';
+    let muteMusicTooltip = this.props.musicMuted ? 'un-mute music' : 'mute music';
     let settings: any = null;
     if (this.state.settingsOpen) settings = <h1 style={{color:'#fff'}} onClick={this.closeSettings}>Settings!</h1>;
     return (
       <div id={this.name}>
         <ul>
           <li>
-            <a href='#' onClick={this.openSettings} className='hint--left hint--slide' data-hint='settings'>
-              <img src='images/settings.png' />
+            <a href='#' onClick={this.muteSounds} className='hint--left hint--slide' data-hint={muteSoundsTooltip}>
+              {soundMuteIcon}
             </a>
           </li>
           <li>
-            <a href='#' onClick={this.mute} className='hint--left hint--slide' data-hint={muteTooltip}>
-              {muteIcon}
+            <a href='#' onClick={this.muteMusic} className='hint--left hint--slide' data-hint={muteMusicTooltip}>
+              {musicMuteIcon}
             </a>
           </li>
         </ul>
@@ -87,3 +91,10 @@ export default WindowHeader;
  * <li><a href='#' onClick={patcher.maximizeWindow}><img src='images/max.png' /></a></li>
  * <li><a href='#' onClick={patcher.minimizeWindow}><img src='images/min.png' /></a></li>
 */
+
+// no settings available right now... waiting on some patch server side stuff
+// <li>
+//   <a href='#' onClick={this.openSettings} className='hint--left hint--slide' data-hint='settings'>
+//     <img src='images/settings.png' />
+//   </a>
+// </li>

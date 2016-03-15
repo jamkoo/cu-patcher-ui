@@ -27,7 +27,7 @@ export function requestChannels(): any {
 
 // reducer
 const initialState = {
-  currentChannel: -1,
+  currentChannel: 0,
   channels: <Array<Channel>>[]
 }
 
@@ -35,12 +35,12 @@ export default function reducer(state: any = initialState, action: any = {}) {
   switch(action.type) {
     case CHANGE_CHANNEL:
       return Object.assign({}, state, {
-        currentChannel: action.channelId
+        currentChannel: state.channels.findIndex((c: Channel) => c.channelID === action.channelId)
       });
     case REQUEST_CHANNELS:
       return Object.assign({}, state, {
         channels: action.channels
-      });
+      });  
     default: return state;
   }
 }

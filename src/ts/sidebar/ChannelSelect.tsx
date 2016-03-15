@@ -7,10 +7,7 @@
 import * as React from 'react';
 import {components} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
-
-export class Channel {
-  public name: string;
-}
+import {Channel} from '../api/patcherAPI';
 
 export interface ActiveChannelViewProps {
   item: Channel;
@@ -21,7 +18,7 @@ class ActiveChannelView extends React.Component<ActiveChannelViewProps, ActiveCh
     return (
       <div className='channel-select quickselect-active'>
         <h5 className='label'>CHANNEL</h5> 
-        <h5 className='channel'>{this.props.item.name}</h5>
+        <h5 className='channel'>{this.props.item.channelName}</h5>
       </div>
     );
   }
@@ -35,7 +32,7 @@ class ChannelListView extends React.Component<ChannelListViewProps, ChannelListV
   render() {
     return (
       <div className='channel-select quickselect-list'>
-        <h6>{this.props.item.name}</h6>
+        <h6>{this.props.item.channelName}</h6>
       </div>
     );
   }

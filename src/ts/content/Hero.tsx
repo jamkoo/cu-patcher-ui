@@ -40,7 +40,6 @@ class Hero extends React.Component<HeroProps, HeroState> {
   }
   
   selectIndex = (index: number) => {
-    console.log(`select ${index}`)
     clearTimeout(this.timeout);
     this.timeout = null;
     this.setState({

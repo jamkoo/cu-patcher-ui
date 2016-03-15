@@ -44,7 +44,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
           <ul id='nav-mobile' className='right'>
             <li className={this.props.activeRoute == Routes.NEWS ? 'active' : ''}><a onClick={this.internalLink.bind(this, Routes.NEWS)}>News</a></li>
             <li><a onClick={this.externalLink.bind(this, 'http://camelotunchained.com/v2/')} className='external-link'>Getting Started <i className="tiny material-icons">launch</i></a></li>
-            <li><a onClick={this.externalLink.bind(this, 'http://camelotunchained.com/v2/')}>CSE Store <i className="tiny material-icons">launch</i></a></li>
+            <li><a onClick={this.externalLink.bind(this, 'https://store.camelotunchained.com/')}>CSE Store <i className="tiny material-icons">launch</i></a></li>
             {chatOption}
           </ul>
         </div>

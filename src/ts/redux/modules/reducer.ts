@@ -24,6 +24,15 @@ let alerts = patcherAlertsReducer;
 import heroContentReducer from './heroContent';
 let heroContent = heroContentReducer;
 
+import soundsReducer from './sounds';
+let soundMuted = soundsReducer;
+
+import musicReducer from './music';
+let musicMuted = musicReducer;
+
+import serversReducer from './servers';
+let servers = serversReducer;
+
 export default combineReducers({
   location,
   chat,
@@ -31,6 +40,9 @@ export default combineReducers({
   news,
   alerts,
   heroContent,
+  soundMuted,
+  musicMuted,
+  servers,
 });
 
 /**
@@ -65,6 +77,14 @@ export default combineReducers({
  *      lastUpdated: Date, -- date of the last update to hero items (default null)
  *      items: Array<HeroItem>, -- array of hero items to be displayed (default [])
  *      error?: ResponseError, -- last response error if any (default undefined)
- *    }
+ *    },
+ *    soundMuted: boolean,
+ *    musicMuted: boolean,
+ *    servers: {
+ *      isFetching: boolean, -- are we currently fetching server data? (default false)
+ *      lastUpdated: Date, -- date of the last update to servers (default null)
+ *      items: Array<HeroItem>, -- array of online servers (default [])
+ *      error?: ResponseError, -- last response error if any (default undefined)
+ *    },
  * }
  */

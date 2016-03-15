@@ -46,9 +46,9 @@ export class PatcherAPI {
         screenName: "chattester",
         loginError: "",
         channelData: [
-          { channelID: 4 },
-          { channelID: 10 },
-          { channelID: 5 }
+          { channelID: 4, channelName: 'Hatchery', channelStatus: ChannelStatus.Ready },
+          { channelID: 10, channelName: 'Wyrmling', channelStatus: ChannelStatus.Ready },
+          { channelID: 5, channelName: 'Editor', channelStatus: ChannelStatus.Ready }
         ],
         patcherState: 1,
         downloadRemaining: 50,

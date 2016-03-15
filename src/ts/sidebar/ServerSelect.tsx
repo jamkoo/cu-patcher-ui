@@ -14,13 +14,13 @@ export enum ServerStatus {
   STARTING
 }
 
-export class Server {
-  public name: string = ''
-  public status: ServerStatus = ServerStatus.OFFLINE;
-  public maxPlayers: number = 0;
-  public artPlayers: number = 0;
-  public tddPlayers: number = 0;
-  public vikPlayers: number = 0;
+export interface Server {
+  name: string,
+  status: ServerStatus,
+  maxPlayers: number,
+  artPlayers: number,
+  tddPlayers: number,
+  vikPlayers: number,
 }
 
 export interface ActiveServerViewProps {

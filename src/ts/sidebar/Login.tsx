@@ -5,7 +5,7 @@
  */
 
 import * as React from 'react';
-import {patcher, User} from '../core/PatcherAPI';
+import {patcher, User} from '../api/PatcherAPI';
 import Animate from '../Animate';
 import LoginStatusModal from './LoginStatusModal';
 

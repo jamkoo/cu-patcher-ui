@@ -5,15 +5,7 @@
  */
 
 import * as React from 'react';
-
-export enum ChannelState {
-  UNINSTALLED,
-  INSTALLING,
-  UPDATEAVAILABLE,
-  DOWNLOADING,
-  READY,
-  LAUNCHING
-}
+import {patcher, Channel, ChannelStatus} from '../api/patcherAPI';
 
 export class Progress {
   constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
@@ -68,11 +60,13 @@ export class Progress {
 }
 
 export interface PatchButtonProps {
+  channel: Channel;
+  playLaunch: () => void;
+  playPatchComplete: () => void;
+  playSelect: () => void;
 };
 
 export interface PatchButtonState {
-  progress: Progress;
-  channelState: ChannelState;
 };
 
 class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
@@ -81,76 +75,49 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   
   constructor(props: PatchButtonProps) {
     super(props);
-    
-    this.state = {
-      progress: new Progress(),
-      channelState: ChannelState.UNINSTALLED
-    }
   }
-  
-  
   
   onClicked = () => {
-    switch (this.state.channelState) {
-      case ChannelState.UNINSTALLED:
-        this.beginInstall();
-        break;
-      case ChannelState.INSTALLING: break;
-      
-      case ChannelState.DOWNLOADING: break;
-      
-      case ChannelState.READY:
-        this.beginInstall();
-        break;
-      case ChannelState.LAUNCHING: break;
+    switch (this.props.channel.channelStatus) {
+      case ChannelStatus.Install: this.install();
+      case ChannelStatus.Validating: break;
+      case ChannelStatus.Installing: break;
+      case ChannelStatus.UpdateQueued: break;
+      case ChannelStatus.Ready: this.playNow();
+      case ChannelStatus.UninstallQueued: break;
     }
   }
   
-  beginDownload = () => {
-    
+  playNow = () => {
+    patcher.launchChannelfunction(this.props.channel, '');
+    this.props.playLaunch();
   }
   
-  beginInstall = () => {
-    this.intervalHandle = setInterval(() => this.mockProgress(), 100);
-    this.setState({
-        progress: new Progress(4000000, this.state.progress.dataCompleted + (4000000 / 8), 1048576 * 100),
-        channelState: ChannelState.INSTALLING
-      });
-  }
-  
-  mockProgress = () => {
-    
-    if (this.state.progress.remaining() > 0) {
-      this.setState({
-        progress: new Progress(4000000, this.state.progress.dataCompleted + (4000000 / 8), 1048576 * 100),
-        channelState: ChannelState.INSTALLING
-      });
-    } else {
-      this.setState({
-        progress: new Progress(),
-        channelState: ChannelState.READY
-      });
-      clearInterval(this.intervalHandle);
-    }
+  install = () => {
+    patcher.installChannel(this.props.channel);
+    this.props.playSelect();
   }
   
   render() {
     let layer1: any = null;
     let layer2: any = null;
     let layer3: any = null;
-    switch(this.state.channelState) {
-      case ChannelState.UNINSTALLED:
+    switch(this.props.channel.channelStatus) {
+      case ChannelStatus.Install:
         layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Install</a>;
         break;
-      case ChannelState.INSTALLING:
-        layer1 = <a className='waves-effect btn install-download-btn installing' onClick={this.onClicked}>Installing</a>;
+      case ChannelStatus.Validating: 
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
+        break;
+      case ChannelStatus.Installing:
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Installing</a>;
         
-        let percentRemaining = (this.state.progress.dataCompleted / this.state.progress.totalDataSize) * 100;
+        let percentRemaining = (patcher.getDownloadEstimate() - (patcher.getDownloadRemaining() / patcher.getDownloadEstimate())) * 100;
         layer2 = <div className='fill' style={{width: percentRemaining + '%', opacity: 1}} />;
         
-        let rate = Progress.bitsToString(this.state.progress.rate);
-        let dataSize = Progress.bytesToString(this.state.progress.dataCompleted) + '/' + Progress.bytesToString(this.state.progress.totalDataSize);
-        let time = this.state.progress.timeEstimate();
+        let rate = Progress.bitsToString(patcher.getDownloadRate());
+        let dataSize = Progress.bytesToString(patcher.getDownloadEstimate() - patcher.getDownloadRemaining()) + '/' + Progress.bytesToString(patcher.getDownloadEstimate());
+        let time = Progress.secondsToString((patcher.getDownloadRemaining() * 8) / patcher.getDownloadRate());
         layer3 = (
           <div className='text'>
             <div className='progress-text'><span className='body'>{time}</span></div>
@@ -159,15 +126,14 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
           </div>
         );
         break;
-      case ChannelState.DOWNLOADING:
-        layer1 = <a className='waves-effect btn install-download-btn downloading' onClick={this.onClicked}>Downloading</a>;
-        layer2 = <div className='fill' style={{width: this.state.progress + '%', opacity: 1}} />;
+      case ChannelStatus.UpdateQueued:
+       layer1 = <a className='waves-effect btn install-download-btn ready'>Update Queued</a>;
         break;
-      case ChannelState.READY:
+      case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked}>Play Now</a>;
         break;
-      case ChannelState.LAUNCHING:
-        layer1 = <a className='waves-effect btn install-download-btn launching' onClick={this.onClicked}>Launching</a>;
+      case ChannelStatus.UninstallQueued:
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Uninstall Queued</a>;
         break;
     }
     
