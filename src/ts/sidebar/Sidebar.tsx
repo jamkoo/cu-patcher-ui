@@ -113,7 +113,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       );
     }
     
-    let servers = this.props.servers.filter(s => s.channelID === this.props.currentChannel.channelID);
+    let servers: any[] = [];// this.props.servers.filter(s => s.channelID === this.props.currentChannel.channelID);
     let activeServer = this.state.activeServer || this.props.servers[0];
     let characters = this.state.characters;
     setTimeout(this.initjQueryObjects, 100);
