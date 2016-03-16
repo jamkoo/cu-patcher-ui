@@ -18,13 +18,29 @@ export interface Server {
   accessLevel: number,
   host: string,
   name: string,
-  playerMaximum: string,
+  playerMaximum: number,
   channelID: number,
   shardID: number,
   arthurians?: number,
   tuathaDeDanann?: number,
   vikings?: number,
   max?: number,
+}
+
+
+function OfflineServer(name: string, channel: number, shardID: number) :Server {
+  return {
+    accessLevel: 0,
+    host: '',
+    name: name,
+    playerMaximum: 0,
+    channelID: channel,
+    shardID: shardID,
+    arthurians: 0,
+    tuathaDeDanann: 0,
+    vikings: 0,
+    max: 0,
+  } as Server;
 }
 
 // action types
@@ -42,6 +58,10 @@ export function requestServers() {
 }
 
 export function fetchServersSuccess(servers: Array<Server>) {
+  let hatchery = servers.find(s => s.name === 'Hatchery');
+  let wyrmling = servers.find(s => s.name === 'Wyrmling');
+  if (!hatchery) servers.unshift(OfflineServer('Hatchery', 4, 1))
+  if (!wyrmling) servers.unshift(OfflineServer('Wyrmling', 10, 1))
   return {
     type: FETCH_SERVERS_SUCCESS,
     servers: servers,

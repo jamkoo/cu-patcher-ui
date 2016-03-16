@@ -49,7 +49,6 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
       rememberMe: this.props.rememberMe
     });
     
-    this.setState({status: this.state.status, error: ''});
     
     // start interval to check login status
     this.intervalCounter = 0;
@@ -71,6 +70,7 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
         setTimeout(this.props.closeModal, 3000);
       }
     }, 100)
+    this.setState({status: LoginStatus.AUTHENTICATING, error: ''});
   }
   
   render() {
