@@ -8,38 +8,32 @@ import * as React from 'react';
 import {components} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 
+import {Server} from '../redux/modules/servers';
+
 export enum ServerStatus {
   OFFLINE,
   ONLINE,
   STARTING
 }
 
-export interface Server {
-  name: string,
-  status: ServerStatus,
-  maxPlayers: number,
-  artPlayers: number,
-  tddPlayers: number,
-  vikPlayers: number,
-}
-
 export interface ActiveServerViewProps {
   item: Server;
 };
+
 export interface ActiveServerViewState {};
 class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServerViewState> {
   render() {
-    let totalPlayers = this.props.item.artPlayers + this.props.item.tddPlayers + this.props.item.vikPlayers;
-    let status = ServerStatus[this.props.item.status].toLowerCase();
+    let totalPlayers = this.props.item.arthurians + this.props.item.tuathaDeDanann + this.props.item.vikings;
+    let status = 'online';
     return (
       <div className='server-select quickselect-active'>
         <h5 className='label'>SELECT SERVER</h5>
         <div>
-          <div className='server-status'><div className={'indicator tooltipped ' + status} data-position='right'
+          <div className='server-status'><div className={'indicator ' + status} data-position='right'
             data-delay='150' data-tooltip={status} /></div>
           <div className='server-details'>
             <h5 className='server'>{this.props.item.name}</h5>
-            <h6>{totalPlayers}/{this.props.item.maxPlayers}</h6>
+            <h6>{totalPlayers}/{this.props.item.playerMaximum}</h6>
           </div>
         </div>
       </div>
@@ -53,16 +47,16 @@ export interface ServerListViewProps {
 export interface ServerListViewState {};
 class ServerListView extends React.Component<ServerListViewProps, ServerListViewState> {
   render() {
-    let totalPlayers = this.props.item.artPlayers + this.props.item.tddPlayers + this.props.item.vikPlayers;
-    let status = ServerStatus[this.props.item.status].toLowerCase();
+    let totalPlayers = this.props.item.arthurians + this.props.item.tuathaDeDanann + this.props.item.vikings;
+    let status = 'online';
     return (
       <div className='server-select quickselect-list'>
         <div>
-          <div className='server-status'><div className={'indicator tooltipped ' + status} data-position='right'
+          <div className='server-status'><div className={'indicator ' + status} data-position='right'
             data-delay='150' data-tooltip={status} /></div>
           <div className='server-details'>
             <h5 className='server'>{this.props.item.name}</h5>
-            <h6>{totalPlayers}/{this.props.item.maxPlayers}</h6>
+            <h6>{totalPlayers}/{this.props.item.playerMaximum}</h6>
           </div>
         </div>
       </div>
@@ -104,10 +98,8 @@ class ServerSelect extends React.Component<ServerSelectProps, ServerSelectState>
     return <ServerListView item={server} />
   }
   
-
-  
   render() {
-    if (this.props.servers.length == 0) return <div>No Server data available</div>;
+    if (this.props.servers.length == 0) return null;
     return (
         <QuickSelect items={this.props.servers} activeViewComponentGenerator={this.generateActiveView}
           listViewComponentGenerator={this.generateListView} onSelectedItemChanged={this.onSelectedServerChanged} />

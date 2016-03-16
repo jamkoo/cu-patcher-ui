@@ -63,11 +63,7 @@ class WindowHeader extends React.Component<WindowHeaderProps, WindowHeaderState>
               {soundMuteIcon}
             </a>
           </li>
-          <li>
-            <a href='#' onClick={this.muteMusic} className='hint--left hint--slide' data-hint={muteMusicTooltip}>
-              {musicMuteIcon}
-            </a>
-          </li>
+          
         </ul>
         <Animate animationEnter='slideInUp' animationLeave='slideOutDown'
           durationEnter={400} durationLeave={500}>
@@ -96,5 +92,12 @@ export default WindowHeader;
 // <li>
 //   <a href='#' onClick={this.openSettings} className='hint--left hint--slide' data-hint='settings'>
 //     <img src='images/settings.png' />
+//   </a>
+// </li>
+
+// music muted
+// <li>
+//   <a href='#' onClick={this.muteMusic} className='hint--left hint--slide' data-hint={muteMusicTooltip}>
+//     {musicMuteIcon}
 //   </a>
 // </li>

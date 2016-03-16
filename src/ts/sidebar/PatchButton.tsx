@@ -5,7 +5,10 @@
  */
 
 import * as React from 'react';
+import {Server} from '../redux/modules/servers';
 import {patcher, Channel, ChannelStatus} from '../api/patcherAPI';
+import {CSENormalizeString} from '../api/CSENormalizeString';
+import {restAPI} from 'camelot-unchained';
 
 export class Progress {
   constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
@@ -60,10 +63,12 @@ export class Progress {
 }
 
 export interface PatchButtonProps {
+  server: Server;
   channel: Channel;
   playLaunch: () => void;
   playPatchComplete: () => void;
   playSelect: () => void;
+  character: restAPI.SimpleCharacter
 };
 
 export interface PatchButtonState {
@@ -79,17 +84,24 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   
   onClicked = () => {
     switch (this.props.channel.channelStatus) {
-      case ChannelStatus.Install: this.install();
+      case ChannelStatus.NotInstalled: this.install();
       case ChannelStatus.Validating: break;
-      case ChannelStatus.Installing: break;
-      case ChannelStatus.UpdateQueued: break;
+      case ChannelStatus.Updating: break;
+      case ChannelStatus.OutOfDate: this.install();
       case ChannelStatus.Ready: this.playNow();
-      case ChannelStatus.UninstallQueued: break;
+      case ChannelStatus.Launching: break;
+      case ChannelStatus.Running: break;
+      case ChannelStatus.Uninstalling: break;
+      case ChannelStatus.UpdateFailed: this.install();
     }
   }
   
   playNow = () => {
-    patcher.launchChannelfunction(this.props.channel, '');
+    let launchString = '';
+    if (this.props.character && this.props.character.id !== '') {
+      launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)}`
+    }
+    patcher.launchChannelfunction(this.props.channel, launchString);
     this.props.playLaunch();
   }
   
@@ -98,21 +110,27 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     this.props.playSelect();
   }
   
+  uninstall = () => {
+    patcher.uninstallChannel(this.props.channel);
+    this.props.playSelect();
+  }
+  
   render() {
+    let uninstall: any = null;
     let layer1: any = null;
     let layer2: any = null;
     let layer3: any = null;
     switch(this.props.channel.channelStatus) {
-      case ChannelStatus.Install:
+      case ChannelStatus.NotInstalled:
         layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Install</a>;
         break;
       case ChannelStatus.Validating: 
         layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
         break;
-      case ChannelStatus.Installing:
+      case ChannelStatus.Updating:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Installing</a>;
         
-        let percentRemaining = (patcher.getDownloadEstimate() - (patcher.getDownloadRemaining() / patcher.getDownloadEstimate())) * 100;
+        let percentRemaining = 100.0 - ((patcher.getDownloadRemaining() / patcher.getDownloadEstimate()) * 100);
         layer2 = <div className='fill' style={{width: percentRemaining + '%', opacity: 1}} />;
         
         let rate = Progress.bitsToString(patcher.getDownloadRate());
@@ -126,29 +144,42 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
           </div>
         );
         break;
-      case ChannelStatus.UpdateQueued:
-       layer1 = <a className='waves-effect btn install-download-btn ready'>Update Queued</a>;
+      case ChannelStatus.OutOfDate:
+        layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Update</a>;
         break;
       case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked}>Play Now</a>;
+        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall</a>;
         break;
-      case ChannelStatus.UninstallQueued:
-        layer1 = <a className='waves-effect btn install-download-btn installing'>Uninstall Queued</a>;
+      case ChannelStatus.Launching:
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Launching</a>;
+        break;
+      case ChannelStatus.Running:
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Playing</a>;
+        break;
+      case ChannelStatus.Uninstalling:
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Uninstalling</a>;
+        break;
+      case ChannelStatus.UpdateFailed:
+        layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Update Failed. Try Again.</a>;
         break;
     }
     
     
     return (
-      <div id={this.name}>
-        <div className='layer z1'>
-          {layer1}
+      <div>
+        <div id={this.name}>
+          <div className='layer z1'>
+            {layer1}
+          </div>
+          <div className='layer z2'>
+            {layer2}
+          </div>
+          <div className='layer z3'>
+            {layer3}
+          </div>
         </div>
-        <div className='layer z2'>
-          {layer2}
-        </div>
-        <div className='layer z3'>
-          {layer3}
-        </div>
+        {uninstall}
       </div>
     );
   }

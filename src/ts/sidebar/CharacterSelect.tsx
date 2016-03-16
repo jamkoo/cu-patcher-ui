@@ -5,16 +5,11 @@
  */
 
 import * as React from 'react';
-import {components, race} from 'camelot-unchained';
+import {components, race, restAPI} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 
-export class Character {
-  name: string;
-  race: race;
-}
-
 export interface ActiveCharacterViewProps {
-  item: Character;
+  item: restAPI.SimpleCharacter;
 };
 export interface ActiveCharacterViewState {};
 class ActiveCharacterView extends React.Component<ActiveCharacterViewProps, ActiveCharacterViewState> {
@@ -35,7 +30,7 @@ class ActiveCharacterView extends React.Component<ActiveCharacterViewProps, Acti
 }
 
 export interface CharacterListViewProps {
-  item: Character;
+  item: restAPI.SimpleCharacter;
 };
 export interface CharacterListViewState {};
 class CharacterListView extends React.Component<CharacterListViewProps, CharacterListViewState> {
@@ -55,11 +50,12 @@ class CharacterListView extends React.Component<CharacterListViewProps, Characte
 }
 
 export interface CharacterSelectProps {
-  characters: Array<Character>;
+  characters: Array<restAPI.SimpleCharacter>;
+  selectedCharacter: restAPI.SimpleCharacter,
+  onCharacterSelectionChanged: (id: string) => void;
 };
 
 export interface CharacterSelectState {
-  activeCharacterIndex: number;
 };
 
 class CharacterSelect extends React.Component<CharacterSelectProps, CharacterSelectState> {
@@ -67,15 +63,10 @@ class CharacterSelect extends React.Component<CharacterSelectProps, CharacterSel
   
   constructor(props: CharacterSelectProps) {
     super(props);
-    this.state = {
-      activeCharacterIndex: 0
-    }
   }
   
   onSelectedCharacterChanged = (character: any) => {
-    this.setState({
-      activeCharacterIndex: this.props.characters.indexOf(character) 
-    });
+    this.props.onCharacterSelectionChanged(character.id);
   }
   
   generateActiveView = (character: any) => {
@@ -88,8 +79,6 @@ class CharacterSelect extends React.Component<CharacterSelectProps, CharacterSel
   
   render() {
     if (this.props.characters.length == 0) return <div>Create new character.</div>;
-    
-    let activeCharacter = this.props.characters[this.state.activeCharacterIndex];
     return (
         <QuickSelect items={this.props.characters} activeViewComponentGenerator={this.generateActiveView}
           listViewComponentGenerator={this.generateListView} onSelectedItemChanged={this.onSelectedCharacterChanged} />

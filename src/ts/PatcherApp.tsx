@@ -17,6 +17,8 @@ import {fetchHeroContent, validateHeroContent} from './redux/modules/heroContent
 import {changeChannel, requestChannels} from './redux/modules/channels';
 import {muteSounds, unMuteSounds} from './redux/modules/sounds';
 import {muteMusic, unMuteMusic} from './redux/modules/music';
+import {fetchServers} from './redux/modules/servers';
+import {fetchCharacters, selectCharacter} from './redux/modules/characters';
 
 import Sidebar from './sidebar/Sidebar';
 import Header from './Header';
@@ -43,6 +45,7 @@ function select(state: any): any {
     soundMuted: state.soundMuted,
     musicMuted: state.musicMuted,
     servers: state.servers,
+    characters: state.characters,
   }
 }
 
@@ -63,6 +66,7 @@ export interface PatcherAppProps {
   soundMuted?: boolean;
   musicMuted?: boolean;
   servers?: any;
+  characters?: any;
 }
 
 export interface PatcherState {};
@@ -73,6 +77,7 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
   private alertsInterval: any = null;
   private heroContentInterval: any = null;
   private channelInterval: any = null;
+  private serversInterval: any = null;
   
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
@@ -138,13 +143,22 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
     }
   }
   
+  fetchCharacters = () => {
+    this.props.dispatch(fetchCharacters());
+  }
+  
+  selectCharacter = (id: string) => {
+    this.props.dispatch(selectCharacter(id));
+  }
+  
   componentWillUpdate() {
-    if (this.props.musicMuted && !(this.refs['sound-bg'] as HTMLAudioElement).paused) {
-      (this.refs['sound-bg'] as HTMLAudioElement).pause();
-    } else if (!this.props.musicMuted && (this.refs['sound-bg'] as HTMLAudioElement).paused) {
-      (this.refs['sound-bg'] as HTMLAudioElement).play();
-      (this.refs['sound-bg'] as HTMLAudioElement).volume = 0.5;
-    }
+    // music disabled
+    // if (this.props.musicMuted && !(this.refs['sound-bg'] as HTMLAudioElement).paused) {
+    //   (this.refs['sound-bg'] as HTMLAudioElement).pause();
+    // } else if (!this.props.musicMuted && (this.refs['sound-bg'] as HTMLAudioElement).paused) {
+    //   (this.refs['sound-bg'] as HTMLAudioElement).play();
+    //   (this.refs['sound-bg'] as HTMLAudioElement).volume = 0.5;
+    // }
   }
   
   componentDidMount() {
@@ -154,6 +168,12 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       this.props.dispatch(validateAlerts());
       if (!this.props.alerts.isFetching) this.props.dispatch(fetchAlerts());
     }, 60000);
+    
+    // fetch initial servers and then every 5 seconds fetch servers.
+    if (!this.props.servers.isFetching) this.props.dispatch(fetchServers());
+    this.serversInterval = setInterval(() => {
+      if (!this.props.servers.isFetching) this.props.dispatch(fetchServers());
+    }, 5000);
     
     // fetch initial hero content and then every 30 minutes validate & fetch hero content.
     if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
@@ -167,12 +187,15 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
     this.channelInterval = setInterval(() => {
       this.props.dispatch(requestChannels());
     }, 500);
+    
   }
   
   componentDidUnMount() {
     // unregister intervals
     clearInterval(this.alertsInterval);
     clearInterval(this.heroContentInterval);
+    clearInterval(this.channelInterval);
+    clearInterval(this.serversInterval);
   }
   
   changeChannel = (channel: Channel) => {
@@ -227,7 +250,8 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
           onMuteMusic={this.props.musicMuted ? this.onUnMuteMusic : this.onMuteMusic}/>
         <Header changeRoute={this.onRouteChanged} activeRoute={this.props.location} openChat={this.showChat} />
         <Sidebar 
-          servers={this.props.servers}
+          servers={this.props.servers.servers}
+          currentServerIndex={this.props.servers.currentServer}
           alerts={this.props.alerts.alerts}
           onApiUpdated={this.onPatcherAPIUpdate}
           channels={this.props.channels}
@@ -235,7 +259,11 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
           changeChannel={this.changeChannel}
           playSelect={this.playSelect}
           playLaunch={this.playLaunchGame}
-          playPatchComplete={this.playPatchComplete} />
+          playPatchComplete={this.playPatchComplete}
+          characters={this.props.characters.characters}
+          selectedCharacterId={this.props.characters.selectedCharacterId}
+          fetchCharacters={this.fetchCharacters}
+          selectCharacter={this.selectCharacter} />
         <div className='main-content'>
         <Animate animationEnter='fadeIn' animationLeave='fadeOut'
           durationEnter={400} durationLeave={500}>
@@ -250,10 +278,12 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
         <audio src='sounds/select.ogg' ref='sound-select' />
         <audio src='sounds/launch-game.ogg' ref='sound-launch-game' />
         <audio src='sounds/patch-complete.ogg' ref='sound-patch-complete' />
-        <audio src='sounds/bg.ogg' ref='sound-bg' />
       </div>
     );
   }
 };
 
 export default connect(select)(PatcherApp);
+
+// music disabled
+//        <audio src='sounds/bg.ogg' ref='sound-bg' />

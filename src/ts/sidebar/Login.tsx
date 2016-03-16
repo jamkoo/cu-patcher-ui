@@ -95,6 +95,12 @@ class Login extends React.Component<LoginProps, LoginState> {
     window.open('https://api.citystateentertainment.com/Account/ForgottenPassword', '_blank');
   }
   
+  onKeyDown = (event: any) => {
+    if (event.key == 'Enter') {
+      this.logIn();
+    }
+  }
+  
   render() {
     let modal: any = null;
     if (this.state.showModal) {
@@ -103,7 +109,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     }
     
     return (
-      <div id={this.name} className='loginbox card-panel'>
+      <div id={this.name} className='loginbox card-panel' onKeyDown={this.onKeyDown}>
         <div className='row no-margin-bottom'>
         <div className='input-field col s12'>
           <input id='email' type='email' className='validate' value={this.state.email || ''} onChange={this.onEmailChanged}/>

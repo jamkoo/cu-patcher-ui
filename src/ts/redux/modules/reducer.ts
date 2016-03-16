@@ -33,6 +33,9 @@ let musicMuted = musicReducer;
 import serversReducer from './servers';
 let servers = serversReducer;
 
+import charactersReducer from './characters';
+let characters = charactersReducer;
+
 export default combineReducers({
   location,
   chat,
@@ -43,6 +46,7 @@ export default combineReducers({
   soundMuted,
   musicMuted,
   servers,
+  characters,
 });
 
 /**
@@ -83,7 +87,15 @@ export default combineReducers({
  *    servers: {
  *      isFetching: boolean, -- are we currently fetching server data? (default false)
  *      lastUpdated: Date, -- date of the last update to servers (default null)
- *      items: Array<HeroItem>, -- array of online servers (default [])
+ *      servers: Array<Server>, -- array of online servers (default [])
+ *      currentServer: number, -- index of currently selected server
+ *      error?: ResponseError, -- last response error if any (default undefined)
+ *    },
+ *    characters: {
+ *      isFetching: boolean, -- are we currently fetching character data? (default false)
+ *      lastUpdated: Date, -- date of the last update to characters (default null)
+ *      characters: Array<restAPI.SimpleCharacter>, -- array of characters (default [])
+ *      selectedCharacterId: string -- id of currently selected character (default '')
  *      error?: ResponseError, -- last response error if any (default undefined)
  *    },
  * }

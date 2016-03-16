@@ -13,12 +13,15 @@ export interface User {
 }
 
 export enum ChannelStatus {
-  Install, 
+  NotInstalled,
   Validating, 
-  Installing, 
-  UpdateQueued, 
+  Updating,
+  OutOfDate,
   Ready, 
-  UninstallQueued
+  Launching,
+  Running,
+  Uninstalling,
+  UpdateFailed
 }
 
 export interface Channel {

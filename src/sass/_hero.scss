@@ -30,8 +30,8 @@
     cursor: pointer !important;
     margin: 5px;
     padding: 0px 5px;
-    border: 2px solid $colorg4;
-    color: $colorg4;
+    border: 2px solid white;
+    color: white;
     border-radius: 5px;
     list-style: none;
     &:hover {
@@ -41,8 +41,8 @@
     }
   }
   .active {
-    color: white;
-    border-color: white;
+    color: $colorg4;
+    border-color: $colorg4;
   }
 }
 

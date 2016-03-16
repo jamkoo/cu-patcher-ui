@@ -5,7 +5,7 @@
  */
 
 import * as React from 'react';
-import {components, race} from 'camelot-unchained';
+import {components, race, restAPI} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 declare let $: any;
 
@@ -14,7 +14,7 @@ import ChannelSelect from './ChannelSelect';
 import ServerSelect, {ServerStatus} from './ServerSelect';
 import PatchButton from './PatchButton';
 import ServerCounts from './ServerCounts';
-import CharacterSelect, {Character} from './CharacterSelect';
+import CharacterSelect from './CharacterSelect';
 import Alerts from './Alerts';
 
 import {PatcherAlert} from '../redux/modules/patcherAlerts';
@@ -31,11 +31,15 @@ export interface SidebarProps {
   playLaunch: () => void;
   playPatchComplete: () => void;
   servers: Array<Server>,
+  currentServerIndex: number,
+  characters: Array<restAPI.SimpleCharacter>;
+  selectedCharacterId: string,
+  fetchCharacters: () => void;
+  selectCharacter: (id: string) => void;
 };
 
 export interface SidebarState {
   loggedIn: boolean;
-  characters: Array<Character>;
   activeServer: Server;
 };
 
@@ -50,7 +54,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     super(props);
     this.state = {
       loggedIn: false,
-      characters: this.getCharacters(),
       activeServer: null
     };
   }
@@ -58,10 +61,10 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   onLogIn = () => {
     this.setState({
      loggedIn: true,
-     characters: this.state.characters,
      activeServer: this.state.activeServer
     });
     this.props.onApiUpdated();
+    this.props.fetchCharacters();
   }
   
   onLogOut = () => {
@@ -70,7 +73,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   
   initjQueryObjects = () => {
     $('.dropdown-button').dropdown();
-    $('.tooltipped').tooltip();
+    //$('.tooltipped').tooltip();
   }
   
   getChannels = () => {
@@ -93,7 +96,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   onSelectedServerChanged = (server: any) => {
     this.setState({
       loggedIn: this.state.loggedIn,
-      characters: this.state.characters,
       activeServer: server
     });
     this.props.playSelect();
@@ -113,26 +115,42 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       );
     }
     
-    let servers: any[] = [];// this.props.servers.filter(s => s.channelID === this.props.currentChannel.channelID);
-    let activeServer = this.state.activeServer || this.props.servers[0];
-    let characters = this.state.characters;
     setTimeout(this.initjQueryObjects, 100);
+
+    let selectedCharacter: restAPI.SimpleCharacter = null;
+    let renderServerSection: any = null;
+    let servers = this.props.servers.filter(s => s.channelID === this.props.currentChannel.channelID);
+    let activeServer: Server = null;
+    if (servers.length > 0) {
+      activeServer = this.props.servers[this.props.currentServerIndex]
+      let characters = this.props.characters.filter(c => c.shardID == activeServer.shardID || c.shardID == 0);
+      selectedCharacter = characters.find(c => c.id == this.props.selectedCharacterId) || characters[0];
+      renderServerSection = (
+        <div>
+          <ServerSelect servers={servers}
+                        onSelectedServerChanged={this.onSelectedServerChanged} />
+          <CharacterSelect characters={characters}
+                           selectedCharacter={selectedCharacter}
+                           onCharacterSelectionChanged={this.props.selectCharacter} />
+          <ServerCounts artCount={activeServer.arthurians}
+                        tddCount={activeServer.tuathaDeDanann}
+                        vikCount={activeServer.vikings} />
+        </div>
+      );
+    }
 
     return (
       <div id={this.name} className=''>
         <Alerts alerts={this.props.alerts} />
         <ChannelSelect channels={this.props.channels} onSelectedChannelChanged={this.onSelectedChannelChanged} />
         <div className='card-panel no-padding'>
-          <ServerSelect servers={[]}
-                        onSelectedServerChanged={this.onSelectedServerChanged} />
-          <CharacterSelect characters={this.state.characters}/>
-          <ServerCounts artCount={0}
-                        tddCount={0}
-                        vikCount={0} />
-          <PatchButton channel={this.props.currentChannel}
+          {renderServerSection}
+          <PatchButton server={activeServer}
+                      channel={this.props.currentChannel}
                        playSelect={this.props.playSelect}
                        playLaunch={this.props.playLaunch}
-                       playPatchComplete={this.props.playPatchComplete} />
+                       playPatchComplete={this.props.playPatchComplete}
+                       character={selectedCharacter} />
         </div>
       </div>
     );
