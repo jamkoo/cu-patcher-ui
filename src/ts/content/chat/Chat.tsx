@@ -97,7 +97,7 @@ class Chat extends React.Component<ChatProps, ChatState> {
   }
   componentDidMount() : void {
     if (!this.state.chat.currentRoom) {
-      const roomId = new RoomId('_modsquad', chatType.GROUP);
+      const roomId = new RoomId('_global', chatType.GROUP);
       this.state.chat.setCurrentRoom(roomId);
     }
   }
