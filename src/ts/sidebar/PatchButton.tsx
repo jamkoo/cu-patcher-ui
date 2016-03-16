@@ -40,16 +40,16 @@ export class Progress {
     }
   }
   
-  static bitsToString(bits: number): string {
-    if (bits >= 1000000000) {
+  static bypsToString(bytes: number): string {
+    if (bytes >= 1000000000) {
       // display as GB
-      return (bits / 1000000000).toFixed(2) + 'Gbps';
-    } else if (bits >= 1000000) {
+      return (bytes / 1000000000).toFixed(2) + 'GB/s';
+    } else if (bytes >= 1000000) {
       // display as MB
-      return (bits / 1000000).toFixed(2) + 'Mbps';
+      return (bytes / 1000000).toFixed(2) + 'MB/s';
     } else {
       // display rest as KB
-      return (bits / 1000).toFixed(2) + 'Kbps';
+      return (bytes / 1000).toFixed(2) + 'KB/s';
     }
   }
   
@@ -155,9 +155,9 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         let percentRemaining = 100.0 - ((patcher.getDownloadRemaining() / patcher.getDownloadEstimate()) * 100);
         layer2 = <div className='fill' style={{width: percentRemaining + '%', opacity: 1}} />;
         
-        let rate = Progress.bitsToString(patcher.getDownloadRate());
+        let rate = Progress.bypsToString(patcher.getDownloadRate());
         let dataSize = Progress.bytesToString(patcher.getDownloadEstimate() - patcher.getDownloadRemaining()) + '/' + Progress.bytesToString(patcher.getDownloadEstimate());
-        let time = Progress.secondsToString((patcher.getDownloadRemaining() * 8) / patcher.getDownloadRate());
+        let time = Progress.secondsToString(patcher.getDownloadRemaining() / patcher.getDownloadRate());
         layer3 = (
           <div className='text'>
             <div className='progress-text'><span className='body'>{time}</span></div>
