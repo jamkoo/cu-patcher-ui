@@ -9,7 +9,7 @@ import messageType from './messageType';
 import EventEmitter from '../core/EventEmitter';
 import {patcher} from '../api/PatcherAPI';
 
-const DEFAULT_ROOM_LIST : string[] = ['_global', '_it', '_modsquad'];
+const DEFAULT_ROOM_LIST : string[] = ['_global'];
 
 class ChatClient {
   chat: CSEChat = null;
