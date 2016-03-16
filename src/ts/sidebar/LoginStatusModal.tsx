@@ -42,6 +42,7 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
   }
   
   checkLogin = () => {
+    this.setState({status: LoginStatus.AUTHENTICATING, error: ''});
     // Do login
     patcher.login({
       email: this.props.email,
@@ -70,7 +71,6 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
         setTimeout(this.props.closeModal, 3000);
       }
     }, 100)
-    this.setState({status: LoginStatus.AUTHENTICATING, error: ''});
   }
   
   render() {

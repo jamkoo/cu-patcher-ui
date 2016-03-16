@@ -10,6 +10,9 @@ import {patcher, Channel, ChannelStatus} from '../api/patcherAPI';
 import {CSENormalizeString} from '../api/CSENormalizeString';
 import {restAPI} from 'camelot-unchained';
 
+import EualaModal from './EualaModal';
+import Animate from '../Animate';
+
 export class Progress {
   constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
   
@@ -72,6 +75,7 @@ export interface PatchButtonProps {
 };
 
 export interface PatchButtonState {
+  showEuala: boolean;
 };
 
 class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
@@ -80,6 +84,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   
   constructor(props: PatchButtonProps) {
     super(props);
+    this.state = { showEuala: false}
   }
   
   onClicked = () => {
@@ -97,6 +102,15 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   }
   
   playNow = () => {
+    this.setState({showEuala: true});
+  }
+  
+  closeEualaModal = () => {
+    this.setState({showEuala: false});
+  }
+  
+  launcClient = () => {
+    this.setState({showEuala: false});
     let launchString = '';
     if (this.props.character && this.props.character.id !== '') {
       launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)}`
@@ -113,6 +127,14 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   uninstall = () => {
     patcher.uninstallChannel(this.props.channel);
     this.props.playSelect();
+  }
+  
+  generateEualaModal = () => {
+    return (
+      <div className='fullscreen-blackout flex-row' key='accept-euala'>
+        <EualaModal accept={this.launcClient} decline={this.closeEualaModal} />
+      </div>
+    );
   }
   
   render() {
@@ -165,6 +187,8 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
     }
     
+    // euala modal
+    let eualaModal: any = this.state.showEuala ? this.generateEualaModal() : null;
     
     return (
       <div>
@@ -180,6 +204,10 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
           </div>
         </div>
         {uninstall}
+        <Animate animationEnter='slideInUp' animationLeave='slideOutDown'
+          durationEnter={400} durationLeave={500}>
+          {eualaModal}
+        </Animate>
       </div>
     );
   }
