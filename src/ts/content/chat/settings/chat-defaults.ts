@@ -57,7 +57,7 @@ export const display = {
   joinParts: {
     key: 'join-parts',
     type:'boolean',
-    default: false,
+    default: true,
     title: 'Show Joins/Parts',
     description: 'Display join and part messages when a user enter or leaves a channel?'
   },
