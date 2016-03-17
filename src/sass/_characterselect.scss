@@ -25,6 +25,11 @@
   }
 }
 
+.quickselect-default {
+  max-height: 150px;
+  overflow-y: scroll;
+}
+
 .character-select.quickselect-list {
   padding: 2.5px;
   background-color: $color4;

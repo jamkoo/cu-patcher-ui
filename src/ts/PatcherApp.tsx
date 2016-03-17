@@ -169,11 +169,11 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       if (!this.props.alerts.isFetching) this.props.dispatch(fetchAlerts());
     }, 60000);
     
-    // fetch initial servers and then every 5 seconds fetch servers.
+    // fetch initial servers and then every 30 seconds fetch servers.
     if (!this.props.servers.isFetching) this.props.dispatch(fetchServers());
     this.serversInterval = setInterval(() => {
       if (!this.props.servers.isFetching) this.props.dispatch(fetchServers());
-    }, 5000);
+    }, 30000);
     
     // fetch initial hero content and then every 30 minutes validate & fetch hero content.
     if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
@@ -182,11 +182,11 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
     }, 60000 * 30);
     
-    // update channel info twice a second.
+    // update channel info every 30 seconds.
     this.props.dispatch(requestChannels());
     this.channelInterval = setInterval(() => {
       this.props.dispatch(requestChannels());
-    }, 500);
+    }, 30000);
     
   }
   
