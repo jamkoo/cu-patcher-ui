@@ -103,12 +103,11 @@ export function fetchServers() {
               s.arthurians = players.arthurians;
               s.vikings = players.vikings;
               s.tuathaDeDanann = players.tuathaDeDanann;
-              s.playerMaximum = players.max;
               dispatch(updateServer(s));
             })
             .catch((error: ResponseError) => {/*ignore error*/});
         })
-        //dispatch(fetchServersSuccess(servers))
+        dispatch(fetchServersSuccess(servers))
       })
       .catch((error: ResponseError) => dispatch(fetchServersFailed(error)));
   }
