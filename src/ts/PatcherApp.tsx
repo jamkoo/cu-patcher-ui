@@ -182,11 +182,11 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
     }, 60000 * 30);
     
-    // update channel info every 30 seconds.
+    // update channel info every 1 second.
     this.props.dispatch(requestChannels());
     this.channelInterval = setInterval(() => {
       this.props.dispatch(requestChannels());
-    }, 30000);
+    }, 1000);
     
   }
   

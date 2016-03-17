@@ -77,7 +77,6 @@ export interface PatchButtonProps {
 
 export interface PatchButtonState {
   showEuala: boolean;
-  showArgs: boolean;
 };
 
 class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
@@ -86,7 +85,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   
   constructor(props: PatchButtonProps) {
     super(props);
-    this.state = { showEuala: false, showArgs: false}
+    this.state = { showEuala: false}
   }
   
   onClicked = () => {
@@ -104,19 +103,19 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   }
   
   playNow = () => {
-    this.setState({showEuala: true, showArgs: false});
+    this.setState({showEuala: true});
   }
   
   closeEualaModal = () => {
-    this.setState({showEuala: false, showArgs: false});
+    this.setState({showEuala: false});
   }
   
   closeArgsModal = () => {
-    this.setState({showEuala: false, showArgs: false});
+    this.setState({showEuala: false});
   }
   
   launchClient = (commands: string = '') => {
-    this.setState({showEuala: false, showArgs: false});
+    this.setState({showEuala: false});
     let launchString = commands;
     if (this.props.character && this.props.character.id !== '') {
       launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)} ${commands}`
