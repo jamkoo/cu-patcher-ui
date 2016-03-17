@@ -185,7 +185,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked}>Play Now</a>;
-        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall</a>;
+        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {this.props.channel.channelName}</a>;
         break;
       case ChannelStatus.Launching:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Launching</a>;
