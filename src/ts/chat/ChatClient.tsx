@@ -31,7 +31,6 @@ class ChatClient {
 
     this.errorListener = this.chat.on('error', (err: any) => this._onerror(err));
     this.chat.once('online', () => this._online(rooms));
-
     this.chat.connect();
   }
 
@@ -39,9 +38,13 @@ class ChatClient {
     this.connected = true;
     this._initializeEvents();
     this._fire('connect');
+    rooms = rooms.concat(this.getStoredRooms());
     rooms.forEach((room: string) => {
       this.chat.joinRoom(room + this.config.serviceAddress);
     });
+
+
+   //localStorage.removeItem("CSE_PATCHER_Stored_channels");
   }
 
   private _onerror(err:any) {
@@ -115,6 +118,41 @@ class ChatClient {
     return this.chat.config.getNick();
   }
 
+
+  public getStoredRooms(): string[] {
+     var storedRooms = localStorage.getItem("CSE_PATCHER_Stored_channels");
+     if (storedRooms != null) {
+        return storedRooms.split(",");
+     }
+     return [];
+  }
+  public removeFromStoredRooms(room: string): void {
+      var storedRooms = this.getStoredRooms();
+      var idx = storedRooms.indexOf(room);
+      if (idx != -1) {
+        storedRooms.splice(idx, 1);
+      }
+      this.setStoredRooms(storedRooms);
+  }
+  public addToStoredRooms(room: string): void {
+      var storedRooms = this.getStoredRooms();
+      var idx = storedRooms.indexOf(room);
+      if (idx != -1){
+        return;
+      }
+      storedRooms.push(room);
+      this.setStoredRooms(storedRooms);
+  }
+  public setStoredRooms(rooms: string[]): void {
+      if (rooms.length > 0){
+        localStorage.setItem("CSE_PATCHER_Stored_channels", rooms.toString());
+      } else {
+        localStorage.removeItem("CSE_PATCHER_Stored_channels");
+      }
+  }
+
+
+
   public sendMessageToRoom(message: string, roomName: string): void {
     if (!this.chat || !this.connected) {
       console.warn("ChatClient:sendMessageToRoom() called when not connected.");
@@ -138,6 +176,8 @@ class ChatClient {
       return;
     }
     this.chat.joinRoom(roomName + this.chat.config.serviceAddress);
+
+    this.addToStoredRooms(roomName);
   }
 
   public leaveRoom(roomName: string): void {
@@ -146,6 +186,8 @@ class ChatClient {
       return;
     }
     this.chat.leaveRoom(roomName + this.chat.config.serviceAddress);
+
+    this.removeFromStoredRooms(roomName);
   }
 
 };
