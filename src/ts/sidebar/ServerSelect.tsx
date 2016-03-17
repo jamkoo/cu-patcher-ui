@@ -23,7 +23,7 @@ export interface ActiveServerViewProps {
 export interface ActiveServerViewState {};
 class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServerViewState> {
   render() {
-    let totalPlayers = this.props.item.arthurians + this.props.item.tuathaDeDanann + this.props.item.vikings;
+    let totalPlayers = (this.props.item.arthurians|0) + (this.props.item.tuathaDeDanann|0) + (this.props.item.vikings|0);
     let status = this.props.item.playerMaximum > 0 ? 'online' : 'offline';
     return (
       <div className='server-select quickselect-active'>
@@ -48,7 +48,7 @@ export interface ServerListViewProps {
 export interface ServerListViewState {};
 class ServerListView extends React.Component<ServerListViewProps, ServerListViewState> {
   render() {
-    let totalPlayers = this.props.item.arthurians + this.props.item.tuathaDeDanann + this.props.item.vikings;
+    let totalPlayers = (this.props.item.arthurians|0) + (this.props.item.tuathaDeDanann|0) + (this.props.item.vikings|0);
     let status = this.props.item.playerMaximum > 0 ? 'online' : 'offline';
     return (
       <div className='server-select quickselect-list'>
