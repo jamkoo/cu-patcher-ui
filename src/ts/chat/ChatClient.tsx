@@ -42,9 +42,6 @@ class ChatClient {
     rooms.forEach((room: string) => {
       this.chat.joinRoom(room + this.config.serviceAddress);
     });
-
-
-   //localStorage.removeItem("CSE_PATCHER_Stored_channels");
   }
 
   private _onerror(err:any) {
