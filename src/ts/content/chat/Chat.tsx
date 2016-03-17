@@ -114,7 +114,7 @@ class Chat extends React.Component<ChatProps, ChatState> {
     const room : ChatRoomInfo = current ? this.state.chat.getRoom(current) : undefined;
     return (
       <div id={this.name} className="cse-chat chat-container no-select">
-        <div className="chat-disconnect" onClick={this.disconnect}>{this.state.chat.latency}</div>
+        <div className="chat-disconnect" >{this.state.chat.latency}</div>
         <div className="chat-frame">
           <Info
             chat={this.state.chat} 
