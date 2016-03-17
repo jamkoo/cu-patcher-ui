@@ -112,16 +112,16 @@ class Login extends React.Component<LoginProps, LoginState> {
       <div id={this.name} className='loginbox card-panel' onKeyDown={this.onKeyDown}>
         <div className='row no-margin-bottom'>
         <div className='input-field col s12'>
-          <input id='email' type='email' className='validate' value={this.state.email || ''} onChange={this.onEmailChanged}/>
+          <input id='email' type='email' className='validate' value={this.state.email || ''} onChange={this.onEmailChanged} tabIndex={1}/>
           <label htmlFor='email'>Email Address</label>
         </div>
         <div className='input-field col s12'>
-          <input id='password' type='password' className='validate' value={this.state.password || ''} onChange={this.onPasswordChanged}/>
+          <input id='password' type='password' className='validate' value={this.state.password || ''} onChange={this.onPasswordChanged} tabIndex={2}/>
           <label htmlFor='password'>Password</label>
         </div>
         <div className='col s12 no-padding'>
           <div className='col s8 no-padding'>
-            <input type="checkbox" className="filled-in" id="remember-me" checked={this.state.rememberMe} onChange={this.onRememberMe}/>
+            <input type="checkbox" className="filled-in" id="remember-me" checked={this.state.rememberMe} onChange={this.onRememberMe}  tabIndex={3}/>
             <label htmlFor="remember-me">Remember me</label>
           </div>
           <div className='forgot-password col s4'>
@@ -129,7 +129,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           </div>
         </div>
         <div className='col s12'>
-          <a className='waves-effect btn-flat right sign-in' onClick={this.logIn}>Sign In</a>
+          <a className='waves-effect btn-flat right sign-in' onClick={this.logIn}  tabIndex={4}>Sign In</a>
         </div>
         </div>
         

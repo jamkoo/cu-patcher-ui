@@ -17,7 +17,7 @@ import {fetchHeroContent, validateHeroContent} from './redux/modules/heroContent
 import {changeChannel, requestChannels} from './redux/modules/channels';
 import {muteSounds, unMuteSounds} from './redux/modules/sounds';
 import {muteMusic, unMuteMusic} from './redux/modules/music';
-import {fetchServers} from './redux/modules/servers';
+import {fetchServers, changeServer} from './redux/modules/servers';
 import {fetchCharacters, selectCharacter} from './redux/modules/characters';
 
 import Sidebar from './sidebar/Sidebar';
@@ -201,6 +201,10 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
   changeChannel = (channel: Channel) => {
     this.props.dispatch(changeChannel(channel.channelID));
   }
+  
+  selectServer = (name: string) => {
+    this.props.dispatch(changeServer(name));
+  }
 
   render() {
     let content: any = null;
@@ -252,6 +256,7 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
         <Sidebar 
           servers={this.props.servers.servers}
           currentServerIndex={this.props.servers.currentServer}
+          selectServer={this.selectServer}
           alerts={this.props.alerts.alerts}
           onApiUpdated={this.onPatcherAPIUpdate}
           channels={this.props.channels}

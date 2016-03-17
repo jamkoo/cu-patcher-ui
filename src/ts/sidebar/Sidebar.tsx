@@ -32,6 +32,7 @@ export interface SidebarProps {
   playPatchComplete: () => void;
   servers: Array<Server>,
   currentServerIndex: number,
+  selectServer: (name: string) => void;
   characters: Array<restAPI.SimpleCharacter>;
   selectedCharacterId: string,
   fetchCharacters: () => void;
@@ -93,11 +94,8 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }];
   }
   
-  onSelectedServerChanged = (server: any) => {
-    this.setState({
-      loggedIn: this.state.loggedIn,
-      activeServer: server
-    });
+  onSelectedServerChanged = (server: Server) => {
+    this.props.selectServer(server.name);
     this.props.playSelect();
   }
   

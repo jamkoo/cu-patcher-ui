@@ -11,6 +11,7 @@ import {CSENormalizeString} from '../api/CSENormalizeString';
 import {restAPI} from 'camelot-unchained';
 
 import EualaModal from './EualaModal';
+import CommandLineArgsModal from './CommandLineArgsModal';
 import Animate from '../Animate';
 
 export class Progress {
@@ -76,6 +77,7 @@ export interface PatchButtonProps {
 
 export interface PatchButtonState {
   showEuala: boolean;
+  showArgs: boolean;
 };
 
 class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
@@ -84,7 +86,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   
   constructor(props: PatchButtonProps) {
     super(props);
-    this.state = { showEuala: false}
+    this.state = { showEuala: false, showArgs: false}
   }
   
   onClicked = () => {
@@ -102,18 +104,22 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   }
   
   playNow = () => {
-    this.setState({showEuala: true});
+    this.setState({showEuala: true, showArgs: false});
   }
   
   closeEualaModal = () => {
-    this.setState({showEuala: false});
+    this.setState({showEuala: false, showArgs: false});
   }
   
-  launcClient = () => {
-    this.setState({showEuala: false});
-    let launchString = '';
+  closeArgsModal = () => {
+    this.setState({showEuala: false, showArgs: false});
+  }
+  
+  launchClient = (commands: string = '') => {
+    this.setState({showEuala: false, showArgs: false});
+    let launchString = commands;
     if (this.props.character && this.props.character.id !== '') {
-      launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)}`
+      launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)} ${commands}`
     }
     patcher.launchChannelfunction(this.props.channel, launchString);
     this.props.playLaunch();
@@ -132,7 +138,15 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   generateEualaModal = () => {
     return (
       <div className='fullscreen-blackout flex-row' key='accept-euala'>
-        <EualaModal accept={this.launcClient} decline={this.closeEualaModal} />
+        <EualaModal accept={this.launchClient} decline={this.closeEualaModal} />
+      </div>
+    );
+  }
+  
+  generateArgsModal = () => {
+    return (
+      <div className='fullscreen-blackout flex-row' key='accept-euala'>
+        <CommandLineArgsModal ok={this.launchClient} cancel={this.closeEualaModal} />
       </div>
     );
   }

@@ -44,6 +44,7 @@ class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServ
 export interface ServerListViewProps {
   item: Server;
 };
+
 export interface ServerListViewState {};
 class ServerListView extends React.Component<ServerListViewProps, ServerListViewState> {
   render() {
@@ -70,7 +71,6 @@ export interface ServerSelectProps {
 };
 
 export interface ServerSelectState {
-  activeServerIndex: number;
 };
 
 class ServerSelect extends React.Component<ServerSelectProps, ServerSelectState> {
@@ -78,15 +78,9 @@ class ServerSelect extends React.Component<ServerSelectProps, ServerSelectState>
   
   constructor(props: ServerSelectProps) {
     super(props);
-    this.state = {
-      activeServerIndex: 0
-    }
   }
   
   onSelectedServerChanged = (server: any) => {
-    this.setState({
-      activeServerIndex: this.props.servers.indexOf(server) 
-    });
     this.props.onSelectedServerChanged(server);
   }
   
