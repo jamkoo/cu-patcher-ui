@@ -43,10 +43,10 @@ export class PatcherAPI {
     } else {
       // Install a dummy API (for testing)
       this._api = {
-        userEmail: "someone@somewhere.com",
-        userPass: "modsquad",
-        loginToken: "dasdakljdajdodaksjdasjd",
-        screenName: "chattester",
+        userEmail: "",
+        userPass: "###",
+        loginToken: "",
+        screenName: "###",
         loginError: "",
         channelData: [
           { channelID: 4, channelName: 'Hatchery', channelStatus: ChannelStatus.Ready },
