@@ -169,8 +169,8 @@
             position: absolute;
             height: 15px;
             width: 15px;
-            left: 3px;
-            top: 3px;
+            right: 0px;
+            top: 0px;
           }
 
           /* Dummy Icon (TODO?) */
@@ -518,9 +518,6 @@
   margin-top: -100px;
   z-index: 999;
   background: $gradient-modal;
-  border-width: 1px;
-  border-image: $gradient-border-modal;
-  border-image-slice: 1;
   padding: 1em;
   ::-webkit-input-placeholder {
     color: #776329;
@@ -553,5 +550,5 @@
   top: 0;
   bottom: 0;
   z-index: 998;
-  background-color: rgba(20, 20, 20, 0.85);
+  background-color: rgba(0, 0, 0, 0.85);
 }
