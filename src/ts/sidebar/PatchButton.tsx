@@ -68,7 +68,7 @@ export class Progress {
 
 export interface PatchButtonProps {
   server: Server;
-  channel: Channel;
+  channelIndex: number;
   playLaunch: () => void;
   playPatchComplete: () => void;
   playSelect: () => void;
@@ -89,8 +89,19 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     this.state = { showEuala: false}
   }
   
+  componentDidMount() {
+    this.intervalHandle = setInterval(() => {
+      this.setState({showEuala: this.state.showEuala});
+    }, 500);
+  }
+  
+  componentDidUnMount() {
+    // unregister intervals
+    clearInterval(this.intervalHandle);
+  }
+  
   onClicked = () => {
-    switch (this.props.channel.channelStatus) {
+    switch (patcher.getAllChannels()[this.props.channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled: this.install();
       case ChannelStatus.Validating: break;
       case ChannelStatus.Updating: break;
@@ -121,18 +132,18 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     if (this.props.character && this.props.character.id !== '') {
       launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)} ${commands}`
     }
-    patcher.launchChannelfunction(this.props.channel, launchString);
+    patcher.launchChannelfunction(patcher.getAllChannels()[this.props.channelIndex], launchString);
     this.props.playLaunch();
   }
   
   install = () => {
-    patcher.installChannel(this.props.channel);
+    patcher.installChannel(patcher.getAllChannels()[this.props.channelIndex]);
     this.props.playSelect();
     this.startDownload = undefined;
   }
   
   uninstall = () => {
-    patcher.uninstallChannel(this.props.channel);
+    patcher.uninstallChannel(patcher.getAllChannels()[this.props.channelIndex]);
     this.props.playSelect();
   }
   
@@ -157,7 +168,12 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     let layer1: any = null;
     let layer2: any = null;
     let layer3: any = null;
-    switch(this.props.channel.channelStatus) {
+    
+    let channels = patcher.getAllChannels();
+    if (typeof(channels) == 'undefined' || channels == null || channels.length == 0) return null;
+    
+    let channelIndex = this.props.channelIndex != null && this.props.channelIndex >= 0 ? this.props.channelIndex : 0;
+    switch(channels[channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled:
         layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Install</a>;
         break;
@@ -193,11 +209,11 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         );
         break;
       case ChannelStatus.OutOfDate:
-        layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Update</a>;
+        layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
         break;
       case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked}>Play Now</a>;
-        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {this.props.channel.channelName}</a>;
+        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {channels[channelIndex].channelName}</a>;
         this.startDownload = undefined;
         break;
       case ChannelStatus.Launching:

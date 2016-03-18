@@ -52,7 +52,7 @@ class CharacterListView extends React.Component<CharacterListViewProps, Characte
 export interface CharacterSelectProps {
   characters: Array<restAPI.SimpleCharacter>;
   selectedCharacter: restAPI.SimpleCharacter,
-  onCharacterSelectionChanged: (id: string) => void;
+  onCharacterSelectionChanged: (character: restAPI.SimpleCharacter) => void;
 };
 
 export interface CharacterSelectState {
@@ -65,15 +65,15 @@ class CharacterSelect extends React.Component<CharacterSelectProps, CharacterSel
     super(props);
   }
   
-  onSelectedCharacterChanged = (character: any) => {
-    this.props.onCharacterSelectionChanged(character.id);
+  onSelectedCharacterChanged = (character: restAPI.SimpleCharacter) => {
+    this.props.onCharacterSelectionChanged(character);
   }
   
-  generateActiveView = (character: any) => {
+  generateActiveView = (character: restAPI.SimpleCharacter) => {
     return <ActiveCharacterView item={character} />
   }
   
-  generateListView = (character: any) => {
+  generateListView = (character: restAPI.SimpleCharacter) => {
     return <CharacterListView item={character} />
   }
   

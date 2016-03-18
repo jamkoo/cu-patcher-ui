@@ -112,7 +112,7 @@ export class PatcherAPI {
     if (channel.channelID === 5) return 3; // Editor
     return 2;
   }
-  public getAllChannels() : any[] {
+  public getAllChannels() : Channel[] {
     if (this._api.channelData) {
       return Array.prototype.slice.call(this._api.channelData).sort(function(a:Channel, b:Channel) {
         return this.getChannelValue(a) - this.getChannelValue(b);

@@ -53,10 +53,10 @@ export function fetchCharactersFailed(error: ResponseError) {
   };
 }
 
-export function selectCharacter(id: string) {
+export function selectCharacter(character: restAPI.SimpleCharacter) {
   return {
     type: SELECT_CHARACTER,
-    id: id
+    character: character
   };
 }
 
@@ -73,14 +73,22 @@ export function fetchCharacters() {
 }
 
 // reducer
+export interface CharactersState {
+  isFetching?: boolean;
+  lastUpdated?: Date;
+  characters?: Array<restAPI.SimpleCharacter>;
+  selectedCharacter?: restAPI.SimpleCharacter;
+  error?: string;
+}
+
 const initialState = {
   isFetching: false,
   lastUpdated: <Date>null,
-  characters: <Array<restAPI.SimpleCharacter>>[],
-  selectedCharacterId: ''
+  characters: <Array<restAPI.SimpleCharacter>>[selectNewCharacter()],
+  selectedCharacter: selectNewCharacter()
 }
 
-export default function reducer(state: any = initialState, action: any = {}) {
+export default function reducer(state: CharactersState = initialState, action: any = {}) {
   switch(action.type) {
     case FETCH_CHARACTERS:
       return Object.assign({}, state, {
@@ -99,7 +107,7 @@ export default function reducer(state: any = initialState, action: any = {}) {
       });
     case SELECT_CHARACTER:
       return Object.assign({}, state, {
-        selectedCharacterId: action.id
+        selectedCharacter: action.character
       });
     default: return state;
   }

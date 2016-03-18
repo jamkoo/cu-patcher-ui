@@ -11,35 +11,43 @@ const CHANGE_CHANNEL = 'cse-patcher/locations/CHANGE_CHANNEL';
 const REQUEST_CHANNELS = 'cse-patcher/locations/REQUEST_CHANNELS';
 
 // sync actions
-export function changeChannel(id: number): any {
+export function changeChannel(channel: Channel): any {
   return {
     type: CHANGE_CHANNEL,
-    channelId: id
+    channel: channel
   };
 }
 
 export function requestChannels(): any {
+  let channels = patcher.getAllChannels();
+  if (channels == null || typeof(channels) == 'undefined') channels = <Array<Channel>>[];
   return {
     type: REQUEST_CHANNELS,
-    channels: patcher.getAllChannels()
+    channels: channels
   };
 }
 
 // reducer
-const initialState = {
-  currentChannel: 0,
+export interface ChannelState {
+  selectedChannel?: Channel;
+  channels?: Array<Channel>;
+}
+
+const initialState : ChannelState = {
+  selectedChannel: null,
   channels: <Array<Channel>>[]
 }
 
-export default function reducer(state: any = initialState, action: any = {}) {
+export default function reducer(state: ChannelState = initialState, action: any = {}) {
   switch(action.type) {
     case CHANGE_CHANNEL:
       return Object.assign({}, state, {
-        currentChannel: state.channels.findIndex((c: Channel) => c.channelID === action.channelId)
+        selectedChannel: action.channel
       });
     case REQUEST_CHANNELS:
       return Object.assign({}, state, {
-        channels: action.channels
+        channels: action.channels,
+        selectedChannel: state.selectedChannel == null ? action.channels[0] : state.selectedChannel
       });  
     default: return state;
   }

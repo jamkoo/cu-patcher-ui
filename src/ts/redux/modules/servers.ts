@@ -76,10 +76,10 @@ export function fetchServersFailed(error: ResponseError) {
   };
 }
 
-export function changeServer(name: string): any {
+export function changeServer(server: Server): any {
   return {
     type: CHANGE_SERVER,
-    name: name
+    server: server
   };
 }
 
@@ -114,14 +114,22 @@ export function fetchServers() {
 }
 
 // reducer
-const initialState = {
+export interface ServersState {
+  isFetching?: boolean;
+  lastUpdated?: Date;
+  servers?: Array<Server>;
+  currentServer?: Server;
+  error?: string;
+}
+
+const initialState: ServersState = {
   isFetching: false,
   lastUpdated: <Date>null,
   servers: <Array<Server>>[],
-  currentServer: 0,
+  currentServer: null,
 }
 
-export default function reducer(state: any = initialState, action: any = {}) {
+export default function reducer(state: ServersState = initialState, action: any = {}) {
   switch(action.type) {
     case FETCH_SERVERS:
       return Object.assign({}, state, {
@@ -140,7 +148,7 @@ export default function reducer(state: any = initialState, action: any = {}) {
         });
     case CHANGE_SERVER: 
       return Object.assign({}, state, {
-        currentServer: state.servers.findIndex((s: Server) => s.name == action.name)
+        currentServer: action.server
       });
     case UPDATE_SERVER:
       let servers = state.servers;

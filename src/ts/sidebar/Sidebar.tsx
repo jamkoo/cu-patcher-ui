@@ -5,6 +5,7 @@
  */
 
 import * as React from 'react';
+import {connect} from 'react-redux';
 import {components, race, restAPI} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 declare let $: any;
@@ -21,31 +22,45 @@ import {PatcherAlert} from '../redux/modules/patcherAlerts';
 import {patcher, Channel} from '../api/PatcherAPI';
 import {Server} from '../redux/modules/servers';
 
+import reducer from '../redux/modules/reducer';
+import {fetchAlerts, validateAlerts, PatcherAlertsState} from '../redux/modules/patcherAlerts';
+import {changeChannel, requestChannels, ChannelState} from '../redux/modules/channels';
+import {muteSounds, unMuteSounds} from '../redux/modules/sounds';
+import {muteMusic, unMuteMusic} from '../redux/modules/music';
+import {fetchServers, changeServer, ServersState} from '../redux/modules/servers';
+import {fetchCharacters, selectCharacter, CharactersState} from '../redux/modules/characters';
+
+function select(state: any): any {
+  return {
+    channelsState: state.channels,
+    patcherAlertsState: state.alerts,
+    soundMuted: state.soundMuted,
+    musicMuted: state.musicMuted,
+    serversState: state.servers,
+    charactersState: state.characters,
+  }
+}
+
 export interface SidebarProps {
-  alerts: Array<PatcherAlert>,
-  currentChannel: Channel;
-  channels: Array<Channel>;
-  onApiUpdated: () => void,
-  changeChannel: (channel: Channel) => void;
-  playSelect: () => void;
-  playLaunch: () => void;
-  playPatchComplete: () => void;
-  servers: Array<Server>,
-  currentServerIndex: number,
-  selectServer: (name: string) => void;
-  characters: Array<restAPI.SimpleCharacter>;
-  selectedCharacterId: string,
-  fetchCharacters: () => void;
-  selectCharacter: (id: string) => void;
-};
+  dispatch?: (action: any) => void;
+  channelsState?: ChannelState;
+  patcherAlertsState?: PatcherAlertsState;
+  soundMuted?: boolean;
+  musicMuted?: boolean;
+  serversState?: ServersState;
+  charactersState?: CharactersState;
+  onLogIn: () => void;
+}
 
 export interface SidebarState {
-  loggedIn: boolean;
-  activeServer: Server;
 };
 
 class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public name = 'cse-patcher-sidebar';
+  
+  private alertsInterval: any = null;
+  private channelInterval: any = null;
+  private serversInterval: any = null;
   
   static propTypes = {
     alerts: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
@@ -60,16 +75,12 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   }
   
   onLogIn = () => {
-    this.setState({
-     loggedIn: true,
-     activeServer: this.state.activeServer
-    });
-    this.props.onApiUpdated();
-    this.props.fetchCharacters();
+    this.fetchCharacters();
+    this.props.onLogIn();
+    setTimeout(() => this.props.dispatch(requestChannels()), 500);
   }
   
   onLogOut = () => {
-    
   }
   
   initjQueryObjects = () => {
@@ -81,31 +92,89 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     return [{name: 'Hatchery'}, {name: 'Wyrmling'}];
   }
   
+  fetchCharacters = () => {
+    this.props.dispatch(fetchCharacters());
+  }
+  
   getCharacters = () => {
     return [{
       name: 'Create new character',
       race: race.NONE
     },{
-      name: 'CSE JB [STRM]',
+      name: 'Test Strm',
       race: race.STRM
     },{
-      name: 'CSE JB [DRYAD]',
+      name: 'Test Dryad',
       race: race.HAMADRYAD
     }];
   }
   
+  playSelect = () => {
+    if (!this.props.soundMuted) {
+      (this.refs['sound-select'] as HTMLAudioElement).play();
+      (this.refs['sound-select'] as HTMLAudioElement).volume = 0.75;
+    }
+  }
+  
+  playLaunchGame = () => {
+    if (!this.props.soundMuted) {
+      (this.refs['sound-launch-game'] as HTMLAudioElement).play();
+      (this.refs['sound-launch-game'] as HTMLAudioElement).volume = 0.75;
+    }
+  }
+  
+  playPatchComplete = () => {
+    if (!this.props.soundMuted) {
+      (this.refs['sound-patch-complete'] as HTMLAudioElement).play();
+      (this.refs['sound-patch-complete'] as HTMLAudioElement).volume = 0.75;
+    }
+  }
+  
   onSelectedServerChanged = (server: Server) => {
-    this.props.selectServer(server.name);
-    this.props.playSelect();
+    this.props.dispatch(changeServer(server));
+    this.playSelect();
   }
   
   onSelectedChannelChanged = (channel: Channel) => {
-    this.props.changeChannel(channel);
-    this.props.playSelect();
+    this.props.dispatch(changeChannel(channel));
+    this.playSelect();
+  }
+  
+  selectCharacter = (character: restAPI.SimpleCharacter) => {
+    this.props.dispatch(selectCharacter(character));
+  }
+  
+  componentDidMount() {
+    // fetch initial alerts and then every minute validate & fetch alerts.
+    if (!this.props.patcherAlertsState.isFetching) this.props.dispatch(fetchAlerts());
+    this.alertsInterval = setInterval(() => {
+      this.props.dispatch(validateAlerts());
+      if (!this.props.patcherAlertsState.isFetching) this.props.dispatch(fetchAlerts());
+    }, 60000);
+    
+    // fetch initial servers and then every 30 seconds fetch servers.
+    if (!this.props.serversState.isFetching) this.props.dispatch(fetchServers());
+    this.serversInterval = setInterval(() => {
+      if (!this.props.serversState.isFetching) this.props.dispatch(fetchServers());
+    }, 30000);
+    
+    // update channel info every 1 minute.
+    this.props.dispatch(requestChannels());
+    this.channelInterval = setInterval(() => {
+      this.props.dispatch(requestChannels());
+    }, 1000 * 60);
+    
+  }
+  
+  componentDidUnMount() {
+    // unregister intervals
+    clearInterval(this.alertsInterval);
+    clearInterval(this.channelInterval);
+    clearInterval(this.serversInterval);
   }
 
   render() {
-    if (!this.state.loggedIn) {
+    if (!patcher.hasLoginToken()) {
       return (
         <div id={this.name} className=''>
           <Login onLogIn={this.onLogIn} />
@@ -115,39 +184,48 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     
     setTimeout(this.initjQueryObjects, 100);
 
-    let selectedCharacter: restAPI.SimpleCharacter = null;
     let renderServerSection: any = null;
-    let servers = this.props.servers.filter(s => s.channelID === this.props.currentChannel.channelID);
     let activeServer: Server = null;
-    if (servers.length > 0) {
-      activeServer = this.props.servers[this.props.currentServerIndex]
-      let characters = this.props.characters.filter(c => c.shardID == activeServer.shardID || c.shardID == 0);
-      selectedCharacter = characters.find(c => c.id == this.props.selectedCharacterId) || characters[0];
-      renderServerSection = (
-        <div>
-          <ServerSelect servers={servers}
-                        onSelectedServerChanged={this.onSelectedServerChanged} />
-          <CharacterSelect characters={characters}
-                           selectedCharacter={selectedCharacter}
-                           onCharacterSelectionChanged={this.props.selectCharacter} />
-          <ServerCounts artCount={activeServer.arthurians}
-                        tddCount={activeServer.tuathaDeDanann}
-                        vikCount={activeServer.vikings} />
-        </div>
-      );
+    let selectedCharacter: restAPI.SimpleCharacter = null;
+    let selectedChannel: Channel = null;
+    let selectedChannelIndex: number = -1;
+    if (this.props.serversState.servers.length > 0 &&  typeof(this.props.channelsState.channels) !== 'undefined' && this.props.channelsState.channels.length > 0) {
+      selectedChannel = this.props.channelsState.selectedChannel;
+      selectedChannelIndex = this.props.channelsState.channels.findIndex(c => c.channelID == selectedChannel.channelID);
+      
+      if (typeof(selectedChannelIndex) == 'undefined') selectedChannelIndex = 0;
+      
+      let servers = this.props.serversState.servers.filter((s: Server) => s.channelID === selectedChannel.channelID);
+      if (servers.length > 0) {
+        activeServer = this.props.serversState.currentServer || this.props.serversState.servers[0];
+        let characters = this.props.charactersState.characters.filter((c: restAPI.SimpleCharacter) => c.shardID == activeServer.shardID || c.shardID == 0);
+        selectedCharacter = this.props.charactersState.selectedCharacter;
+        renderServerSection = (
+          <div>
+            <ServerSelect servers={servers}
+                          onSelectedServerChanged={this.onSelectedServerChanged} />
+            <CharacterSelect characters={characters}
+                             selectedCharacter={selectedCharacter}
+                             onCharacterSelectionChanged={this.selectCharacter} />
+            <ServerCounts artCount={activeServer.arthurians}
+                          tddCount={activeServer.tuathaDeDanann}
+                          vikCount={activeServer.vikings} />
+          </div>
+        );
+      }
     }
-
+    
     return (
       <div id={this.name} className=''>
-        <Alerts alerts={this.props.alerts} />
-        <ChannelSelect channels={this.props.channels} onSelectedChannelChanged={this.onSelectedChannelChanged} />
+        <Alerts alerts={this.props.patcherAlertsState.alerts} />
+        <ChannelSelect channels={this.props.channelsState.channels} onSelectedChannelChanged={this.onSelectedChannelChanged} />
         <div className='card-panel no-padding'>
           {renderServerSection}
           <PatchButton server={activeServer}
-                      channel={this.props.currentChannel}
-                       playSelect={this.props.playSelect}
-                       playLaunch={this.props.playLaunch}
-                       playPatchComplete={this.props.playPatchComplete}
+                      channelIndex={selectedChannelIndex}
+                       playSelect={this.playSelect}
+                       playLaunch={this.playLaunchGame}
+                       playPatchComplete={this.playPatchComplete}
                        character={selectedCharacter} />
         </div>
       </div>
@@ -155,4 +233,5 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   }
 };
 
-export default Sidebar;
+//export default Sidebar;
+export default connect(select)(Sidebar);

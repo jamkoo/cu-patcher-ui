@@ -115,11 +115,22 @@ export function fetchPage(page: number) {
 }
 
 // reducer
+export interface NewsState {
+  isFetching?: boolean;
+  didInvalidate?: boolean;
+  lastUpdated?: Date;
+  nextPage?: number;
+  fetchedPageCount?: number;
+  posts?: Array<Post>;
+  error?: string;
+}
+
 const initialState = {
   isFetching: false,
   didInvalidate: false,
   lastUpdated: <Date>null,
   nextPage: 1,
+  fetchedPageCount: 0,
   posts: <Array<Post>>[]
 }
 

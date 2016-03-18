@@ -6,7 +6,9 @@
 
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import {connect} from 'react-redux';
+import {createStore, applyMiddleware} from 'redux';
+import {connect, Provider} from 'react-redux';
+import * as thunkMiddleware from 'redux-thunk';
 
 import reducer from './redux/modules/reducer';
 import {changeRoute, Routes} from './redux/modules/locations';
@@ -32,6 +34,12 @@ import Animate from './Animate';
 
 import {patcher, Channel} from './api/PatcherAPI';
 import {CSENormalizeString} from './api/CSENormalizeString';
+
+
+const createStoreWithMiddleware = applyMiddleware(
+  thunkMiddleware
+)(createStore);
+let store = createStoreWithMiddleware(reducer);
 
 function select(state: any): any {
   return {
@@ -74,10 +82,7 @@ export interface PatcherState {};
 export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
   public name = 'cse-patcher';
   
-  private alertsInterval: any = null;
   private heroContentInterval: any = null;
-  private channelInterval: any = null;
-  private serversInterval: any = null;
   
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
@@ -129,26 +134,8 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
     }
   }
   
-  playLaunchGame = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-launch-game'] as HTMLAudioElement).play();
-      (this.refs['sound-launch-game'] as HTMLAudioElement).volume = 0.75;
-    }
-  }
-  
-  playPatchComplete = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-patch-complete'] as HTMLAudioElement).play();
-      (this.refs['sound-patch-complete'] as HTMLAudioElement).volume = 0.75;
-    }
-  }
-  
-  fetchCharacters = () => {
-    this.props.dispatch(fetchCharacters());
-  }
-  
-  selectCharacter = (id: string) => {
-    this.props.dispatch(selectCharacter(id));
+  onLogIn = () => {
+    setTimeout(() => this.setState({}), 500);
   }
   
   componentWillUpdate() {
@@ -162,50 +149,19 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
   }
   
   componentDidMount() {
-    // fetch initial alerts and then every minute validate & fetch alerts.
-    if (!this.props.alerts.isFetching) this.props.dispatch(fetchAlerts());
-    this.alertsInterval = setInterval(() => {
-      this.props.dispatch(validateAlerts());
-      if (!this.props.alerts.isFetching) this.props.dispatch(fetchAlerts());
-    }, 60000);
-    
-    // fetch initial servers and then every 30 seconds fetch servers.
-    if (!this.props.servers.isFetching) this.props.dispatch(fetchServers());
-    this.serversInterval = setInterval(() => {
-      if (!this.props.servers.isFetching) this.props.dispatch(fetchServers());
-    }, 30000);
-    
     // fetch initial hero content and then every 30 minutes validate & fetch hero content.
     if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
     this.heroContentInterval = setInterval(() => {
       this.props.dispatch(validateHeroContent());
       if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
     }, 60000 * 30);
-    
-    // update channel info every 1 second.
-    this.props.dispatch(requestChannels());
-    this.channelInterval = setInterval(() => {
-      this.props.dispatch(requestChannels());
-    }, 1000);
-    
   }
   
   componentDidUnMount() {
     // unregister intervals
-    clearInterval(this.alertsInterval);
     clearInterval(this.heroContentInterval);
-    clearInterval(this.channelInterval);
-    clearInterval(this.serversInterval);
   }
   
-  changeChannel = (channel: Channel) => {
-    this.props.dispatch(changeChannel(channel.channelID));
-  }
-  
-  selectServer = (name: string) => {
-    this.props.dispatch(changeServer(name));
-  }
-
   render() {
     let content: any = null;
     switch(this.props.location) {
@@ -253,22 +209,9 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
           musicMuted={this.props.musicMuted}
           onMuteMusic={this.props.musicMuted ? this.onUnMuteMusic : this.onMuteMusic}/>
         <Header changeRoute={this.onRouteChanged} activeRoute={this.props.location} openChat={this.showChat} />
-        <Sidebar 
-          servers={this.props.servers.servers}
-          currentServerIndex={this.props.servers.currentServer}
-          selectServer={this.selectServer}
-          alerts={this.props.alerts.alerts}
-          onApiUpdated={this.onPatcherAPIUpdate}
-          channels={this.props.channels}
-          currentChannel={this.props.channels[this.props.currentChannel]}
-          changeChannel={this.changeChannel}
-          playSelect={this.playSelect}
-          playLaunch={this.playLaunchGame}
-          playPatchComplete={this.playPatchComplete}
-          characters={this.props.characters.characters}
-          selectedCharacterId={this.props.characters.selectedCharacterId}
-          fetchCharacters={this.fetchCharacters}
-          selectCharacter={this.selectCharacter} />
+        <Provider store={store}>
+          <Sidebar onLogIn={this.onLogIn} />
+        </Provider>
         <div className='main-content'>
         <Animate animationEnter='fadeIn' animationLeave='fadeOut'
           durationEnter={400} durationLeave={500}>
@@ -291,4 +234,4 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
 export default connect(select)(PatcherApp);
 
 // music disabled
-//        <audio src='sounds/bg.ogg' ref='sound-bg' />
+// <audio src='sounds/bg.ogg' ref='sound-bg' />

@@ -66,6 +66,13 @@ export function fetchAlerts() {
 }
 
 // reducer
+export interface PatcherAlertsState {
+  isFetching?: boolean;
+  lastUpdated?: Date;
+  alerts?: Array<PatcherAlert>;
+  error?: string;
+}
+
 const initialState = {
   isFetching: false,
   lastUpdated: <Date>null,
