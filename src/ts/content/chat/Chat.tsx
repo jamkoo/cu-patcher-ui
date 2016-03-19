@@ -68,7 +68,7 @@ class Chat extends React.Component<ChatProps, ChatState> {
   update = (chat : ChatSession) : void => {
     this.setState({ chat: chat, now: Date.now() } as any);
   }
-
+  
   selectRoom = (roomId: RoomId) : void => {
     this.state.chat.joinRoom(roomId);
   }
@@ -89,6 +89,10 @@ class Chat extends React.Component<ChatProps, ChatState> {
   
   disconnect = () : void => {
     this.state.chat.simulateDisconnect();
+  }
+  
+  getRooms = () : void => {
+    this.state.chat.getRooms();
   }
   
   componentWillMount() : void {

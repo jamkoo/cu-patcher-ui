@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import CSEChat from './CSEChat';
+import { CSEChat, Room } from './CSEChat';
 import Config from './Config';
 import messageType from './messageType';
 import EventEmitter from '../core/EventEmitter';
@@ -61,6 +61,7 @@ class ChatClient {
     this.chat.on('message', (message: any) => this._fire('message', message));
     this.chat.on('groupmessage', (message: any) => this._fire('groupmessage', message));
     this.chat.on('ping', (ping: any) => this._fire('ping', ping));
+    this.chat.on('rooms', (rooms: Room[]) => this._fire('rooms', rooms));
   }
 
   private _disconnect(): void {
@@ -185,6 +186,14 @@ class ChatClient {
     this.chat.leaveRoom(roomName + this.chat.config.serviceAddress);
 
     this.removeFromStoredRooms(roomName);
+  }
+  
+  public getRooms() : void {
+    if (!this.chat) {
+      console.warn("ChatClient:leaveRoom() called when not connected.");
+      return;
+    }
+    this.chat.getRooms();
   }
 
 };
