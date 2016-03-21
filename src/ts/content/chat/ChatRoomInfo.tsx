@@ -27,6 +27,14 @@ class ChatRoomInfo {
     this.scrollbackThreshold = scrollbackThreshold;
     this.scrollbackPageSize = scrollbackPageSize;
   }
+  public diagnostics = () : void => {
+    console.log('|  Room: ' + this.roomId.name
+      + ' Players: ' + this.players
+      + ' Unread: ' + this.unread
+      + ' Messages: ' + this.messages.length
+      + ' ScrollBack: ' + this.scrollback
+    );
+  }
   public addUser = (user: UserInfo) : void => {
     this.users.push(<User key={this.key++} info={user}/>);
     this.players ++;

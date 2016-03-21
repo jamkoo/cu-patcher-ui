@@ -182,6 +182,11 @@ class CSEChat  {
   }
 
   _ping(pong: (ping: any) => void) {
+    
+    if (!pong) {
+      console.error('ping without pong');
+      debugger;
+    }
 
     // If inflight is not 0, then we have a ping that was not responded to
     // so decide what to do (atm we disconnect)
@@ -219,7 +224,11 @@ class CSEChat  {
     const ping = this._pings[id];
     if (ping) {
       this._pingsInFlight --;
-      ping.pong(ping);
+      if (ping.pong) {
+        ping.pong(ping);
+      } else {
+        console.warn('ping lost its pong ' + JSON.stringify(ping));
+      }
       delete this._pings[id];    // reclaim memory
     }
   }

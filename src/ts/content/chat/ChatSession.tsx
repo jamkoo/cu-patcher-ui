@@ -42,6 +42,22 @@ class ChatSession {
         if (room) room.seen();
       }
   }
+  
+  diagnostics = () : void => {
+    const memory : any = (window.performance as any).memory;
+    const now : Date = new Date();
+    console.log(now.toISOString());
+    console.log(
+      '| Memory Usage: ' + ((((memory.usedJSHeapSize/1024/1024)*100)|0)/100) + "MB"
+      + ' Active: ' + this.windowActive
+      + ' Latency: ' + this.latency
+      + ' Reconnecting: ' + this.reconnecting
+      + ' Rooms: ' + this.rooms.length
+    );
+    this.rooms.forEach((room: ChatRoomInfo) : void => {
+      room.diagnostics();
+    });
+  }
 
   connect(username: string, password: string) {
     if (!this.client) {
@@ -61,6 +77,7 @@ class ChatSession {
   onping(ping: any) {
     this.latency = (Date.now() - ping.now);
     events.fire('chat-session-update', this);
+    this.diagnostics();
   }
 
   onconnect() : void {
