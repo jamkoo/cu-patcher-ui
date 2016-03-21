@@ -82,6 +82,7 @@ export interface PatchButtonState {
 class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   public name: string = 'cse-patcher-patch-button';
   private intervalHandle: any;
+  private startDownload: number;
   
   constructor(props: PatchButtonProps) {
     super(props);
@@ -127,6 +128,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   install = () => {
     patcher.installChannel(this.props.channel);
     this.props.playSelect();
+    this.startDownload = undefined;
   }
   
   uninstall = () => {
@@ -161,16 +163,27 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Validating: 
         layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
+        this.startDownload = undefined;
         break;
       case ChannelStatus.Updating:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Installing</a>;
         
-        let percentRemaining = 100.0 - ((patcher.getDownloadRemaining() / patcher.getDownloadEstimate()) * 100);
-        layer2 = <div className='fill' style={{width: percentRemaining + '%', opacity: 1}} />;
+        if (this.startDownload === undefined) {
+          this.startDownload = Date.now();
+        }
         
-        let rate = Progress.bypsToString(patcher.getDownloadRate());
-        let dataSize = Progress.bytesToString(patcher.getDownloadEstimate() - patcher.getDownloadRemaining()) + '/' + Progress.bytesToString(patcher.getDownloadEstimate());
-        let time = Progress.secondsToString(patcher.getDownloadRemaining() / patcher.getDownloadRate());
+        const downloadRate: number = patcher.getDownloadRate();
+        const downloadRemaining: number = patcher.getDownloadRemaining();
+        const estimate: number = patcher.getDownloadEstimate();
+        
+        const percentDone = estimate ? 100.0 - ((downloadRemaining / estimate) * 100) : 0;
+        layer2 = <div className='fill' style={{width: percentDone + '%', opacity: 1}} />;
+        
+        const downloadDuration: number = (Date.now() - this.startDownload) / 1000;
+        const remainingTime : number = percentDone ? ((100/percentDone)*downloadDuration) - downloadDuration : undefined;
+        const time: string = percentDone ? Progress.secondsToString(remainingTime) : 'starting';
+        const rate: string = Progress.bypsToString(downloadRate);
+        const dataSize: string  = Progress.bytesToString(estimate - downloadRemaining) + '/' + Progress.bytesToString(estimate);
         layer3 = (
           <div className='text'>
             <div className='progress-text'><span className='body'>{time}</span></div>
@@ -185,6 +198,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
       case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked}>Play Now</a>;
         uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {this.props.channel.channelName}</a>;
+        this.startDownload = undefined;
         break;
       case ChannelStatus.Launching:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Launching</a>;
@@ -194,9 +208,11 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Uninstalling:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Uninstalling</a>;
+        this.startDownload = undefined;
         break;
       case ChannelStatus.UpdateFailed:
         layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Update Failed. Try Again.</a>;
+        this.startDownload = undefined;
         break;
     }
     
