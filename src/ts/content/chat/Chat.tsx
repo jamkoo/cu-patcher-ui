@@ -36,7 +36,8 @@ class Chat extends React.Component<ChatProps, ChatState> {
 
     // handle updates to chat session
     this._eventHandlers.push(events.on('chat-session-update', this.update));
-    
+    this._eventHandlers.push(events.on('chat-show-room', this.joinRoom));
+
     // Initialize chat settings in localStorage
     initLocalStorage();
   }
@@ -75,6 +76,10 @@ class Chat extends React.Component<ChatProps, ChatState> {
 
   leaveRoom = (roomId: RoomId) : void => {
     this.state.chat.leaveRoom(roomId);
+  }
+
+  joinRoom = (roomName: string) : void => {
+    this.state.chat.joinRoom(new RoomId(roomName, chatType.GROUP));
   }
 
   slashCommand = (command: string) : boolean => {

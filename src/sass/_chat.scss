@@ -372,6 +372,11 @@
             margin-right: 0.5em;
             font-size: 80%;
           }
+          .chat-room-link {
+            color: $chat-line-room-color;
+            cursor: pointer;
+            margin-right: 0.5em;
+          }
           .chat-emoticon {
             display: inline-block;
             margin: 0 0.1em;
