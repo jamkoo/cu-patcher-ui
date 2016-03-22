@@ -11,6 +11,7 @@ import ChatRoomInfo from './ChatRoomInfo';
 import { ChatMessage, chatType } from './ChatMessage';
 import SlashCommand from './SlashCommand';
 import RoomId from './RoomId';
+import { chatConfig, ChatConfig } from './ChatConfig';
 
 import Info from './Info';
 import Content from './Content';
@@ -19,6 +20,7 @@ import {initLocalStorage} from './settings/chat-defaults';
 export interface ChatState {
   chat: ChatSession;
   now: number;
+  config: ChatConfig;
 }
 
 export interface ChatProps {
@@ -34,8 +36,12 @@ class Chat extends React.Component<ChatProps, ChatState> {
     super(props);
     this.state = this.initialState();
 
+    // load configuration (before subscribing to options updates!)
+    chatConfig.refresh();
+
     // handle updates to chat session
     this._eventHandlers.push(events.on('chat-session-update', this.update));
+    this._eventHandlers.push(events.on('chat-options-update', this.optionsUpdated));
     
     // Initialize chat settings in localStorage
     initLocalStorage();
@@ -44,7 +50,8 @@ class Chat extends React.Component<ChatProps, ChatState> {
   initialState(): ChatState {
     return {
       chat: (window as any)['_cse_chat_session'] || new ChatSession(),
-      now: 0
+      now: 0,
+      config: chatConfig
     }
   }
 
@@ -67,6 +74,10 @@ class Chat extends React.Component<ChatProps, ChatState> {
 
   update = (chat : ChatSession) : void => {
     this.setState({ chat: chat, now: Date.now() } as any);
+  }
+  
+  optionsUpdated = (config: ChatConfig) : void => {
+    this.setState({ config: config, now: Date.now() } as any);
   }
   
   selectRoom = (roomId: RoomId) : void => {

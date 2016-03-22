@@ -7,7 +7,7 @@
 import * as React from 'react';
 import Whitelist from './URLWhitelist';
 import URLRegExp from './URLRegExp';
-import {prefixes, display} from './settings/chat-defaults';
+import { chatConfig } from './ChatConfig';
 
 function _fixupLink(url: string) : string {
   if (url.indexOf('www.') == 0) {
@@ -17,11 +17,9 @@ function _fixupLink(url: string) : string {
 }
 
 function fromText(text: string, keygen:() => number) : JSX.Element[] {
-  const embedImages: boolean = JSON.parse(localStorage.getItem(`${prefixes.display}${display.embedImages.key}`));
-  const embedVideos: boolean = JSON.parse(localStorage.getItem(`${prefixes.display}${display.embedVideos.key}`));
 
-  const videoMatch: string = embedVideos ? Whitelist.isVideo(text) : null;
-  const vineMatch: string = embedVideos ? Whitelist.isVine(text) : null;
+  const videoMatch: string = chatConfig.EMBED_VIDEOS ? Whitelist.isVideo(text) : null;
+  const vineMatch: string = chatConfig.EMBED_VIDEOS ? Whitelist.isVine(text) : null;
   const href : string = _fixupLink(text);
 
   // Video link (youtube)
@@ -44,7 +42,7 @@ function fromText(text: string, keygen:() => number) : JSX.Element[] {
   } 
 
   // Image link (whitelisted)
-  else if (embedImages && Whitelist.isImage(text) && Whitelist.ok(text)) {
+  else if (chatConfig.EMBED_IMAGES && Whitelist.isImage(text) && Whitelist.ok(text)) {
     return [
       <a key={keygen()} className="chat-line-message" target="_blank" href={href}>
         <img className='chat-line-image' src={text} title={text}/>
