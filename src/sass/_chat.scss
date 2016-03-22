@@ -375,7 +375,6 @@
           .chat-room-link {
             color: $chat-line-room-color;
             cursor: pointer;
-            margin-right: 0.5em;
           }
           .chat-emoticon {
             display: inline-block;
@@ -546,7 +545,7 @@
       -webkit-filter: brightness(1.2);
     }
   }
-  
+
   .room-list-anchor {
     position: relative;
     top: -13px;     /* input element bottom margin (15px) - 2px for underline and a 1px gap */
@@ -569,7 +568,7 @@
         padding: 1em;
         cursor: pointer;
         border-bottom: 1px solid rgba(0,0,0,0.2);
-        &:hover { 
+        &:hover {
           background-color: #444;
         }
       }

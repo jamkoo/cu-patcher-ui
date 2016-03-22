@@ -12,7 +12,7 @@ function fromText(text: string, keygen: () => number) : JSX.Element[] {
 }
 
 function createRegExp() : RegExp {
-  return /#[a-z0-9]+/g;
+  return /#[^\s]+/g;
 }
 
 export default {
