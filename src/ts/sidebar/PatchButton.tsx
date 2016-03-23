@@ -13,18 +13,19 @@ import {restAPI} from 'camelot-unchained';
 import EualaModal from './EualaModal';
 import CommandLineArgsModal from './CommandLineArgsModal';
 import Animate from '../Animate';
+import UninstallButton from './UninstallButton';
 
 export class Progress {
   constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
-  
+
   public timeEstimate = () => {
     return Progress.secondsToString((this.remaining() * 8) / this.rate);
   }
-  
+
   public remaining = () => {
     return this.totalDataSize - this.dataCompleted;
   }
-  
+
   static bytesToString(bytes: number): string {
     if (bytes >= 1099511627776) {
       // display as TB
@@ -40,7 +41,7 @@ export class Progress {
       return (bytes / 1024).toFixed(2) + 'KB';
     }
   }
-  
+
   static bypsToString(bytes: number): string {
     if (bytes >= 1000000000) {
       // display as GB
@@ -53,7 +54,7 @@ export class Progress {
       return (bytes / 1000).toFixed(2) + 'KB/s';
     }
   }
-  
+
   static secondsToString(val: number): string {
     let days = Math.floor(val / 86400)
     let hours = Math.floor((val % 86400) / 3600);
@@ -89,13 +90,13 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     super(props);
     this.state = { showEuala: false}
   }
-  
+
   componentDidMount() {
     this.intervalHandle = setInterval(() => {
       this.setState({showEuala: this.state.showEuala});
     }, 500);
   }
-  
+
   componentDidUnMount() {
     // unregister intervals
     clearInterval(this.intervalHandle);
@@ -127,11 +128,11 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
       case ChannelStatus.UpdateFailed: this.install();
     }
   }
-  
+
   playNow = () => {
     this.setState({showEuala: true});
   }
-  
+
   closeEualaModal = () => {
     this.setState({showEuala: false});
   }
@@ -145,18 +146,18 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     patcher.launchChannelfunction(patcher.getAllChannels()[this.props.channelIndex], launchString);
     this.props.playLaunch();
   }
-  
+
   install = () => {
     patcher.installChannel(patcher.getAllChannels()[this.props.channelIndex]);
     this.props.playSelect();
     this.startDownload = undefined;
   }
-  
+
   uninstall = () => {
     patcher.uninstallChannel(patcher.getAllChannels()[this.props.channelIndex]);
     this.props.playSelect();
   }
-  
+
   generateEualaModal = () => {
     return (
       <div className='fullscreen-blackout flex-row' key='accept-euala'>
@@ -170,33 +171,33 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     let layer1: any = null;
     let layer2: any = null;
     let layer3: any = null;
-    
+
     let channels = patcher.getAllChannels();
     if (typeof(channels) == 'undefined' || channels == null || channels.length == 0) return null;
-    
+
     let channelIndex = this.props.channelIndex != null && this.props.channelIndex >= 0 ? this.props.channelIndex : 0;
     switch(channels[channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled:
         layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Install</a>;
         break;
-      case ChannelStatus.Validating: 
+      case ChannelStatus.Validating:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
         this.startDownload = undefined;
         break;
       case ChannelStatus.Updating:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Installing</a>;
-        
+
         if (this.startDownload === undefined) {
           this.startDownload = Date.now();
         }
-        
+
         const downloadRate: number = patcher.getDownloadRate();
         const downloadRemaining: number = patcher.getDownloadRemaining();
         const estimate: number = patcher.getDownloadEstimate();
-        
+
         const percentDone = estimate ? 100.0 - ((downloadRemaining / estimate) * 100) : 0;
         layer2 = <div className='fill' style={{width: percentDone + '%', opacity: 1}} />;
-        
+
         const downloadDuration: number = (Date.now() - this.startDownload) / 1000;
         const remainingTime : number = percentDone ? ((100/percentDone)*downloadDuration) - downloadDuration : undefined;
         const time: string = percentDone ? Progress.secondsToString(remainingTime) : 'starting';
@@ -215,7 +216,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>Play Now</a>;
-        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {channels[channelIndex].channelName}</a>;
+        uninstall = <UninstallButton uninstall={this.uninstall} name={channels[channelIndex].channelName}/>;
         this.startDownload = undefined;
         break;
       case ChannelStatus.Launching:
@@ -233,10 +234,10 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         this.startDownload = undefined;
         break;
     }
-    
+
     // euala modal
     let eualaModal: any = this.state.showEuala ? this.generateEualaModal() : null;
-    
+
     return (
       <div>
         <div id={this.name}>
