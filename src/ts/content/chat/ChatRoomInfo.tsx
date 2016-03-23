@@ -27,11 +27,11 @@ class ChatRoomInfo {
     this.scrollbackThreshold = scrollbackThreshold;
     this.scrollbackPageSize = scrollbackPageSize;
   }
-  public addUser(user: UserInfo) : void {
+  public addUser = (user: UserInfo) : void => {
     this.users.push(<User key={this.key++} info={user}/>);
     this.players ++;
   }
-  public removeUser(user: UserInfo) : void {
+  public removeUser = (user: UserInfo) : void => {
     const users: JSX.Element[] = this.users;
     for (let i = 0; i < users.length; i++) {
       if (users[i].props.info.name === user.name) {
@@ -41,7 +41,7 @@ class ChatRoomInfo {
       }
     }
   }
-  public add(message: ChatMessage) : void {
+  public add = (message: ChatMessage) : void => {
     this.messages.push(
       <ChatLine key={this.key++} message={message}/>
     );
@@ -51,24 +51,37 @@ class ChatRoomInfo {
       this.messages.shift();
     }
   }
-  public push(message: ChatMessage) : void {
+  public push = (message: ChatMessage) : void => {
     this.add(message);
     this.unread ++;
   }
-  public seen() : void {
+  public seen = () : void => {
     this.unread = 0;
   }
-  public startScrollback() : void {
-    if (this.messages.length > this.scrollbackThreshold) { 
-      this.scrollback = this.messages.length - this.scrollbackThreshold;
+  public countVisibleMessages = () : number => {
+    let count: number = 0;
+    this.messages.forEach((message: JSX.Element) : void => {
+      if (!chatConfig.JOIN_PARTS) {
+        // not showing JOIN/PARTS so don't count these message types
+        if (message.props['message'].type === chatType.AVAILABLE) return;
+        if (message.props['message'].type === chatType.UNAVAILABLE) return;
+      }
+      count ++;      
+    });
+    return count;
+  }
+  public startScrollback = () : void => {
+    const count : number = this.countVisibleMessages();
+    if (count > this.scrollbackThreshold) { 
+      this.scrollback = count - this.scrollbackThreshold;
     } else {
       this.scrollback = 0;
     }
   }
-  public cancelScrollback() : void {
+  public cancelScrollback = () : void => {
     this.scrollback = 0;
   }
-  public nextScrollbackPage() : void {
+  public nextScrollbackPage = () : void => {
     if (this.scrollbackPageSize > this.scrollback) {
       this.cancelScrollback();
     } else {
