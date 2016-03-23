@@ -12,6 +12,7 @@ import Emoji from './Emoji';
 import Colors from './Colors';
 import Links from './Links';
 import Markdown from './Markdown';
+import JoinRoomFromText from './JoinRoomFromText';
 
 class ChatLineParser {
   _key: number = 1;
@@ -20,6 +21,7 @@ class ChatLineParser {
   static EMOJI: number = ChatTextParser.TEXT + 2;
   static MARKDOWN: number = ChatTextParser.TEXT + 3;
   static COLORS: number = ChatTextParser.TEXT + 4;
+  static JOINROOM: number = ChatTextParser.TEXT + 5;
 
   _parseText(text: string) : JSX.Element[] {
     return [ <span key={this._key++}>{text}</span> ];
@@ -51,6 +53,8 @@ class ChatLineParser {
     if (chatConfig.SHOW_EMOTICONS) {
       tokens.push({ token: ChatLineParser.EMOJI, expr: Emoji.createRegExp() });
     }
+    tokens.push({ token: ChatLineParser.JOINROOM, expr: JoinRoomFromText.createRegExp()} );
+
     // Run through each parser
     const parser : ChatTextParser = new ChatTextParser(tokens);
     return parser.parse(text, (token: number, text: string) => {
@@ -59,6 +63,7 @@ class ChatLineParser {
         case ChatLineParser.EMOJI: return Emoji.fromText(text, keygen);
         case ChatLineParser.MARKDOWN: return Markdown.fromText(text, keygen);
         case ChatLineParser.COLORS: return Colors.fromText(text, keygen);
+        case ChatLineParser.JOINROOM: return JoinRoomFromText.fromText(text, keygen);
       }
       // treat everything else as just text
       return this._parseText(text);

@@ -41,12 +41,13 @@ class Chat extends React.Component<ChatProps, ChatState> {
 
     // handle updates to chat session
     this._eventHandlers.push(events.on('chat-session-update', this.update));
+    this._eventHandlers.push(events.on('chat-show-room', this.joinRoom));
     this._eventHandlers.push(events.on('chat-options-update', this.optionsUpdated));
-    
+
     // Initialize chat settings in localStorage
     initLocalStorage();
   }
-  
+
   initialState(): ChatState {
     return {
       chat: (window as any)['_cse_chat_session'] || new ChatSession(),
@@ -69,23 +70,27 @@ class Chat extends React.Component<ChatProps, ChatState> {
       case chatType.PRIVATE:
         this.state.chat.sendMessage(text, roomId.name);
         break;
-    } 
+    }
   }
 
   update = (chat : ChatSession) : void => {
     this.setState({ chat: chat, now: Date.now() } as any);
   }
-  
+
   optionsUpdated = (config: ChatConfig) : void => {
     this.setState({ config: config, now: Date.now() } as any);
   }
-  
+
   selectRoom = (roomId: RoomId) : void => {
     this.state.chat.joinRoom(roomId);
   }
 
   leaveRoom = (roomId: RoomId) : void => {
     this.state.chat.leaveRoom(roomId);
+  }
+
+  joinRoom = (roomName: string) : void => {
+    this.state.chat.joinRoom(new RoomId(roomName, chatType.GROUP));
   }
 
   slashCommand = (command: string) : boolean => {
@@ -97,17 +102,17 @@ class Chat extends React.Component<ChatProps, ChatState> {
     (window as any)["_cse_chat_session"] = this.state.chat;
     this.props.hideChat();
   }
-  
+
   disconnect = () : void => {
     this.state.chat.simulateDisconnect();
   }
-  
+
   getRooms = () : void => {
     this.state.chat.getRooms();
   }
-  
+
   componentWillMount() : void {
-    // hook up to chat 
+    // hook up to chat
     this.state.chat.connect(this.props.username, this.props.userpass);
   }
   componentDidMount() : void {
@@ -132,8 +137,8 @@ class Chat extends React.Component<ChatProps, ChatState> {
         <div className="chat-disconnect" >{this.state.chat.latency}</div>
         <div className="chat-frame">
           <Info
-            chat={this.state.chat} 
-            currentRoom={this.state.chat.currentRoom} 
+            chat={this.state.chat}
+            currentRoom={this.state.chat.currentRoom}
             selectRoom={this.selectRoom}
             leaveRoom={this.leaveRoom}
             />
