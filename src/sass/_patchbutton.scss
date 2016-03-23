@@ -119,9 +119,10 @@
 }
 
 .uninstall-link {
+  display: block;
   text-align: center;
-  color: white;
-  margin: 0 auto;
+  color: #848484;
+  margin: 5px;
   cursor: pointer !important;
 }
 

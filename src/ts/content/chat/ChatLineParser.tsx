@@ -6,7 +6,7 @@
 
 import * as React from 'react';
 import { ChatTextParser, ChatTextParserToken } from './ChatTextParser';
-import {prefixes, display} from './settings/chat-defaults';
+import { chatConfig } from './ChatConfig';
 
 import Emoji from './Emoji';
 import Colors from './Colors';
@@ -16,11 +16,7 @@ import JoinRoomFromText from './JoinRoomFromText';
 
 class ChatLineParser {
   _key: number = 1;
-
-  _showColors: boolean = JSON.parse(localStorage.getItem(`${prefixes.display}${display.showColors.key}`));
-  _showEmoticons: boolean = JSON.parse(localStorage.getItem(`${prefixes.display}${display.showEmoticons.key}`));
-  _showMarkdown: boolean = JSON.parse(localStorage.getItem(`${prefixes.display}${display.showMarkdown.key}`));
-
+  
   static LINK: number = ChatTextParser.TEXT + 1;
   static EMOJI: number = ChatTextParser.TEXT + 2;
   static MARKDOWN: number = ChatTextParser.TEXT + 3;
@@ -46,15 +42,15 @@ class ChatLineParser {
     const keygen = () : number => { return this._key++; };
     const tokens : ChatTextParserToken[] = [];
     // Parsers which need recursion should be first
-    if (this._showColors) {
+    if (chatConfig.SHOW_COLORS) {
       tokens.push({ token: ChatLineParser.COLORS, expr: Colors.createRegExp() });
     }
-    if (this._showMarkdown) {
+    if (chatConfig.SHOW_MARKDOWN) {
       tokens.push({ token: ChatLineParser.MARKDOWN, expr: Markdown.createRegExp() });
     }
     // Parsers with simple search/replace should be last
     tokens.push({ token: ChatLineParser.LINK, expr: Links.createRegExp()} );
-    if (this._showEmoticons) {
+    if (chatConfig.SHOW_EMOTICONS) {
       tokens.push({ token: ChatLineParser.EMOJI, expr: Emoji.createRegExp() });
     }
     tokens.push({ token: ChatLineParser.JOINROOM, expr: JoinRoomFromText.createRegExp()} );

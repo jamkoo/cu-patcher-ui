@@ -11,6 +11,7 @@ import ChatRoomInfo from './ChatRoomInfo';
 import { ChatMessage, chatType } from './ChatMessage';
 import SlashCommand from './SlashCommand';
 import RoomId from './RoomId';
+import { chatConfig, ChatConfig } from './ChatConfig';
 
 import Info from './Info';
 import Content from './Content';
@@ -19,6 +20,7 @@ import {initLocalStorage} from './settings/chat-defaults';
 export interface ChatState {
   chat: ChatSession;
   now: number;
+  config: ChatConfig;
 }
 
 export interface ChatProps {
@@ -34,18 +36,23 @@ class Chat extends React.Component<ChatProps, ChatState> {
     super(props);
     this.state = this.initialState();
 
+    // load configuration (before subscribing to options updates!)
+    chatConfig.refresh();
+
     // handle updates to chat session
     this._eventHandlers.push(events.on('chat-session-update', this.update));
     this._eventHandlers.push(events.on('chat-show-room', this.joinRoom));
+    this._eventHandlers.push(events.on('chat-options-update', this.optionsUpdated));
 
     // Initialize chat settings in localStorage
     initLocalStorage();
   }
-  
+
   initialState(): ChatState {
     return {
       chat: (window as any)['_cse_chat_session'] || new ChatSession(),
-      now: 0
+      now: 0,
+      config: chatConfig
     }
   }
 
@@ -63,13 +70,17 @@ class Chat extends React.Component<ChatProps, ChatState> {
       case chatType.PRIVATE:
         this.state.chat.sendMessage(text, roomId.name);
         break;
-    } 
+    }
   }
 
   update = (chat : ChatSession) : void => {
     this.setState({ chat: chat, now: Date.now() } as any);
   }
-  
+
+  optionsUpdated = (config: ChatConfig) : void => {
+    this.setState({ config: config, now: Date.now() } as any);
+  }
+
   selectRoom = (roomId: RoomId) : void => {
     this.state.chat.joinRoom(roomId);
   }
@@ -91,17 +102,17 @@ class Chat extends React.Component<ChatProps, ChatState> {
     (window as any)["_cse_chat_session"] = this.state.chat;
     this.props.hideChat();
   }
-  
+
   disconnect = () : void => {
     this.state.chat.simulateDisconnect();
   }
-  
+
   getRooms = () : void => {
     this.state.chat.getRooms();
   }
-  
+
   componentWillMount() : void {
-    // hook up to chat 
+    // hook up to chat
     this.state.chat.connect(this.props.username, this.props.userpass);
   }
   componentDidMount() : void {
@@ -126,8 +137,8 @@ class Chat extends React.Component<ChatProps, ChatState> {
         <div className="chat-disconnect" >{this.state.chat.latency}</div>
         <div className="chat-frame">
           <Info
-            chat={this.state.chat} 
-            currentRoom={this.state.chat.currentRoom} 
+            chat={this.state.chat}
+            currentRoom={this.state.chat.currentRoom}
             selectRoom={this.selectRoom}
             leaveRoom={this.leaveRoom}
             />
