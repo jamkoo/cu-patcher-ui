@@ -14,10 +14,10 @@ export interface User {
 
 export enum ChannelStatus {
   NotInstalled,
-  Validating, 
+  Validating,
   Updating,
   OutOfDate,
-  Ready, 
+  Ready,
   Launching,
   Running,
   Uninstalling,
@@ -25,8 +25,8 @@ export enum ChannelStatus {
 }
 
 export interface Channel {
-  channelName: string; 
-  channelID: number; 
+  channelName: string;
+  channelID: number;
   channelStatus: ChannelStatus;
 }
 
@@ -34,7 +34,7 @@ const API : string = "patcherAPI";
 
 // Define patcher class
 
-export class PatcherAPI { 
+export class PatcherAPI {
   private _hasReadFAQ : boolean = false;
   private _api : any;
   constructor() {
@@ -69,6 +69,9 @@ export class PatcherAPI {
   }
   hasApi() :boolean {
     return this._api !== undefined;
+  }
+  hasRealApi(): boolean {
+    return API in window;
   }
   getUserEmail() :string {
     return this._api.userEmail;
@@ -173,23 +176,23 @@ export class PatcherAPI {
     this._hasReadFAQ = true;
     this._api.MarkFAQAsRead();
   }
-  
+
   /**
    * Window Controls
    */
   closeWindow() {
     this._api.closeWindow();
   }
-  
+
   minimizeWindow() {
     this._api.minimizeWindow();
   }
-  
+
   maximizeWindow() {
     this._api.maxmizeWindow();
   }
-  
-  
+
+
 }
 
 export const patcher = new PatcherAPI();
