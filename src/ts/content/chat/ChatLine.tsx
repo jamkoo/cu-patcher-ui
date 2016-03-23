@@ -8,7 +8,7 @@ import * as React from 'react';
 import { chatType, ChatMessage } from './ChatMessage';
 import * as events from '../../core/events';
 import ChatLineParser from './ChatLineParser';
-import {prefixes, display} from './settings/chat-defaults';
+import { chatConfig } from './ChatConfig';
 
 export interface ChatLineState {
 }
@@ -50,13 +50,10 @@ class ChatLine extends React.Component<ChatLineProps, ChatLineState> {
   }
   render(): JSX.Element {
     let element: JSX.Element = null;
-    let showTimestamp = JSON.parse(localStorage.getItem(`${prefixes.display}${display.timestamps.key}`));
-    let timestamp : JSX.Element = showTimestamp ? <span className="chat-timestamp">{ this.timestamp(this.props.message) }</span> : null;
-
-    let joinParts = JSON.parse(localStorage.getItem(`${prefixes.display}${display.joinParts.key}`));
+    let timestamp : JSX.Element = chatConfig.TIMESTAMPS ? <span className="chat-timestamp">{ this.timestamp(this.props.message) }</span> : null;
     switch(this.props.message.type) {
       case chatType.AVAILABLE:
-        if (!joinParts) break;
+        if (!chatConfig.JOIN_PARTS) break;
         element = (
           <div className="chat-line">
             <span className="chat-line-entry">{this.props.message.nick} entered the room</span>
@@ -64,7 +61,7 @@ class ChatLine extends React.Component<ChatLineProps, ChatLineState> {
         );
         break;
       case chatType.UNAVAILABLE:
-        if (!joinParts) break;
+        if (!chatConfig.JOIN_PARTS) break;
         element = (
           <div className="chat-line">
             <span className="chat-line-exit">{this.props.message.nick} left the room</span>

@@ -8,6 +8,8 @@ import * as React from 'react';
 import Prefixer from '../utils/Prefixer';
 import BooleanOption from './BooleanOption';
 import {display, prefixes} from './chat-defaults';
+import { chatConfig } from '../ChatConfig';
+
 const pre = new Prefixer(prefixes.display);
 
 export interface ChatDisplayProps {
@@ -41,6 +43,7 @@ class ChatDisplay extends React.Component<ChatDisplayProps, ChatDisplayState> {
 
   updateItem = (key: string, value: any) => {
     localStorage.setItem(pre.prefix(key), value);
+    chatConfig.refresh();
     this.setState(this.initializeState())
   }
 
