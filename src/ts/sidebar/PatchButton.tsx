@@ -83,7 +83,8 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   public name: string = 'cse-patcher-patch-button';
   private intervalHandle: any;
   private startDownload: number;
-  
+  private commands: string = '';
+
   constructor(props: PatchButtonProps) {
     super(props);
     this.state = { showEuala: false}
@@ -99,8 +100,21 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     // unregister intervals
     clearInterval(this.intervalHandle);
   }
-  
-  onClicked = () => {
+
+  onClicked = (event: React.MouseEvent):void => {
+    if (event.altKey) {
+      var channelCommand = localStorage.getItem('CSE_COMMANDS_' + this.props.server.name);
+      if(!channelCommand){
+        channelCommand = ''
+      }
+      channelCommand =  window.prompt('Please enter your command line parameters for ' + this.props.server.name, channelCommand);
+      localStorage.setItem('CSE_COMMANDS_' + this.props.server.name, channelCommand);
+
+      if(!channelCommand){
+          localStorage.removeItem('CSE_COMMANDS_' + this.props.server.name);
+      }
+      this.commands= channelCommand;
+    }
     switch (patcher.getAllChannels()[this.props.channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled: this.install();
       case ChannelStatus.Validating: break;
@@ -121,16 +135,12 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   closeEualaModal = () => {
     this.setState({showEuala: false});
   }
-  
-  closeArgsModal = () => {
+
+  launchClient = () => {
     this.setState({showEuala: false});
-  }
-  
-  launchClient = (commands: string = '') => {
-    this.setState({showEuala: false});
-    let launchString = commands;
+    let launchString = this.commands;
     if (this.props.character && this.props.character.id !== '') {
-      launchString = `server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)} ${commands}`
+      launchString += ` server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)}`
     }
     patcher.launchChannelfunction(patcher.getAllChannels()[this.props.channelIndex], launchString);
     this.props.playLaunch();
@@ -154,15 +164,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
       </div>
     );
   }
-  
-  generateArgsModal = () => {
-    return (
-      <div className='fullscreen-blackout flex-row' key='accept-euala'>
-        <CommandLineArgsModal ok={this.launchClient} cancel={this.closeEualaModal} />
-      </div>
-    );
-  }
-  
+
   render() {
     let uninstall: any = null;
     let layer1: any = null;
@@ -212,7 +214,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
         break;
       case ChannelStatus.Ready:
-        layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked}>Play Now</a>;
+        layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>Play Now</a>;
         uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {channels[channelIndex].channelName}</a>;
         this.startDownload = undefined;
         break;
