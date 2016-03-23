@@ -373,8 +373,15 @@
             font-size: 80%;
           }
           .chat-room-link {
-            color: $chat-line-room-color;
+            color: #FFE457;
             cursor: pointer;
+            transition: all .25s ease-in-out;
+            font-size: small;
+            &:hover {
+              background-color: #A4A4A5;
+              border-radius: 2px;
+              padding: 0px 5px;
+            }
           }
           .chat-emoticon {
             display: inline-block;

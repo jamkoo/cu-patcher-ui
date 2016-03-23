@@ -8,7 +8,7 @@ import * as React from 'react';
 import * as events from '../../core/events';
 
 function fromText(text: string, keygen: () => number) : JSX.Element[] {
-  return [<span key={keygen()} className={'chat-room-link'} onClick={() : void => { events.fire('chat-show-room', text.substr(1)); }}>{text}</span>];
+  return [<span key={keygen()} className={'chat-room-link'} onClick={() : void => { events.fire('chat-show-room', text.substr(1)); }}>{text.substr(1)}</span>];
 }
 
 function createRegExp() : RegExp {
