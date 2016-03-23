@@ -65,11 +65,16 @@ function fire(topic: string, data: any) : void {
   emitter.emit(topic, data);
 }
 
+function diagnostics() : void {
+  emitter.diagnostics();
+}
+
 // Export interface
 
 export {
   on,
   once,
   off,
-  fire
+  fire,
+  diagnostics
 };

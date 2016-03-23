@@ -12,9 +12,10 @@ import ChatRoomInfo from './ChatRoomInfo';
 import RoomId from './RoomId';
 import ChatClient from '../../chat/ChatClient';
 import messageType from '../../chat/messageType';
+import { patcher } from '../../api/PatcherAPI';
 
 class ChatSession {
-  
+
   SCROLLBACK_THRESHOLD : number = 50;
   SCROLLBACK_PAGESIZE : number = 100;
 
@@ -34,13 +35,29 @@ class ChatSession {
       this.onchat = this.onchat.bind(this);
       this.ondisconnect = this.ondisconnect.bind(this);
       this.onrooms = this.onrooms.bind(this);
-      
+
       window.onblur = () => this.windowActive = false;
       window.onfocus = () => {
         this.windowActive = true;
         var room = this.getRoom(this.currentRoom);
         if (room) room.seen();
       }
+  }
+
+  diagnostics = () : void => {
+    const memory : any = (window.performance as any).memory;
+    const now : Date = new Date();
+    console.log(now.toISOString());
+    console.log(
+      '| Memory Usage: ' + ((((memory.usedJSHeapSize/1024/1024)*100)|0)/100) + "MB"
+      + ' Active: ' + this.windowActive
+      + ' Latency: ' + this.latency
+      + ' Reconnecting: ' + this.reconnecting
+      + ' Rooms: ' + this.rooms.length
+    );
+    this.rooms.forEach((room: ChatRoomInfo) : void => {
+      room.diagnostics();
+    });
   }
 
   connect(username: string, password: string) {
@@ -54,6 +71,10 @@ class ChatSession {
       this.client.on('groupmessage', this.onchat);
       this.client.on('disconnect', this.ondisconnect);
       this.client.on('rooms', this.onrooms);
+      if (!patcher.hasRealApi()) {
+        if (username === "") username = window.prompt('username?');
+        if (password === "###") password = window.prompt('password?');
+      }
       this.client.connect(username, password);
     }
   }
@@ -61,6 +82,7 @@ class ChatSession {
   onping(ping: any) {
     this.latency = (Date.now() - ping.now);
     events.fire('chat-session-update', this);
+    this.diagnostics();
   }
 
   onconnect() : void {
@@ -72,7 +94,7 @@ class ChatSession {
   }
 
   onconnectfail() {
-    // if failed to connect and we are trying to re-connect, we should 
+    // if failed to connect and we are trying to re-connect, we should
     // retry
     if (this.reconnecting) {
       // connectFail while reconnecting, try again
@@ -128,11 +150,11 @@ class ChatSession {
   simulateDisconnect() {
     this.client.disconnect();
   }
-  
+
   getRooms() {
     this.client.getRooms();
   }
-  
+
   onrooms(items: Room[]) {
     events.fire('chat-room-list', items);
   }
@@ -183,7 +205,7 @@ class ChatSession {
         room.add(new ChatMessage(chatType.AVAILABLE, '', user.name));
       } else {
         room.removeUser(user);
-        room.add(new ChatMessage(chatType.UNAVAILABLE, '', user.name));      
+        room.add(new ChatMessage(chatType.UNAVAILABLE, '', user.name));
       }
       events.fire('chat-session-update', this);
     }
