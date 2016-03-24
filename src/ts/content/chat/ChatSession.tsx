@@ -13,6 +13,7 @@ import RoomId from './RoomId';
 import ChatClient from '../../chat/ChatClient';
 import messageType from '../../chat/messageType';
 import { patcher } from '../../api/PatcherAPI';
+import { chatConfig, ChatConfig } from './ChatConfig';
 
 class ChatSession {
 
@@ -88,6 +89,7 @@ class ChatSession {
   onconnect() : void {
     // TODO: if no rooms yet, this won't work.
     this.me = this.client.getNick();
+    chatConfig.setNick(this.me);
     this.broadcast(new ChatMessage(chatType.SYSTEM, '', '', 'Connected to chat server.'));
     this.connected = true;
     this.reconnecting = false;
