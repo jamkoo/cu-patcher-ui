@@ -13,6 +13,7 @@ import {restAPI} from 'camelot-unchained';
 import EualaModal from './EualaModal';
 import CommandLineArgsModal from './CommandLineArgsModal';
 import Animate from '../Animate';
+import UninstallButton from './UninstallButton';
 
 export class Progress {
   constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
@@ -217,7 +218,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Ready:
         layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>Play Now</a>;
-        uninstall = <a className='uninstall-link' onClick={this.uninstall}>Uninstall {channels[channelIndex].channelName}</a>;
+        uninstall = <UninstallButton uninstall={this.uninstall} name={channels[channelIndex].channelName}/>;
         this.startDownload = undefined;
         break;
       case ChannelStatus.Launching:
