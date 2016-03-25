@@ -9,12 +9,12 @@ import ChatLineParser from './ChatLineParser';
 
 
 function fromText(text: string, keygen: () => number) : JSX.Element[] {
-  let regexp: RegExp = this.createRegExp();
-  let match: RegExpExecArray = regexp.exec(text);
+  const regexp: RegExp = this.createRegExp();
+  const match: RegExpExecArray = regexp.exec(text);
 
   if (match) {
-    let matchColor: string = match[1];
-    let matchText: string = match[2];
+    const matchColor: string = match[1];
+    const matchText: string = match[2];
     return [<span key={keygen()} style={{ color: matchColor }}>{this.parse(matchText)}</span>];
   }
 }
