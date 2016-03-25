@@ -102,25 +102,27 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   }
 
   onClicked = (event: React.MouseEvent):void => {
-    if (event.altKey) {
-      var channelCommand = localStorage.getItem('CSE_COMMANDS_' + this.props.server.name);
-      if(!channelCommand){
-        channelCommand = ''
-      }
-      channelCommand =  window.prompt('Please enter your command line parameters for ' + this.props.server.name, channelCommand);
-      localStorage.setItem('CSE_COMMANDS_' + this.props.server.name, channelCommand);
-
-      if(!channelCommand){
-          localStorage.removeItem('CSE_COMMANDS_' + this.props.server.name);
-      }
-      this.commands= channelCommand;
-    }
+    
     switch (patcher.getAllChannels()[this.props.channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled: this.install();
       case ChannelStatus.Validating: break;
       case ChannelStatus.Updating: break;
       case ChannelStatus.OutOfDate: this.install();
-      case ChannelStatus.Ready: this.playNow();
+      case ChannelStatus.Ready: 
+        if (event.altKey) {
+          var channelCommand = localStorage.getItem('CSE_COMMANDS_' + this.props.server.name);
+          if(!channelCommand) {
+            channelCommand = ''
+          }
+          channelCommand =  window.prompt('Please enter your command line parameters for ' + this.props.server.name, channelCommand);
+          localStorage.setItem('CSE_COMMANDS_' + this.props.server.name, channelCommand);
+        
+          if(!channelCommand) {
+              localStorage.removeItem('CSE_COMMANDS_' + this.props.server.name);
+          }
+          this.commands= channelCommand;
+        }
+        this.playNow();
       case ChannelStatus.Launching: break;
       case ChannelStatus.Running: break;
       case ChannelStatus.Uninstalling: break;
