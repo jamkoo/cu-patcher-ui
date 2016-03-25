@@ -82,7 +82,7 @@
   position: relative;
   display: inline-block;
   background-image: url($url);
-  background-size: cover;
+  background-size: contain;
   width: 91px;
   height: 91px;
   margin: 3px;

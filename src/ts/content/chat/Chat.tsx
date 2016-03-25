@@ -148,7 +148,7 @@ class Chat extends React.Component<ChatProps, ChatState> {
             slashCommand={this.slashCommand}
             />
         </div>
-        <div className="chat-close" onClick={this.close}></div>
+        <div className="chat-close" onClick={this.close}>Close</div>
       </div>
     );
   }

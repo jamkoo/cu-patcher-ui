@@ -29,7 +29,7 @@
   li {
     opacity: 0.5;
     cursor: pointer !important;
-    margin: 5px -5px 0px 5px;
+    margin: 5px -12px 0px 5px;
     padding: 5px 25px 0px 9px;
     border: 1px solid rgba(255, 255, 255, 0.27);
     background: black;
@@ -58,26 +58,3 @@
   display: none;
 }
 
-@media (max-width: 800px) {
-    .cse-patcher-hero-item .herotext{
-        zoom: 60%;
-    }
-    .cse-patcher-hero-item .herotext div {
-        width: calc(150% - 308px);
-    }
-    .cse-patcher-hero-item .herotext .righttext{
-        padding-right: 50%;
-    }
-}
-
-@media (min-width: 1600px) {
-    .cse-patcher-hero-item .herotext{
-        zoom: 150%;
-    }
-}
-
-@media (min-width: 1900px) {
-    .cse-patcher-hero-item .herotext{
-        zoom: 170%;
-    }
-}
