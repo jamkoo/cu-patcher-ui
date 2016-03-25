@@ -8,7 +8,7 @@ import * as React from 'react';
 import {components} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 
-import {Server} from '../redux/modules/servers';
+import {Server, AccessType} from '../redux/modules/servers';
 
 export enum ServerStatus {
   OFFLINE,
@@ -25,6 +25,7 @@ class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServ
   render() {
     let totalPlayers = (this.props.item.arthurians|0) + (this.props.item.tuathaDeDanann|0) + (this.props.item.vikings|0);
     let status = this.props.item.playerMaximum > 0 ? 'online' : 'offline';
+    let accessLevel = AccessType[this.props.item.accessLevel];
     return (
       <div className='server-select quickselect-active'>
         <h5 className='label'>SELECT SERVER</h5>
@@ -32,7 +33,7 @@ class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServ
           <div className='server-status'><div className={'indicator ' + status} data-position='right'
             data-delay='150' data-tooltip={status} /></div>
           <div className='server-details'>
-            <h5 className='server'>{this.props.item.name}</h5>
+            <h5 className='server'>{this.props.item.name} ({accessLevel})</h5>
             <h6>{totalPlayers}/{this.props.item.playerMaximum}</h6>
           </div>
         </div>
@@ -50,13 +51,14 @@ class ServerListView extends React.Component<ServerListViewProps, ServerListView
   render() {
     let totalPlayers = (this.props.item.arthurians|0) + (this.props.item.tuathaDeDanann|0) + (this.props.item.vikings|0);
     let status = this.props.item.playerMaximum > 0 ? 'online' : 'offline';
+    let accessLevel = AccessType[this.props.item.accessLevel];
     return (
       <div className='server-select quickselect-list'>
         <div>
           <div className='server-status'><div className={'indicator ' + status} data-position='right'
             data-delay='150' data-tooltip={status} /></div>
           <div className='server-details'>
-            <h5 className='server'>{this.props.item.name}</h5>
+            <h5 className='server'>{this.props.item.name} ({accessLevel})</h5>
             <h6>{totalPlayers}/{this.props.item.playerMaximum}</h6>
           </div>
         </div>
@@ -75,23 +77,23 @@ export interface ServerSelectState {
 
 class ServerSelect extends React.Component<ServerSelectProps, ServerSelectState> {
   public name: string = 'cse-patcher-server-select';
-  
+
   constructor(props: ServerSelectProps) {
     super(props);
   }
-  
+
   onSelectedServerChanged = (server: any) => {
     this.props.onSelectedServerChanged(server);
   }
-  
+
   generateActiveView = (server: any) => {
     return <ActiveServerView item={server} />
   }
-  
+
   generateListView = (server: any) => {
     return <ServerListView item={server} />
   }
-  
+
   render() {
     if (this.props.servers.length == 0) return null;
     return (

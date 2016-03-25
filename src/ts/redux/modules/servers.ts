@@ -14,8 +14,19 @@ import {fetchJSON} from '../../core/fetchHelpers';
 
 const serversUrl = 'http://api.camelotunchained.com/servers';
 
+export enum AccessType {
+  Invalid = -1,
+  Public = 0,
+  Beta3 = 1,
+  Beta2 = 2,
+  Beta1 = 3,
+  Alpha = 4,
+  InternalTest = 5,
+  Employees = 6,
+}
+
 export interface Server {
-  accessLevel: number,
+  accessLevel: AccessType,
   host: string,
   name: string,
   playerMaximum: number,
@@ -30,7 +41,7 @@ export interface Server {
 
 function OfflineServer(name: string, channel: number, shardID: number) :Server {
   return {
-    accessLevel: 0,
+    accessLevel: AccessType.Invalid,
     host: '',
     name: name,
     playerMaximum: 0,
@@ -146,7 +157,7 @@ export default function reducer(state: ServersState = initialState, action: any 
           isFetching: false,
           error: action.error
         });
-    case CHANGE_SERVER: 
+    case CHANGE_SERVER:
       return Object.assign({}, state, {
         currentServer: action.server
       });

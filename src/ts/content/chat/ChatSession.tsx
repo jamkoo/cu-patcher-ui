@@ -177,7 +177,7 @@ class ChatSession {
   // Receive a message from a room or user.
   recv(message: ChatMessage) : void {
     // check for a broadcast message (private message sent by "")
-    if (message.type === chatType.PRIVATE && message.nick === "") {
+    if (message.type === chatType.PRIVATE && message.nick === "chat.camelotunchained.com/warning") {
       this.broadcast(message);
     } else {
       const roomId = new RoomId(message.roomName, message.type);
