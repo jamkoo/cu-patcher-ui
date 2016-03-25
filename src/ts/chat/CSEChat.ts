@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
- 
+
 import {Client, Element} from 'node-xmpp-client';
 import Config from './Config';
 import EventEmitter from '../core/EventEmitter';
@@ -35,7 +35,7 @@ class CSEChat  {
     this.config = config;
   }
 
-  // generate an id using an id generator  
+  // generate an id using an id generator
   _nextId(prefix: string) : string {
     return prefix + (this._iqc++);
   }
@@ -66,11 +66,11 @@ class CSEChat  {
     this.client.end();
     this.client = null;
   }
-    
+
   sendMessageToRoom(message: string, roomName: string) {
     if (!this.client) return;
     this.client.send(new Element('message', {
-      to: roomName + '@' + this.config.service + '.' + this.config.address, 
+      to: roomName + '@' + this.config.service + '.' + this.config.address,
       type: 'groupchat'
     }).c('body').t(message));
   }
@@ -78,7 +78,7 @@ class CSEChat  {
   sendMessageToUser(message: string, userName: string) {
     if (!this.client) return;
     this.client.send(new Element('message', {
-      to: userName + '@' + this.config.address, 
+      to: userName + '@' + this.config.address,
       type: 'chat'
     }).c('body').t(message));
   }
@@ -123,7 +123,7 @@ class CSEChat  {
   removeListener(event:any) : void {
     this.eventEmitter.removeListener(event);
   }
- 
+
   // PRIVATE METHODS (as private as they can be)
 
   _initializeEvents() {
@@ -182,7 +182,7 @@ class CSEChat  {
   }
 
   _ping(pong: (ping: any) => void) {
-    
+
     if (!pong) {
       console.error('ping without pong');
       debugger;
@@ -273,20 +273,20 @@ class CSEChat  {
         const query = stanza.getChild('query');
         if (query) {
           if (query.attrs.xmlns === NS_DISCO_ITEMS) {
-            this._gotRooms(stanza.attrs.id, query); 
-          }          
+            this._gotRooms(stanza.attrs.id, query);
+          }
         }
       }
     }
-      
+
   }
-  
+
   _gotRooms(id: string, stanza: Element) : void {
     const items : Element[] = stanza.getChildren('item');
     const info : any = this._msgs[id];
     if (info) {
       this._inFlight --;
-      delete this._msgs[id]; 
+      delete this._msgs[id];
       const rooms : Room[] = [];
       items.forEach((item: Element) => {
         rooms.push({ name: item.attrs['name'], jid: item.attrs['jid'] });
@@ -294,20 +294,19 @@ class CSEChat  {
       this.eventEmitter.emit('rooms', rooms);
     }
   }
-    
+
   _parseMessageGroup(stanza:Element) {
 
     const body = stanza.getChild('body');
     const message = body ? body.getText() : '';
+    const nick = stanza.getChild('nick');
     const cseflags = stanza.getChild('cseflags');
     const isCSE = cseflags ? cseflags.attrs.cse : false;
 
-
     const fromArr = stanza.attrs.from.split('/');
-    const room = fromArr[0];
-    const roomName = room.split('@')[0];
+    const roomName = fromArr[0].split('@')[0];
     const sender = fromArr[1];
-    const senderName = sender.split('@')[0];
+    const senderName = nick ? nick.getText() : sender;
 
     let s = new Sender(0, sender, senderName, isCSE);
     return new Message(this._idCounter++, new Date(), message, roomName, messageType.MESSAGE_GROUP, s);
@@ -318,12 +317,13 @@ class CSEChat  {
     const body = stanza.getChild('body');
     const message = body ? body.getText() : '';
     const nick = stanza.getChild('nick');
-    const senderName = nick ? nick.getText() : '';
+    const sender = stanza.from.split('@')[0];
+    const senderName = nick ? nick.getText() : sender;
     const cseflags = stanza.getChild('cseflags');
     const isCSE = cseflags ? cseflags.attrs.cse : false;
 
-    let s = new Sender(0, senderName, nick, isCSE);
-    return new Message(this._idCounter++, new Date(), message, senderName, messageType.MESSAGE_CHAT, s);
+    let s = new Sender(0, sender, senderName, isCSE);
+    return new Message(this._idCounter++, new Date(), message, sender, messageType.MESSAGE_CHAT, s);
   }
 
   _parsePresence(stanza:Element) {
@@ -341,7 +341,7 @@ class CSEChat  {
     const isCSE = cseflags ? cseflags.attrs.cse : false;
 
     let s = new Sender(0, sender, senderName, isCSE);
-     
+
     if (stanza.attrs.type=="unavailable"){
          return new Message(this._idCounter++, new Date(), "", roomName, messageType.UNAVAILIBLE, s);
     }
