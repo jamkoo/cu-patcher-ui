@@ -35,6 +35,7 @@
     cursor: pointer !important;
     
     img {
+      zoom: 100%; //remove later
       position: absolute;
       left: 50%;
       min-width: 100%;
@@ -106,6 +107,7 @@
     width: 20px;
     overflow: hidden;
     background: url("../images/news-close.png") no-repeat center center;
+    background-size: contain;
     color: transparent;
   }
   

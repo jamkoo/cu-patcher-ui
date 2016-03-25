@@ -31,9 +31,11 @@ nav {
             font-size: 1rem!important;
             float:right;
             display: block;
-            width: 20px;
+            width: 12px;
+            margin-left: 5px;
             overflow: hidden;
             background: url("../images/linkout.jpg") no-repeat center center;
+            background-size: contain;
             color: transparent;
         }
       }

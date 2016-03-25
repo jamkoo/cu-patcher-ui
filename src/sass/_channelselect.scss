@@ -33,6 +33,7 @@
   &:after {
     content: '';
     background-image: url('../images/dropdown.png');
+    background-size: contain;
     position: absolute;
     right: 2.5px;
     bottom: 10px;
