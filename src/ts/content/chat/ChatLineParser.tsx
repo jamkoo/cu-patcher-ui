@@ -16,7 +16,7 @@ import JoinRoomFromText from './JoinRoomFromText';
 
 class ChatLineParser {
   _key: number = 1;
-  
+
   static LINK: number = ChatTextParser.TEXT + 1;
   static EMOJI: number = ChatTextParser.TEXT + 2;
   static MARKDOWN: number = ChatTextParser.TEXT + 3;
@@ -42,9 +42,7 @@ class ChatLineParser {
     const keygen = () : number => { return this._key++; };
     const tokens : ChatTextParserToken[] = [];
     // Parsers which need recursion should be first
-    if (chatConfig.SHOW_COLORS) {
-      tokens.push({ token: ChatLineParser.COLORS, expr: Colors.createRegExp() });
-    }
+    tokens.push({ token: ChatLineParser.COLORS, expr: Colors.createRegExp() });
     if (chatConfig.SHOW_MARKDOWN) {
       tokens.push({ token: ChatLineParser.MARKDOWN, expr: Markdown.createRegExp() });
     }

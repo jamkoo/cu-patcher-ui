@@ -6,7 +6,7 @@
 
 import * as React from 'react';
 import ChatLineParser from './ChatLineParser';
-
+import { chatConfig } from './ChatConfig';
 
 function fromText(text: string, keygen: () => number) : JSX.Element[] {
   const regexp: RegExp = this.createRegExp();
@@ -15,7 +15,11 @@ function fromText(text: string, keygen: () => number) : JSX.Element[] {
   if (match) {
     const matchColor: string = match[1];
     const matchText: string = match[2];
-    return [<span key={keygen()} style={{ color: matchColor }}>{this.parse(matchText)}</span>];
+    if (chatConfig.SHOW_COLORS) {
+      return [<span key={keygen()} style={{ color: matchColor }}>{this.parse(matchText)}</span>];
+    } else {
+      return [<span key={keygen()}>{this.parse(matchText)}</span>];
+    }
   }
 }
 
