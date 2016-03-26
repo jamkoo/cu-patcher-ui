@@ -24,7 +24,7 @@ class Rooms extends React.Component<RoomsProps, RoomsState> {
     super(props);
   }
   render() {
-    
+
     let unreadTotal = 0;
     const content : JSX.Element[] = [];
     const rooms = this.props.rooms;
@@ -33,8 +33,8 @@ class Rooms extends React.Component<RoomsProps, RoomsState> {
       content.push(
         <Room
           key={i}
-          roomId={rooms[i].roomId} 
-          players={rooms[i].players} 
+          roomId={rooms[i].roomId}
+          players={rooms[i].players}
           unread={rooms[i].unread}
           selected={rooms[i].roomId.same(this.props.current)}
           select={this.props.select}
@@ -42,9 +42,9 @@ class Rooms extends React.Component<RoomsProps, RoomsState> {
         />
       );
     }
-    
+
     // update title to display unread
-    document.title = unreadTotal > 0 ? `(${unreadTotal}) Camelot Unchained` : 'Camelot Unchained'; 
+    document.title = unreadTotal > 0 ? `(${unreadTotal}) Camelot Unchained` : 'Camelot Unchained';
     return (
       <div className="chat-tab-content chat-rooms">
         {content}
