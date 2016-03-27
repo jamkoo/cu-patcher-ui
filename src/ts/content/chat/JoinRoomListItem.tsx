@@ -26,7 +26,8 @@ class JoinRoomListItem extends React.Component<JoinRoomListItemProps, JoinRoomLi
   }
 
   render() {
-    return ( <div className="room-name" onClick={this.selectRoom}>{this.props.room.name}</div> );
+    const name: string = this.props.room.jid.split('@')[0];
+    return ( <div className="room-name" onClick={this.selectRoom}>{name}</div> );
   }
 }
 
