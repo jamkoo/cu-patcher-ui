@@ -26,11 +26,6 @@ class ChatLineParser {
   static JOINROOM: number = ChatTextParser.TEXT + 5;
   static HIGHLIGHT: number = ChatTextParser.TEXT + 6;
 
-  highlight:string[] = [];
-
-  addHighlight(highlight : string[]) : void {
-    this.highlight=highlight;
-  }
   _parseText(text: string) : JSX.Element[] {
     return [ <span key={this._key++}>{text}</span> ];
   }
@@ -60,7 +55,11 @@ class ChatLineParser {
       tokens.push({ token: ChatLineParser.EMOJI, expr: Emoji.createRegExp() });
     }
     tokens.push({ token: ChatLineParser.JOINROOM, expr: JoinRoomFromText.createRegExp()} );
-    tokens.push({ token: ChatLineParser.HIGHLIGHT, expr: Highlight.createRegExp(this.highlight)} );
+
+    const highlights = chatConfig.getHighlights();
+    if (highlights.length) {
+      tokens.push({ token: ChatLineParser.HIGHLIGHT, expr: Highlight.createRegExp(highlights) });
+    }
 
     // Run through each parser
     const parser : ChatTextParser = new ChatTextParser(tokens);
