@@ -18,10 +18,10 @@ export class ChatConfig {
   NICK : string = '';
   HIGHLIGHTS : string[] = ['alpha','beta','CSE'];
 
-
   constructor() {
     this.refresh();
   }
+
   public setNick = (nick :string): void => {
     this.NICK = nick;
   }
