@@ -13,17 +13,15 @@ function fromText(text: string, keygen: () => number) : JSX.Element[] {
 }
 
 function createRegExp(highlight: string[]) : RegExp {
-  let regex:string;
+  let regex: string;
   highlight.forEach((h: string) => {
-    if (h) {
-      if (!regex) {
-        regex = '\\b'+h+'\\b';
-      } else {
-        regex += '|\\b'+h+'\\b';
-      }
+    if (!regex) {
+      regex = '\\b' + h + '\\b';
+    } else {
+      regex += '|\\b' + h + '\\b';
     }
   });
-  return new RegExp(regex, "g");
+  return new RegExp(regex, 'g');
 }
 
 export default {
