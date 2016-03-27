@@ -32,8 +32,6 @@ class ChatLine extends React.Component<ChatLineProps, ChatLineState> {
   }
   buildMessage(timestamp: JSX.Element, text: string, classes: string = null): JSX.Element {
     const parser = new ChatLineParser();
-    parser.addHighlight(chatConfig.getHighlights());
-
     const isAction: boolean = parser.isAction(text);
     let nick: string = this.props.message.nick;
     let elements: JSX.Element[];
