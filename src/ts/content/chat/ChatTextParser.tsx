@@ -24,42 +24,47 @@ class ChatTextParser {
     let re : RegExp;
     let match: RegExpExecArray;
     let next: number;
-    
+
     if (this.tokens.length > index) {
       re = this.tokens[index].expr;
       next = 0;
-      
+
       // find all matches for this token
       for (match = re.exec(text); match; match = re.exec(text)) {
         // parse text before match
         if (match.index > next) {
           section = text.substr(next, match.index - next);
           insert = this.parse(section, callback, index + 1);
-          html = html.concat(insert);                        
+          html = html.concat(insert);
         }
 
-        // parse the match
-        insert = callback(this.tokens[index].token, match[0]);
-        if (!insert) {
-          // text didn't match after all, parse again
-          insert = this.parse(match[0], callback, index + 1);
+        // parse the match *only* if its not empty
+        if (match[0]) {
+          insert = callback(this.tokens[index].token, match[0]);
+          if (!insert) {
+            // text didn't match after all, parse again
+            insert = this.parse(match[0], callback, index + 1);
+          }
+          html = html.concat(insert);
+        } else {
+          console.warn('bailing, regular expression returning empty match, brain fried, core dumped!');
+          break;
         }
-        html = html.concat(insert);                                            
 
-        // track where we are up to                
+        // track where we are up to
         next = match.index + match[0].length;
       }
-      
+
       // parse trailing text
       if (next < text.length) {
         section = text.substr(next);
         insert = this.parse(section, callback, index + 1);
-        html = html.concat(insert); 
+        html = html.concat(insert);
       }
-      
+
       return html;
     }
-    
+
     // no more tokens, just treat as text
     return callback(ChatTextParser.TEXT, text);
   }
