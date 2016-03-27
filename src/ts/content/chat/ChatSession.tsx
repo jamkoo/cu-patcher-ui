@@ -113,7 +113,7 @@ class ChatSession {
     switch (args.type) {
       case messageType.AVAILIBLE:
       case messageType.UNAVAILIBLE:
-        this.presence(args.type, new UserInfo(args.roomName, args.sender.sender));
+        this.presence(args.type, new UserInfo(args.roomName, args.sender.sender, args.sender.isCSE));
         break;
       case messageType.MESSAGE_CHAT:
       case messageType.MESSAGE_GROUP:

@@ -338,7 +338,7 @@ class CSEChat  {
     const senderName = sender.split('@')[0];
 
     const cseflags = stanza.getChild('cseflags');
-    const isCSE = cseflags ? cseflags.attrs.cse : false;
+    const isCSE = cseflags ? cseflags.attrs.cse : senderName.startsWith('cse'); // Kludge since presence stanzas don't currently set cseflags
 
     let s = new Sender(0, sender, senderName, isCSE);
 

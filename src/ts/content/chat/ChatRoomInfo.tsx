@@ -38,6 +38,14 @@ class ChatRoomInfo {
   public addUser = (user: UserInfo) : void => {
     let sortIndex: number = this.users.length;
     for (let i = 0; i < this.users.length; i++) {
+      if (user.isCSE) {
+        if (! this.users[i].props.info.isCSE) {
+          sortIndex = i - 1 > -1 ? i-- : 0;
+          break;
+        }
+      } else if (this.users[i].props.info.isCSE) {
+         continue;
+      }
       if (this.users[i].props.info.name > user.name) {
         sortIndex = i;
         break;
