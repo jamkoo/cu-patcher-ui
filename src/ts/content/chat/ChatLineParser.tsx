@@ -13,8 +13,10 @@ import Colors from './Colors';
 import Links from './Links';
 import Markdown from './Markdown';
 import JoinRoomFromText from './JoinRoomFromText';
+import Highlight from './Highlight';
 
 class ChatLineParser {
+
   _key: number = 1;
 
   static LINK: number = ChatTextParser.TEXT + 1;
@@ -22,7 +24,13 @@ class ChatLineParser {
   static MARKDOWN: number = ChatTextParser.TEXT + 3;
   static COLORS: number = ChatTextParser.TEXT + 4;
   static JOINROOM: number = ChatTextParser.TEXT + 5;
+  static HIGHLIGHT: number = ChatTextParser.TEXT + 6;
 
+  highlight:string[] = [];
+
+  addHighlight(highlight : string[]) : void {
+    this.highlight=highlight;
+  }
   _parseText(text: string) : JSX.Element[] {
     return [ <span key={this._key++}>{text}</span> ];
   }
@@ -52,6 +60,7 @@ class ChatLineParser {
       tokens.push({ token: ChatLineParser.EMOJI, expr: Emoji.createRegExp() });
     }
     tokens.push({ token: ChatLineParser.JOINROOM, expr: JoinRoomFromText.createRegExp()} );
+    tokens.push({ token: ChatLineParser.HIGHLIGHT, expr: Highlight.createRegExp(this.highlight)} );
 
     // Run through each parser
     const parser : ChatTextParser = new ChatTextParser(tokens);
@@ -62,6 +71,7 @@ class ChatLineParser {
         case ChatLineParser.MARKDOWN: return Markdown.fromText(text, keygen);
         case ChatLineParser.COLORS: return Colors.fromText(text, keygen);
         case ChatLineParser.JOINROOM: return JoinRoomFromText.fromText(text, keygen);
+        case ChatLineParser.HIGHLIGHT: return Highlight.fromText(text, keygen);
       }
       // treat everything else as just text
       return this._parseText(text);
