@@ -147,6 +147,10 @@ img{
     zoom: 65%;
 }
 
+::selection {
+    background:  rgb(181, 181, 181);
+}
+
 @media (max-width: 900px) {
     #cse-patcher {
         zoom: 90%;
