@@ -16,14 +16,15 @@ export interface ServerCountsState {};
 
 class ServerCounts extends React.Component<ServerCountsProps, ServerCountsState> {
   public name: string = 'cse-patcher-server-counts';
-  
+
   constructor(props: ServerCountsProps) {
     super(props);
   }
-  
+
   render() {
     return (
       <div id={this.name}>
+        <h5 className='label'>REALM POPULATION</h5>
         <div className='vik-counts'><span>{this.props.vikCount}</span></div>
         <div className='tdd-counts'><span>{this.props.tddCount}</span></div>
         <div className='art-counts'><span>{this.props.artCount}</span></div>

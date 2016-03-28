@@ -24,15 +24,15 @@ class JoinRoomList extends React.Component<JoinRoomListProps, JoinRoomListState>
   constructor(props: JoinRoomListProps) {
     super(props);
   }
-  
+
   componentDidMount = () : void => {
     document.addEventListener("mousedown", this.onmousedown, true);
   }
-  
+
   componentWillUnmount = () : void => {
     document.removeEventListener("mousedown", this.onmousedown, true);
   }
-  
+
   onmousedown = (e: MouseEvent) => {
     const el : HTMLElement = e.target as HTMLElement;
     if (el.className !== 'room-name') {
@@ -53,10 +53,11 @@ class JoinRoomList extends React.Component<JoinRoomListProps, JoinRoomListState>
       this.hidden = undefined;            // filter changed, cancel hidden
       if (rooms.length && filter.length) {
         rooms.forEach((room: Room, index: number) => {
-          if (filter.length === 0 || room.name.toLowerCase().indexOf(filter) !== -1) {
+          const name : string = room.jid.split('@')[0];
+          if (filter.length === 0 || name.toLowerCase().indexOf(filter) !== -1) {
             names.push(
               <JoinRoomListItem room={room} key={index} selectRoom={this.props.selectRoom}/>
-            );          
+            );
           }
         });
       }

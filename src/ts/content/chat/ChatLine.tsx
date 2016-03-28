@@ -9,6 +9,7 @@ import { chatType, ChatMessage } from './ChatMessage';
 import * as events from '../../core/events';
 import ChatLineParser from './ChatLineParser';
 import { chatConfig } from './ChatConfig';
+import ChatSession from './ChatSession';
 
 export interface ChatLineState {
 }

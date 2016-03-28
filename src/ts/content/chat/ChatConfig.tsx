@@ -15,9 +15,21 @@ export class ChatConfig {
   EMBED_VIDEOS: boolean = false;
   JOIN_PARTS: boolean = false;
   TIMESTAMPS: boolean = false;
+  NICK: string = '';
+  HIGHLIGHTS: string[] = ['alpha','beta','CSE'];
+
   constructor() {
     this.refresh();
   }
+
+  public setNick = (nick :string): void => {
+    this.NICK = nick;
+  }
+
+  public getHighlights = () : string[] => {
+    return this.HIGHLIGHTS.concat(this.NICK);
+  }
+
   public refresh = () : void => {
     const LOAD = (option: any) : any => {
       return JSON.parse(localStorage.getItem(`${prefixes.display}${option.key}`));

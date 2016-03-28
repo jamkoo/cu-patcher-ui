@@ -10,9 +10,11 @@ import * as events from '../../core/events';
 export class UserInfo {
   roomName: string;
   name: string;
-  constructor(roomName: string, name: string) {
+  isCSE: string;
+  constructor(roomName: string, name: string, isCSE: string) {
     this.roomName = roomName;
     this.name = name;
+    this.isCSE = isCSE;
   }
 }
 
@@ -32,6 +34,7 @@ class User extends React.Component<UserProps, UserState> {
   render() {
     let classes : string[] = [ 'chat-info-user' ];
     if (this.props.selected) classes.push('chat-info-user-selected');
+    if (this.props.info.isCSE) classes.push('chat-info-cseuser');
     return (
       <div className={classes.join(' ')} onClick={this.PM}>
         {this.props.info.name}

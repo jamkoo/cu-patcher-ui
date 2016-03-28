@@ -251,6 +251,24 @@
         padding: 0.5em;
         cursor: pointer;
       }
+
+      .chat-info-cseuser {
+        color: #FF5E44;
+        padding: 0.5em;
+        cursor: pointer;
+        &:before {
+          content: "";
+          background: url('../images/chat/chat-icon-cse.png') ;
+          background-size: contain;
+          height: 20px;
+          width: 20px;
+          display: inline-block;
+          margin: -4px 5px 0px -4px;
+          top: 6px;
+          position: relative;
+        }
+      }
+
       .chat-info-user:hover {
         background-color: $chat-info-selected-bgc;
       }
@@ -375,6 +393,9 @@
             margin-right: 0.5em;
             font-size: 80%;
           }
+          .chat-nickname {
+            cursor: pointer;
+          }
           .chat-room-link {
             color: #D4BD7F;
             cursor: pointer;
@@ -387,6 +408,9 @@
               color: #FFE294;
               border: 1px #D2BC82 solid;
             }
+          }
+          .chat-room-highlight {
+            color: #FFE457;
           }
           .chat-emoticon {
             display: inline-block;

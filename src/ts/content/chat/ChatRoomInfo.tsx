@@ -36,7 +36,22 @@ class ChatRoomInfo {
     );
   }
   public addUser = (user: UserInfo) : void => {
-    this.users.push(<User key={this.key++} info={user}/>);
+    let sortIndex: number = this.users.length;
+    for (let i = 0; i < this.users.length; i++) {
+      if (user.isCSE) {
+        if (! this.users[i].props.info.isCSE) {
+          sortIndex = i - 1 > -1 ? i-- : 0;
+          break;
+        }
+      } else if (this.users[i].props.info.isCSE) {
+         continue;
+      }
+      if (this.users[i].props.info.name > user.name) {
+        sortIndex = i;
+        break;
+      }
+    }
+    this.users.splice(sortIndex, 0, <User key={this.key++} info={user}/>);
     this.players ++;
   }
   public removeUser = (user: UserInfo) : void => {
@@ -74,13 +89,13 @@ class ChatRoomInfo {
         if (message.props['message'].type === chatType.AVAILABLE) return;
         if (message.props['message'].type === chatType.UNAVAILABLE) return;
       }
-      count ++;      
+      count ++;
     });
     return count;
   }
   public startScrollback = () : void => {
     const count : number = this.countVisibleMessages();
-    if (count > this.scrollbackThreshold) { 
+    if (count > this.scrollbackThreshold) {
       this.scrollback = count - this.scrollbackThreshold;
     } else {
       this.scrollback = 0;

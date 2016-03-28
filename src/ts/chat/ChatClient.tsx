@@ -39,8 +39,12 @@ class ChatClient {
     this._initializeEvents();
     this._fire('connect');
     rooms = rooms.concat(this.getStoredRooms());
+    const joining : any = {};
     rooms.forEach((room: string) => {
-      this.chat.joinRoom(room + this.config.serviceAddress);
+      if (!joining[room]) {
+        joining[room] = true;
+        this.chat.joinRoom(room + this.config.serviceAddress);
+      }
     });
   }
 
@@ -187,7 +191,7 @@ class ChatClient {
 
     this.removeFromStoredRooms(roomName);
   }
-  
+
   public getRooms() : void {
     if (!this.chat) {
       console.warn("ChatClient:leaveRoom() called when not connected.");

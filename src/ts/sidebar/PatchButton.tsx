@@ -110,15 +110,14 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
       case ChannelStatus.OutOfDate: this.install();
       case ChannelStatus.Ready:
          if (event.altKey) {
-          var channelCommand = localStorage.getItem('CSE_COMMANDS_' + this.props.server.name);
-          if(!channelCommand) {
-            channelCommand = ''
-          }
-          channelCommand =  window.prompt('Please enter your command line parameters for ' + this.props.server.name, channelCommand);
-          localStorage.setItem('CSE_COMMANDS_' + this.props.server.name, channelCommand);
+          const serverName: string = this.props.server ? this.props.server.name : 'cube';
+          let channelCommand: string = localStorage.getItem('CSE_COMMANDS_' + serverName) || '';
+
+          channelCommand =  window.prompt('Please enter your command line parameters for ' + serverName, channelCommand);
+          localStorage.setItem('CSE_COMMANDS_' + serverName, channelCommand);
 
           if(!channelCommand) {
-              localStorage.removeItem('CSE_COMMANDS_' + this.props.server.name);
+              localStorage.removeItem('CSE_COMMANDS_' + serverName);
           }
           this.commands = channelCommand;
         } else {
