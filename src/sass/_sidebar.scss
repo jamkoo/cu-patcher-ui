@@ -10,6 +10,7 @@
   left: $margin-size * 2;
   width: 300px;
   z-index: 10;
+  -webkit-user-select: none !important;
   .card-panel {
     background: $sidebar-bg;
     border-width: 1px;
@@ -76,6 +77,11 @@
   position: relative;
   left: 5px;
   margin-top: 10px;
+  h5.label {
+    color: lighten($color4, 20%);
+    padding: 2.5px;
+    font-size: 18px;
+  }
 }
 
 @mixin server-count($url) {

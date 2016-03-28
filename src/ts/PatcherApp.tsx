@@ -81,9 +81,9 @@ export interface PatcherState {};
 
 export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
   public name = 'cse-patcher';
-  
+  private playOnce = false;
   private heroContentInterval: any = null;
-  
+
   static propTypes = {
     dispatch: React.PropTypes.func.isRequired,
     location: React.PropTypes.number.isRequired,
@@ -94,60 +94,61 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
     this.props.dispatch(changeRoute(route));
     this.playSelect();
   }
-  
+
   hideChat = () => {
     this.props.dispatch(hideChat());
   }
-  
+
   showChat = () => {
     this.props.dispatch(showChat());
   }
-  
+
   fetchNewsPage = (page: number) => {
     this.props.dispatch(fetchPage(page));
   }
-  
+
   onPatcherAPIUpdate = () => {
     this.setState({});
   }
-  
+
   onMuteSounds = () =>  {
     this.props.dispatch(muteSounds());
   }
-  
+
   onUnMuteSounds = () => {
     this.props.dispatch(unMuteSounds());
   }
-  
+
   onMuteMusic = () =>  {
     this.props.dispatch(muteMusic());
   }
-  
+
   onUnMuteMusic = () => {
     this.props.dispatch(unMuteMusic());
   }
-  
+
   playSelect = () => {
     if (!this.props.soundMuted) {
       (this.refs['sound-select'] as HTMLAudioElement).play();
       (this.refs['sound-select'] as HTMLAudioElement).volume = 0.75;
     }
   }
-  
+
   onLogIn = () => {
     setTimeout(() => this.setState({}), 500);
   }
-  
-  componentWillUpdate() {
-    // music disabled
-    // if (this.props.musicMuted && !(this.refs['sound-bg'] as HTMLAudioElement).paused) {
-    //   (this.refs['sound-bg'] as HTMLAudioElement).pause();
-    // } else if (!this.props.musicMuted && (this.refs['sound-bg'] as HTMLAudioElement).paused) {
-    //   (this.refs['sound-bg'] as HTMLAudioElement).play();
-    //   (this.refs['sound-bg'] as HTMLAudioElement).volume = 0.5;
-    // }
+
+  componentDidUpdate() {
+    if (this.props.musicMuted && !(this.refs['sound-bg'] as HTMLAudioElement).paused) {
+      console.log('pausing bg');
+      (this.refs['sound-bg'] as HTMLAudioElement).pause();
+    } else if (!this.props.musicMuted && (this.refs['sound-bg'] as HTMLAudioElement).paused && !this.playOnce) {
+      console.log('playing bg');
+      (this.refs['sound-bg'] as HTMLAudioElement).play();
+      (this.refs['sound-bg'] as HTMLAudioElement).volume = 0.5;
+    }
   }
-  
+
   componentDidMount() {
     // fetch initial hero content and then every 30 minutes validate & fetch hero content.
     if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
@@ -155,13 +156,18 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       this.props.dispatch(validateHeroContent());
       if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
     }, 60000 * 30);
+
+    if (!this.props.musicMuted) {
+      (this.refs['sound-bg'] as HTMLAudioElement).play();
+    }
+    (this.refs['sound-bg'] as HTMLAudioElement).onended = () => this.playOnce = true;
   }
-  
+
   componentDidUnMount() {
     // unregister intervals
     clearInterval(this.heroContentInterval);
   }
-  
+
   render() {
     let content: any = null;
     switch(this.props.location) {
@@ -192,7 +198,7 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       case Routes.PATCHNOTES: content = <div key='2'><PatchNotes /></div>; break;
       case Routes.SUPPORT: content = <div key='3'><Support /></div>; break;
     }
-    
+
     let chat: any = null;
     if (this.props.chat.visibility.showChat) {
       chat = (
@@ -201,13 +207,13 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
         </div>
       );
     }
-    
+
     return (
       <div id={this.name}>
         <WindowHeader soundMuted={this.props.soundMuted}
-          onMuteSounds={this.props.soundMuted ? this.onUnMuteSounds : this.onMuteSounds}
+          onMuteSounds={() => this.props.soundMuted ? this.onUnMuteSounds() : this.onMuteSounds()}
           musicMuted={this.props.musicMuted}
-          onMuteMusic={this.props.musicMuted ? this.onUnMuteMusic : this.onMuteMusic}/>
+          onMuteMusic={() => this.props.musicMuted ? this.onUnMuteMusic() : this.onMuteMusic()}/>
         <Header changeRoute={this.onRouteChanged} activeRoute={this.props.location} openChat={this.showChat} />
         <Provider store={store}>
           <Sidebar onLogIn={this.onLogIn} />
@@ -226,12 +232,10 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
         <audio src='sounds/select.ogg' ref='sound-select' />
         <audio src='sounds/launch-game.ogg' ref='sound-launch-game' />
         <audio src='sounds/patch-complete.ogg' ref='sound-patch-complete' />
+        <audio src='sounds/patcher-theme-v0.1.ogg' ref='sound-bg' />
       </div>
     );
   }
 };
 
 export default connect(select)(PatcherApp);
-
-// music disabled
-// <audio src='sounds/bg.ogg' ref='sound-bg' />
