@@ -14,6 +14,7 @@ import parseLinks from './ParseLinks';
 import parseRooms from './ParseRooms';
 import parseEmoji from './ParseEmoji';
 import parseHighlight from './ParseHighlight';
+import parseNicks from './ParseNicks';
 
 class ChatLineParser {
 
@@ -25,6 +26,7 @@ class ChatLineParser {
   static COLOR: number = ChatTextParser.TEXT + 4;
   static ROOM: number = ChatTextParser.TEXT + 5;
   static HIGHLIGHT: number = ChatTextParser.TEXT + 6;
+  static NICK: number = ChatTextParser.TEXT + 7;
 
   _parseText(text: string): JSX.Element[] {
     return [ <span key={this._key++}>{text}</span> ];
@@ -52,10 +54,10 @@ class ChatLineParser {
     // Parsers with simple search/replace should be last
     tokens.push({ token: ChatLineParser.LINK, expr: parseLinks.createRegExp() });
     tokens.push({ token: ChatLineParser.ROOM, expr: parseRooms.createRegExp() });
+    tokens.push({ token: ChatLineParser.NICK, expr: parseNicks.createRegExp() });
     if (chatConfig.SHOW_EMOTICONS) {
       tokens.push({ token: ChatLineParser.EMOJI, expr: parseEmoji.createRegExp() });
     }
-
     const highlights = chatConfig.getHighlights();
     if (highlights.length) {
       tokens.push({ token: ChatLineParser.HIGHLIGHT, expr: parseHighlight.createRegExp(highlights) });
@@ -71,6 +73,7 @@ class ChatLineParser {
         case ChatLineParser.ROOM: return parseRooms.fromText(text, keygen);
         case ChatLineParser.EMOJI: return parseEmoji.fromText(text, keygen);
         case ChatLineParser.HIGHLIGHT: return parseHighlight.fromText(text, keygen);
+        case ChatLineParser.NICK: return parseNicks.fromText(text, keygen);
       }
       // treat everything else as just text
       return this._parseText(text);

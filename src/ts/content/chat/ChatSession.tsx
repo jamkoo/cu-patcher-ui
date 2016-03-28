@@ -14,6 +14,7 @@ import ChatClient from '../../chat/ChatClient';
 import messageType from '../../chat/messageType';
 import { patcher } from '../../api/PatcherAPI';
 import { chatConfig, ChatConfig } from './ChatConfig';
+import { chatState } from './ChatState';
 
 class ChatSession {
 
@@ -90,6 +91,7 @@ class ChatSession {
     // TODO: if no rooms yet, this won't work.
     this.me = this.client.getNick();
     chatConfig.setNick(this.me);
+    chatState.set('chat', this);
     this.broadcast(new ChatMessage(chatType.SYSTEM, '', '', 'Connected to chat server.'));
     this.connected = true;
     this.reconnecting = false;
@@ -292,6 +294,17 @@ class ChatSession {
       }
       events.fire('chat-session-update', this);
     }
+  }
+
+  // get list of all users from rooms the user has joined
+  getAllUsers() : string[] {
+    const allUsers: string[] = [];
+    this.rooms.forEach((room) => {
+      room.users.forEach((user) => {
+        if (allUsers.indexOf(user.props.info.name) < 0) allUsers.push(user.props.info.name);
+      });
+    });
+    return allUsers;
   }
 }
 

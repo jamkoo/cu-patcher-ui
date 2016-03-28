@@ -15,8 +15,8 @@ export class ChatConfig {
   EMBED_VIDEOS: boolean = false;
   JOIN_PARTS: boolean = false;
   TIMESTAMPS: boolean = false;
-  NICK : string = '';
-  HIGHLIGHTS : string[] = ['alpha','beta','CSE'];
+  NICK: string = '';
+  HIGHLIGHTS: string[] = ['alpha','beta','CSE'];
 
   constructor() {
     this.refresh();
