@@ -111,11 +111,8 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
       case ChannelStatus.Ready:
          if (event.altKey) {
           const serverName: string = this.props.server ? this.props.server.name : 'cube';
+          let channelCommand: string = localStorage.getItem('CSE_COMMANDS_' + serverName) || '';
 
-          let channelCommand = localStorage.getItem('CSE_COMMANDS_' + serverName);
-          if(!channelCommand) {
-            channelCommand = ''
-          }
           channelCommand =  window.prompt('Please enter your command line parameters for ' + serverName, channelCommand);
           localStorage.setItem('CSE_COMMANDS_' + serverName, channelCommand);
 
