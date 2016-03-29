@@ -7,6 +7,8 @@
 import * as React from 'react';
 import * as events from '../../core/events';
 import { UserInfo } from './User';
+import ChatSession from './ChatSession';
+import { chatState } from './ChatState';
 
 export interface ChatInputState {};
 
@@ -17,13 +19,16 @@ export interface ChatInputProps {
 };
 
 class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
-  _privateMessageHandler : any;
+  _privateMessageHandler: any;
+  tabUserList: string[] = [];
+  tabUserIndex: number = null;
   constructor(props: ChatInputProps) {
     super(props);
     this._privateMessageHandler = events.on('cse-chat-private-message', (name: string) => {
       this.privateMessage(name);
     });
-    this.enterToSend = this.enterToSend.bind(this);
+    this.keyDown = this.keyDown.bind(this);
+    this.keyUp = this.keyUp.bind(this);
   }
   componentWillUnmount() {
     if (this._privateMessageHandler) {
@@ -37,17 +42,53 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     return (
       <div className="chat-input input-field">
         <label htmlFor="chat-text">Say something!</label>
-        <input id="chat-text" ref="new-text" onKeyUp={this.enterToSend} type="text"/>
+        <input id="chat-text" ref="new-text" onKeyDown={this.keyDown} onKeyUp={this.keyUp} onChange={this.parseInput} type="text"/>
       </div>
     );
   }
-  enterToSend(e:any) : void {
+  keyDown(e: any) : void {
+    // Complete username on tab key (9)
+    if (e.keyCode === 9) {
+      e.preventDefault();
+      if (! this.tabUserList.length) {
+        const chat: ChatSession = chatState.get('chat');
+        const lastWord: string = e.target.value.match(/\b([\S]+)$/)[1];
+        const endChar: string = lastWord === e.target.value ? ': ' : ' ';
+        const matchingUsers: string[] = [];
+        chat.getRoom(chat.currentRoom).users.forEach((u: JSX.Element) => {
+          if (u.props.info.name.substring(0, lastWord.length) === lastWord) {
+            matchingUsers.push(u.props.info.name);
+          }
+        });
+        if (matchingUsers.length) {
+          this.tabUserList = matchingUsers;
+          this.tabUserIndex = 0;
+          e.target.value = e.target.value + matchingUsers[0].substring(lastWord.length) + endChar;
+        }
+      } else {
+        const oldTabIndex: number = this.tabUserIndex;
+        const newTabIndex: number = oldTabIndex + 1 > this.tabUserList.length - 1 ? 0 : oldTabIndex + 1;
+        const endChar: string = e.target.value.slice(-2) === ': ' ? ': ' : ' ';
+        e.target.value = e.target.value.replace(new RegExp(this.tabUserList[oldTabIndex] + ':? $'), this.tabUserList[newTabIndex]) + endChar;
+        this.tabUserIndex = newTabIndex;
+      }
+    } else {
+      this.tabUserList = [];
+      this.tabUserIndex = null;
+    }
+  }
+  keyUp(e: any) : void {
+    // Send message on enter key (13)
     if (e.keyCode === 13) {
       this.send();
     }
   }
+  parseInput(e: any) : void {
+    // Need this for color code popup later?
+    // console.log(e.target.value);
+  }
   send() : void {
-    const input : any = this.getInputNode();
+    const input: any = this.getInputNode();
     const value: string = input.value.trim();
     if (value[0] !== '/' || !this.props.slashCommand(value.substr(1))) {
       // not a recognised / command, send it
