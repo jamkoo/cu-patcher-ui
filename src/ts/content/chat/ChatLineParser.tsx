@@ -54,7 +54,6 @@ class ChatLineParser {
     // Parsers with simple search/replace should be last
     tokens.push({ token: ChatLineParser.LINK, expr: parseLinks.createRegExp() });
     tokens.push({ token: ChatLineParser.ROOM, expr: parseRooms.createRegExp() });
-    tokens.push({ token: ChatLineParser.NICK, expr: parseNicks.createRegExp() });
     if (chatConfig.SHOW_EMOTICONS) {
       tokens.push({ token: ChatLineParser.EMOJI, expr: parseEmoji.createRegExp() });
     }
@@ -62,6 +61,7 @@ class ChatLineParser {
     if (highlights.length) {
       tokens.push({ token: ChatLineParser.HIGHLIGHT, expr: parseHighlight.createRegExp(highlights) });
     }
+    tokens.push({ token: ChatLineParser.NICK, expr: parseNicks.createRegExp() });
 
     // Run through each parser
     const parser : ChatTextParser = new ChatTextParser(tokens);
