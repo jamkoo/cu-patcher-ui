@@ -49,7 +49,7 @@ class WindowHeader extends React.Component<WindowHeaderProps, WindowHeaderState>
   }
 
   render() {
-    let soundMuteIcon = this.props.soundMuted ? <img src='images/muted.png' /> : <img src='images/mute.png' />;
+    let soundMuteIcon = this.props.soundMuted ? <img src='images/muted-fx.png' /> : <img src='images/mute-fx.png' />;
     let musicMuteIcon = this.props.musicMuted ? <img src='images/muted.png' /> : <img src='images/mute.png' />;
     let muteSoundsTooltip = this.props.soundMuted ? 'un-mute sound effects' : 'mute sound effects';
     let muteMusicTooltip = this.props.musicMuted ? 'un-mute music' : 'mute music';
