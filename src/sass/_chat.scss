@@ -12,7 +12,7 @@
   bottom: 0px;
   display: block;
   z-index: 16;
-  
+
 }
 
 #chat-window.chat-hidden {
@@ -272,10 +272,6 @@
       .chat-info-user:hover {
         background-color: $chat-info-selected-bgc;
       }
-    }
-
-    /* Settings Styles */
-    chat-tab-content.chat-settings {
     }
 
     .chat-content {
