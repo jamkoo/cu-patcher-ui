@@ -153,24 +153,6 @@ img{
     background:  rgb(181, 181, 181);
 }
 
-@media (max-width: 900px) {
-    #cse-patcher {
-        zoom: 90%;
-    }
-}
-
-@media (min-width: 1600px) {
-    #cse-patcher{
-        zoom: 110%;
-    }
-}
-
-@media (min-width: 1900px) {
-    #cse-patcher{
-        zoom: 130%;
-    }
-}
-
 
 @import 'header';
 @import 'sidebar';
