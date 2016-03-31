@@ -11,32 +11,32 @@
   width: 290px;
   margin: 0px 0px 10px 0px;
   font-size: 21px;
-  
+
   .layer {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
   }
-  
+
   .z1 {
     z-index: 6;
   }
-  
+
   .z2 {
     z-index: 7;
   }
-  
+
   .z3 {
     z-index: 8;
   }
-  
+
   .fill {
     background: $colorg4;
     height: 5px;
     margin: 5px;
   }
-  
+
   .text {
     -webkit-user-select: none;
     cursor: default !important;
@@ -44,22 +44,22 @@
     height: 60px;
     margin: 5px 10px;
   }
-  
+
   .progress-text {
     height: 14px;
   }
-  
+
   .header {
     font-weight: 700;
     color: $color3;
     font-size: 10px;
   }
-  
+
   .body {
     color: $colorg4;
     font-size: 10px;
   }
-  
+
   .install-download-btn {
     width: 290px;
     margin: 5px;
@@ -67,7 +67,7 @@
     line-height: 60px;
     font-weight: 700;
   }
-  
+
   .uninstalled {
     background: $gradient2;
     border: solid $colorg2 1px;
@@ -77,12 +77,12 @@
       -webkit-filter: brightness(1.2);
     }
   }
-  
+
   .installing {
     background-color: $color4;
     color: lighten($color4, 30%);
   }
-  
+
   .downloading {
     background: $color4;
     color: $color1;
@@ -90,7 +90,7 @@
       background-color: lighten($color4, 5%);
     }
   }
-  
+
   .ready {
     background: $gradient4;
     border: solid $colorg4 1px;
@@ -100,7 +100,7 @@
       -webkit-filter: brightness(1.2);
     }
   }
-  
+
   .launching {
     background-color: $color4;
     color: $color1;
@@ -108,7 +108,7 @@
       background-color: lighten($color4, 5%);
     }
   }
-  
+
   .update {
     background-color: $color3;
     color: $color1;
@@ -154,4 +154,12 @@
     bottom: -30px;
     left: 80px;
   }
+}
+
+.cu-patcher-ui__character-creation {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  bottom: 0;
+  left: 325px;
 }

@@ -57,11 +57,11 @@ export interface SidebarState {
 
 class Sidebar extends React.Component<SidebarProps, SidebarState> {
   public name = 'cse-patcher-sidebar';
-  
+
   private alertsInterval: any = null;
   private channelInterval: any = null;
   private serversInterval: any = null;
-  
+
   static propTypes = {
     alerts: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   }
@@ -73,29 +73,29 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       activeServer: null
     };
   }
-  
+
   onLogIn = () => {
     this.fetchCharacters();
     this.props.onLogIn();
     setTimeout(() => this.props.dispatch(requestChannels()), 500);
   }
-  
+
   onLogOut = () => {
   }
-  
+
   initjQueryObjects = () => {
     $('.dropdown-button').dropdown();
     //$('.tooltipped').tooltip();
   }
-  
+
   getChannels = () => {
     return [{name: 'Hatchery'}, {name: 'Wyrmling'}];
   }
-  
+
   fetchCharacters = () => {
     this.props.dispatch(fetchCharacters());
   }
-  
+
   getCharacters = () => {
     return [{
       name: 'Create new character',
@@ -108,42 +108,42 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       race: race.HAMADRYAD
     }];
   }
-  
+
   playSelect = () => {
     if (!this.props.soundMuted) {
       (this.refs['sound-select'] as HTMLAudioElement).play();
       (this.refs['sound-select'] as HTMLAudioElement).volume = 0.75;
     }
   }
-  
+
   playLaunchGame = () => {
     if (!this.props.soundMuted) {
       (this.refs['sound-launch-game'] as HTMLAudioElement).play();
       (this.refs['sound-launch-game'] as HTMLAudioElement).volume = 0.75;
     }
   }
-  
+
   playPatchComplete = () => {
     if (!this.props.soundMuted) {
       (this.refs['sound-patch-complete'] as HTMLAudioElement).play();
       (this.refs['sound-patch-complete'] as HTMLAudioElement).volume = 0.75;
     }
   }
-  
+
   onSelectedServerChanged = (server: Server) => {
     this.props.dispatch(changeServer(server));
     this.playSelect();
   }
-  
+
   onSelectedChannelChanged = (channel: Channel) => {
     this.props.dispatch(changeChannel(channel));
     this.playSelect();
   }
-  
+
   selectCharacter = (character: restAPI.SimpleCharacter) => {
     this.props.dispatch(selectCharacter(character));
   }
-  
+
   componentDidMount() {
     // fetch initial alerts and then every minute validate & fetch alerts.
     if (!this.props.patcherAlertsState.isFetching) this.props.dispatch(fetchAlerts());
@@ -151,21 +151,21 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       this.props.dispatch(validateAlerts());
       if (!this.props.patcherAlertsState.isFetching) this.props.dispatch(fetchAlerts());
     }, 60000);
-    
+
     // fetch initial servers and then every 30 seconds fetch servers.
     if (!this.props.serversState.isFetching) this.props.dispatch(fetchServers());
     this.serversInterval = setInterval(() => {
       if (!this.props.serversState.isFetching) this.props.dispatch(fetchServers());
     }, 30000);
-    
+
     // update channel info every 1 minute.
     this.props.dispatch(requestChannels());
     this.channelInterval = setInterval(() => {
       this.props.dispatch(requestChannels());
     }, 1000 * 60);
-    
+
   }
-  
+
   componentDidUnMount() {
     // unregister intervals
     clearInterval(this.alertsInterval);
@@ -181,7 +181,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         </div>
       );
     }
-    
+
     setTimeout(this.initjQueryObjects, 100);
 
     let renderServerSection: any = null;
@@ -192,9 +192,9 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     if (this.props.serversState.servers.length > 0 &&  typeof(this.props.channelsState.channels) !== 'undefined' && this.props.channelsState.channels.length > 0) {
       selectedChannel = this.props.channelsState.selectedChannel;
       selectedChannelIndex = this.props.channelsState.channels.findIndex(c => c.channelID == selectedChannel.channelID);
-      
+
       if (typeof(selectedChannelIndex) == 'undefined') selectedChannelIndex = 0;
-      
+
       let servers = this.props.serversState.servers.filter((s: Server) => s.channelID === selectedChannel.channelID);
       if (servers.length > 0) {
         activeServer = this.props.serversState.currentServer || this.props.serversState.servers[0];
@@ -214,7 +214,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         );
       }
     }
-    
+
     return (
       <div id={this.name} className=''>
         <Alerts alerts={this.props.patcherAlertsState.alerts} />
@@ -226,7 +226,8 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                        playSelect={this.playSelect}
                        playLaunch={this.playLaunchGame}
                        playPatchComplete={this.playPatchComplete}
-                       character={selectedCharacter} />
+                       character={selectedCharacter}
+                       fetchCharacters={() => this.props.dispatch(fetchCharacters())} />
         </div>
       </div>
     );

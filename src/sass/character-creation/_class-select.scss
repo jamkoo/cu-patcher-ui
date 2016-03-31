@@ -1,0 +1,70 @@
+/**
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+@mixin class-thumbnail($url) {
+  background-image: url($url);
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  width: 50px;
+  height: 45px;
+  margin: 2.5px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: all .2s ease-in-out;
+  &:hover {
+    border: 1px solid rgba(255,225,78,0.50);
+  }
+  &:active {
+    border: 1px solid rgba(255,225,78,0.80);
+  }
+}
+
+.cu-character-creation__class-select__FIREMAGE {
+    @include class-thumbnail('../images/races/standing/hamadryad.png');
+}
+
+.cu-character-creation__class-select__BLACKKNIGHT {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__FIANNA {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__MJOLNIR {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__PHYSICIAN {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__EMPATH {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__STONEHEALER {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__BLACKGUARD {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__FORESTSTALKER {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+.cu-character-creation__class-select__WINTERSSHADOW {
+    @include class-thumbnail('../images/temp.jpg');
+}
+
+
+.cu-character-creation__class-select_name {
+  position: absolute;
+  left: 350px;
+  z-index: 2;
+}

@@ -1,0 +1,46 @@
+/**
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.rightarrow, .leftarrow {
+    background: url("../images/arrow.png") no-repeat;
+    background-size: contain;
+    border: none;
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+    &:focus{
+        background-color: transparent;
+    }
+    &:hover{
+        filter: brightness(150%);
+        -webkit-filter: brightness(150%);
+    }
+}
+
+.leftarrow {
+    transform: rotate(180deg);
+}
+
+.attribute-points {
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cu-character-creation__attribute-select__selection-area div{
+    width: 100%;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.right {
+  float: right;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.6);
+}

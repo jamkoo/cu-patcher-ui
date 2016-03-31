@@ -1,0 +1,24 @@
+/**
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.cu-character-creation__navigation {
+  position: absolute;
+  bottom: 70px;
+  left: 0px;
+  right: 0px;
+  z-index: 101;
+  padding: 50px 0 20px 0;
+  -webkit-user-select: none !important;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.50));
+}
+
+.cu-character-creation__name {
+  width: 300px;
+  position: absolute;
+  bottom: 150px;
+  right: 25px;
+  z-index: 102;
+}

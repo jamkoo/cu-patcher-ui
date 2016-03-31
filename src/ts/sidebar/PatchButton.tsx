@@ -15,6 +15,8 @@ import CommandLineArgsModal from './CommandLineArgsModal';
 import Animate from '../Animate';
 import UninstallButton from './UninstallButton';
 
+import CharacterCreation from '../character-creation/CharacterCreation';
+
 export class Progress {
   constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
 
@@ -74,10 +76,12 @@ export interface PatchButtonProps {
   playPatchComplete: () => void;
   playSelect: () => void;
   character: restAPI.SimpleCharacter
+  fetchCharacters: () => void;
 };
 
 export interface PatchButtonState {
   showEuala: boolean;
+  showCreation: boolean;
 };
 
 class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
@@ -88,12 +92,12 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
 
   constructor(props: PatchButtonProps) {
     super(props);
-    this.state = { showEuala: false}
+    this.state = { showEuala: false, showCreation: false}
   }
 
   componentDidMount() {
     this.intervalHandle = setInterval(() => {
-      this.setState({showEuala: this.state.showEuala});
+      this.setState({showEuala: this.state.showEuala, showCreation: this.state.showCreation});
     }, 500);
   }
 
@@ -123,7 +127,16 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         } else {
           this.commands = '';
         }
-        this.playNow();
+
+        if (this.props.character.id == '') {
+          if (this.state.showCreation) {
+            this.closeCreation();
+          } else {
+            this.openCreation();
+          }
+        } else {
+          this.playNow();
+        }
       case ChannelStatus.Launching: break;
       case ChannelStatus.Running: break;
       case ChannelStatus.Uninstalling: break;
@@ -131,16 +144,25 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     }
   }
 
+  openCreation = () => {
+    this.setState({showEuala: false, showCreation: true});
+  }
+
+  closeCreation = () => {
+    this.props.fetchCharacters();
+    this.setState({showEuala: false, showCreation: false});
+  }
+
   playNow = () => {
-    this.setState({showEuala: true});
+    this.setState({showEuala: true, showCreation: false});
   }
 
   closeEualaModal = () => {
-    this.setState({showEuala: false});
+    this.setState({showEuala: false, showCreation: false});
   }
 
   launchClient = () => {
-    this.setState({showEuala: false});
+    this.setState({showEuala: false, showCreation: false});
     let launchString = this.commands;
     if (this.props.character && this.props.character.id !== '') {
       launchString += ` server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)}`
@@ -164,6 +186,18 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     return (
       <div className='fullscreen-blackout flex-row' key='accept-euala'>
         <EualaModal accept={this.launchClient} decline={this.closeEualaModal} />
+      </div>
+    );
+  }
+
+  generateCharacterCreation = () => {
+    return (
+      <div id='cu-character-creation' className='cu-patcher-ui__character-creation' key='char-create'>
+        <CharacterCreation apiHost={'https://api.camelotunchained.com/'}
+                           apiVersion={1}
+                           shard={this.props.server.shardID}
+                           apiKey={patcher.getLoginToken()}
+                           created={() => this.closeCreation()} />
       </div>
     );
   }
@@ -217,7 +251,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
         break;
       case ChannelStatus.Ready:
-        layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>Play Now</a>;
+        layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>{this.props.character.id != '' ? 'Play Now' : this.state.showCreation ? 'Cancel Creation' : 'Create Character'}</a>;
         uninstall = <UninstallButton uninstall={this.uninstall} name={channels[channelIndex].channelName}/>;
         this.startDownload = undefined;
         break;
@@ -239,6 +273,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
 
     // euala modal
     let eualaModal: any = this.state.showEuala ? this.generateEualaModal() : null;
+    let creation: any = this.state.showCreation ? this.generateCharacterCreation() : null;
 
     return (
       <div>
@@ -257,6 +292,10 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         <Animate animationEnter='slideInUp' animationLeave='slideOutDown'
           durationEnter={400} durationLeave={500}>
           {eualaModal}
+        </Animate>
+        <Animate animationEnter='slideInRight' animationLeave='slideOutLeft'
+          durationEnter={400} durationLeave={500}>
+          {creation}
         </Animate>
       </div>
     );

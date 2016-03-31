@@ -51,7 +51,7 @@
     "serve": "http-server -p 9000 dist/"
   },
   "dependencies": {
-    "camelot-unchained": "^0.2.12",
+    "camelot-unchained": "^0.2.17",
     "es6-promise": "^3.0.2",
     "eventemitter3": "^1.1.1",
     "isomorphic-fetch": "^2.2.1",
