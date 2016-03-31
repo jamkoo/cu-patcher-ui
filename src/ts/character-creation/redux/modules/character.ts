@@ -12,6 +12,8 @@ import ResponseError from '../../utils/ResponseError';
 
 import {race, faction, gender, archetype} from 'camelot-unchained';
 
+declare var Materialize: any;
+
 const defaultBanes = {
   "5429de13da9beb2c3c3dd450":3,
   "5429de13da9beb2c3c3dd451":1,
@@ -67,7 +69,7 @@ export function createCharacter(model: CharacterCreationModel,
         }
       })
       .then(checkStatus).then(() => dispatch(createCharacterSuccess()))
-      .catch((error: ResponseError) => dispatch(createCharacterFailed(error)))
+      .catch((error: ResponseError) => (error as any).response.json().then((error: any) => dispatch(createCharacterFailed(error))))
   }
 }
 
@@ -83,10 +85,10 @@ export function createCharacterSuccess() {
   }
 }
 
-export function createCharacterFailed(error: ResponseError) {
+export function createCharacterFailed(error: any) {
   return {
     type: CREATE_CHARACTER_FAILED,
-    error: error.message,
+    error: JSON.parse(error.Message)
   }
 }
 
@@ -114,6 +116,8 @@ export default function reducer(state: CharacterState = initialState, action: an
         success: true,
       });
     case CREATE_CHARACTER_FAILED:
+      let errors: any =  action.error.Errors;
+      errors.forEach((e: string) => Materialize.toast(e, 5000));
       return Object.assign({}, state, {
         isFetching: false,
         error: action.error,
