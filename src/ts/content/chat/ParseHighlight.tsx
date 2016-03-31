@@ -16,9 +16,9 @@ function createRegExp(highlight: string[]) : RegExp {
   let regex: string;
   highlight.forEach((h: string) => {
     if (!regex) {
-      regex = '\\b' + h + '\\b';
+      regex = '(?:^|\\s)@?' + h + ':?(?:$|\\s)';
     } else {
-      regex += '|\\b' + h + '\\b';
+      regex += '|(?:^|\\s)@?' + h + ':?(?:$|\\s)';
     }
   });
   return new RegExp(regex, 'g');
