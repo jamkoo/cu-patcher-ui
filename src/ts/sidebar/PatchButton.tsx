@@ -128,7 +128,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
           this.commands = '';
         }
 
-        if (this.props.character.id == '') {
+        if (typeof this.props.character !== 'undefined' && this.props.character !== null && this.props.character.id == '') {
           if (this.state.showCreation) {
             this.closeCreation();
           } else {
@@ -251,7 +251,15 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         layer1 = <a className='waves-effect btn install-download-btn installing'>Validating</a>;
         break;
       case ChannelStatus.Ready:
-        layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>{this.props.character.id != '' ? 'Play Now' : this.state.showCreation ? 'Cancel Creation' : 'Create Character'}</a>;
+        let text: any = 'Play Now';
+        if (typeof this.props.character !== 'undefined' && this.props.character !== null && this.props.character.id == '') {
+          if (this.state.showCreation) {
+            text = 'Cancel Creation';
+          } else {
+            text = 'Create Character';
+          }
+        }
+        layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>{text}</a>;
         uninstall = <UninstallButton uninstall={this.uninstall} name={channels[channelIndex].channelName}/>;
         this.startDownload = undefined;
         break;

@@ -36,6 +36,16 @@ const CREATE_CHARACTER = 'cu-character-creation/character/CREATE_CHARACTER';
 const CREATE_CHARACTER_SUCCESS = 'cu-character-creation/character/CREATE_CHARACTER_SUCCESS';
 const CREATE_CHARACTER_FAILED = 'cu-character-creation/character/CREATE_CHARACTER_FAILED';
 
+const RESET = 'cu-character-creation/character/RESET';
+
+
+export function resetCharacter() {
+  return {
+    type: RESET,
+    state: initialState
+  }
+}
+
 export function createCharacter(model: CharacterCreationModel,
                                 apiKey: string,
                                 apiUrl: string = 'https://api.camelotunchained.com/',
@@ -108,6 +118,9 @@ export default function reducer(state: CharacterState = initialState, action: an
         isFetching: false,
         error: action.error,
       });
+    case RESET: {
+      return action.state;
+    }
     default: return state;
   }
 }
