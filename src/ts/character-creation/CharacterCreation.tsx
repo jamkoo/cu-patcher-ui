@@ -22,7 +22,7 @@ import reducer from './redux/modules/reducer';
 import {RacesState, fetchRaces, selectRace, RaceInfo} from './redux/modules/races';
 import {FactionsState, fetchFactions, selectFaction, FactionInfo} from './redux/modules/factions';
 import {PlayerClassesState, fetchPlayerClasses, selectPlayerClass, PlayerClassInfo} from './redux/modules/playerClasses';
-import {AttributesState, fetchAttributes, allocateAttributePoint, AttributeInfo, AttributeType} from './redux/modules/attributes';
+import {AttributesState, fetchAttributes, allocateAttributePoint, AttributeInfo, AttributeType, resetAttributes} from './redux/modules/attributes';
 import {AttributeOffsetsState, fetchAttributeOffsets, AttributeOffsetInfo} from './redux/modules/attributeOffsets';
 import {CharacterState, createCharacter, CharacterCreationModel, resetCharacter} from './redux/modules/character';
 import {selectGender} from './redux/modules/genders';
@@ -139,6 +139,7 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
   render() {
     if (this.props.characterState.success) {
       this.props.created();
+      this.props.dispatch(resetAttributes());
       this.props.dispatch(resetCharacter());
     }
 
