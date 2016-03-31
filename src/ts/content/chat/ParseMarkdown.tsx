@@ -8,10 +8,7 @@ import * as React from 'react';
 import ChatLineParser from './ChatLineParser';
 
 
-function fromText(text: string, keygen: () => number) : JSX.Element[] {
-  const regexp: RegExp = this.createRegExp();
-  const match: RegExpExecArray = regexp.exec(text);
-
+function fromText(text: string, keygen: () => number, match: RegExpExecArray) : JSX.Element[] {
   if (match && (match[2] || match[4])) {
     const matchBeginChar: string = match[1] ? match[1] : '';
     const matchEndChar: string = match[6] ? match[6] : '';

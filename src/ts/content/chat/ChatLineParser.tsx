@@ -65,10 +65,10 @@ class ChatLineParser {
 
     // Run through each parser
     const parser : ChatTextParser = new ChatTextParser(tokens);
-    return parser.parse(text, (token: number, text: string) => {
+    return parser.parse(text, (token: number, text: string, match: RegExpExecArray) => {
       switch(token) {
-        case ChatLineParser.COLOR: return parseColors.fromText(text, keygen);
-        case ChatLineParser.MARKDOWN: return parseMarkdown.fromText(text, keygen);
+        case ChatLineParser.COLOR: return parseColors.fromText(text, keygen, match);
+        case ChatLineParser.MARKDOWN: return parseMarkdown.fromText(text, keygen, match);
         case ChatLineParser.LINK: return parseLinks.fromText(text, keygen);
         case ChatLineParser.ROOM: return parseRooms.fromText(text, keygen);
         case ChatLineParser.EMOJI: return parseEmoji.fromText(text, keygen);
