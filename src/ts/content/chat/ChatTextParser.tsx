@@ -17,7 +17,7 @@ class ChatTextParser {
   constructor(tokens: ChatTextParserToken[]) {
     this.tokens = tokens;
   }
-  public parse(text: string, callback: (token: number, text: string) => JSX.Element[], index: number = 0): JSX.Element[] {
+  public parse(text: string, callback: (token: number, text: string, match: RegExpExecArray) => JSX.Element[], index: number = 0): JSX.Element[] {
     let html : JSX.Element[] = [];
     let insert : JSX.Element[];
     let section : string;
@@ -40,7 +40,7 @@ class ChatTextParser {
 
         // parse the match *only* if its not empty
         if (match[0]) {
-          insert = callback(this.tokens[index].token, match[0]);
+          insert = callback(this.tokens[index].token, match[0], match);
           if (!insert) {
             // text didn't match after all, parse again
             insert = this.parse(match[0], callback, index + 1);
@@ -66,7 +66,7 @@ class ChatTextParser {
     }
 
     // no more tokens, just treat as text
-    return callback(ChatTextParser.TEXT, text);
+    return callback(ChatTextParser.TEXT, text, null);
   }
 }
 
