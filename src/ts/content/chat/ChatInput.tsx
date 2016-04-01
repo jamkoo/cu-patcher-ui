@@ -14,25 +14,20 @@ import AtUserList from './AtUserList';
 export interface ChatInputState {
   atUsers: string[];
   atUsersIndex: number;
+  expanded: boolean;
 };
 
 export interface ChatInputProps {
   label: string;
   send: (text: string) => void;
   slashCommand: (command: string) => void;
+  scroll: (extra?:number) => void;
 };
 
 class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
   _privateMessageHandler: any;
   tabUserList: string[] = [];
   tabUserIndex: number = null;
-  selectAtUser = (user: string) => {
-    const input: HTMLInputElement = this.getInputNode();
-    const lastWord: RegExpMatchArray = input.value.match(/@([\S]*)$/);
-    input.value = input.value.substring(0, lastWord.index + 1) + user + ' ';
-    input.focus();
-    this.setState({ atUsers: [], atUsersIndex: 0 });
-  }
   constructor(props: ChatInputProps) {
     super(props);
     this.state = this.initialState();
@@ -46,7 +41,8 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
   initialState(): ChatInputState {
     return {
       atUsers: [],
-      atUsersIndex: 0
+      atUsersIndex: 0,
+      expanded: false
     }
   }
   componentWillUnmount() {
@@ -54,17 +50,28 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
       events.off(this._privateMessageHandler);
     }
   }
-  getInputNode() : HTMLInputElement {
+  selectAtUser = (user: string) => {
+    const input: HTMLInputElement = this.getInputNode();
+    const lastWord: RegExpMatchArray = input.value.match(/@([\S]*)$/);
+    input.value = input.value.substring(0, lastWord.index + 1) + user + ' ';
+    input.focus();
+    this.setState({ atUsers: [], atUsersIndex: 0 } as any);
+  }
+  getInputNode(): HTMLInputElement {
     return this.refs['new-text'] as HTMLInputElement;
   }
-  keyDown(e: any) : void {
+  keyDown(e: React.KeyboardEvent): void {
+    // current input field value
+    const textArea: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
+    const value: string = textArea.value;
+
     // Complete username on tab key (9 = tab)
     if (e.keyCode === 9) {
       e.preventDefault();
       if (!this.tabUserList.length) {
         const chat: ChatSession = chatState.get('chat');
-        const lastWord: string = e.target.value.match(/\b([\S]+)$/)[1];
-        const endChar: string = lastWord === e.target.value ? ': ' : ' ';
+        const lastWord: string = value.match(/\b([\S]+)$/)[1];
+        const endChar: string = lastWord === value ? ': ' : ' ';
         const matchingUsers: string[] = [];
         chat.getRoom(chat.currentRoom).users.forEach((u: JSX.Element) => {
           if (u.props.info.name.substring(0, lastWord.length) === lastWord) {
@@ -74,16 +81,16 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
         if (matchingUsers.length) {
           this.tabUserList = matchingUsers;
           this.tabUserIndex = 0;
-          e.target.value = e.target.value + matchingUsers[0].substring(lastWord.length) + endChar;
-          this.setState({ atUsers: [], atUsersIndex: 0 });
+          textArea.value += matchingUsers[0].substring(lastWord.length) + endChar;
+          this.setState({ atUsers: [], atUsersIndex: 0 } as any);
         }
       } else {
         const oldTabIndex: number = this.tabUserIndex;
         const newTabIndex: number = oldTabIndex + 1 > this.tabUserList.length - 1 ? 0 : oldTabIndex + 1;
-        const endChar: string = e.target.value.slice(-2) === ': ' ? ': ' : ' ';
-        e.target.value = e.target.value.replace(new RegExp(this.tabUserList[oldTabIndex] + ':? $'), this.tabUserList[newTabIndex]) + endChar;
+        const endChar: string = value.slice(-2) === ': ' ? ': ' : ' ';
+        textArea.value = value.replace(new RegExp(this.tabUserList[oldTabIndex] + ':? $'), this.tabUserList[newTabIndex]) + endChar;
         this.tabUserIndex = newTabIndex;
-        this.setState({ atUsers: [], atUsersIndex: 0 });
+        this.setState({ atUsers: [], atUsersIndex: 0 } as any);
       }
     } else {
       this.tabUserList = [];
@@ -94,38 +101,54 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     if (e.keyCode === 38 && this.state.atUsers.length > 0) {
       e.preventDefault();
       const newIndex: number = this.state.atUsersIndex - 1 === -1 ? this.state.atUsers.length - 1 : this.state.atUsersIndex - 1;
-      this.setState(
-        {
-          atUsers: this.state.atUsers,
-          atUsersIndex: newIndex
-        }
-      );
+      this.setState({ atUsers: this.state.atUsers, atUsersIndex: newIndex  } as any);
     }
     if (e.keyCode === 40 && this.state.atUsers.length > 0) {
       e.preventDefault();
       const newIndex: number = this.state.atUsersIndex + 1 > this.state.atUsers.length - 1 ? 0 : this.state.atUsersIndex + 1;
-      this.setState(
-        {
-          atUsers: this.state.atUsers,
-          atUsersIndex: newIndex
-        }
-      );
+      this.setState({ atUsers: this.state.atUsers, atUsersIndex: newIndex } as any);
     }
-  }
-  keyUp(e: any) : void {
+
     // Send message on enter key (13 = enter)
     if (e.keyCode === 13) {
-      if (this.state.atUsers.length > 0) {
+      if (e.shiftKey) {
+        // Shift+ENTER = insert ENTER into text, and expand text area
+        this.expand(e.target as HTMLTextAreaElement);
+      }
+      else if (!e.ctrlKey && !e.altKey) {
+        // just ENTER
         e.preventDefault();
-        this.selectAtUser(this.state.atUsers[this.state.atUsersIndex]);
-      } else {
-        this.send();
+        if (this.state.atUsers.length > 0) {
+          // complete @name expansion
+          this.selectAtUser(this.state.atUsers[this.state.atUsersIndex]);
+        } else {
+          // Send message on enter key (13)
+          this.send();
+          this.collapse();
+        }
       }
     }
   }
-  parseInput(e: any) : void {
+  keyUp(e: React.KeyboardEvent): void {
+    const textArea: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
+
+    // if user deletes all the content, shrink the input area again
+    const value: string = textArea.value;
+    if (value.length === 0) {
+      this.collapse();
+    }
+
+    // if the user types a line that wraps and causes the text area to
+    // scroll and we are not currently expanded, then expand.
+    if (textArea.scrollHeight > textArea.offsetHeight && !this.state.expanded) {
+      this.expand(textArea);
+    }
+  }
+  parseInput(e: React.KeyboardEvent): void {
+    const textArea: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
+
     // Handle @name completion
-    const lastWord: RegExpMatchArray = e.target.value.match(/(?:^|\s)@([\S]*)$/);
+    const lastWord: RegExpMatchArray = textArea.value.match(/(?:^|\s)@([\S]*)$/);
     const userList: string[] = [];
     const userFilter: string = lastWord && lastWord[1] ? lastWord[1] : '';
     if (lastWord) {
@@ -137,16 +160,27 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
       });
       userList.sort();
     }
-    this.setState(
-      {
-        atUsers: userList,
-        atUsersIndex: this.state.atUsersIndex
-      }
-    );
+    this.setState({ atUsers: userList, atUsersIndex: this.state.atUsersIndex} as any);
+  }
+  expand = (input: HTMLTextAreaElement): void => {
+    if (!this.state.expanded) {
+      const was: number = input.offsetHeight;
+      this.setState({ expanded: true } as any);
+      setTimeout(() => {
+        // pass height of growth of input area as extra consideration for scroll logic
+        this.props.scroll(input.offsetHeight - was);
+      }, 100);     // queue it?
+    }
+  }
+  collapse = (): void => {
+    this.setState({ expanded: false } as any);
   }
   send() : void {
     const input: HTMLInputElement = this.getInputNode();
-    const value: string = input.value.trim();
+    let value: string = input.value;
+    // remove leading space (not newline) and trailing white space
+    while (value[0] === ' ') value = value.substr(1);
+    while (value[value.length-1] === '\n') value = value.substr(0,value.length-1);
     if (value[0] !== '/' || !this.props.slashCommand(value.substr(1))) {
       // not a recognised / command, send it
       this.props.send(value);
@@ -160,11 +194,16 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     input.focus();
   }
   render() {
+    const inputClass: string[] = [
+      'chat-input',
+      'input-field',
+      'chat-' + (this.state.expanded ? 'expanded' : 'normal')
+    ];
     return (
-      <div className='chat-input input-field'>
+      <div className={inputClass.join(' ')}>
         <AtUserList users={this.state.atUsers} selectedIndex={this.state.atUsersIndex} selectUser={this.selectAtUser}/>
-        <label htmlFor='chat-text'>Say something!</label>
-        <input id='chat-text' ref='new-text' onKeyDown={this.keyDown} onKeyUp={this.keyUp} onChange={this.parseInput} type='text'/>
+        <label htmlFor="chat-text">Say something!</label>
+        <textarea className="materialize-textarea" id="chat-text" ref="new-text" onKeyDown={this.keyDown} onKeyUp={this.keyUp} onChange={this.parseInput}></textarea>
       </div>
     );
   }

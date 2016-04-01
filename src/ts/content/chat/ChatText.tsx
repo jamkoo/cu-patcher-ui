@@ -20,29 +20,29 @@ const AUTOSCROLL_FUZZYNESS : number = 12;
 
 class ChatText extends React.Component<ChatTextProps, ChatTextState> {
   SCROLLBACK_PAGESIZE: number = 50;
-  scrollTop: number = undefined;
-  scrollPosFromBottom: number = undefined;
-  currentRoom: RoomId = undefined;
+  autoScroll: boolean = true;
+  lazyLoadTop: HTMLElement = null;
+  currentRoom: RoomId;
   constructor(props: ChatTextProps) {
     super(props);
     this.state = new ChatTextState();
     this.handleScroll = this.handleScroll.bind(this);
   }
   scroll() : void {
-    const chatBox : any = this.refs['chatbox'];
-    if (this.scrollPosFromBottom) {
-      this.scrollTop = chatBox.scrollTop = chatBox.scrollHeight - this.scrollPosFromBottom;
-      this.scrollPosFromBottom = undefined;
-    }
-    else if (chatBox.lastElementChild) {
-      if (this.scrollTop === undefined || (this.scrollTop - chatBox.scrollTop) <= AUTOSCROLL_FUZZYNESS) {
-        chatBox.lastElementChild.scrollIntoView();
-        this.scrollTop = chatBox.scrollTop;      
-      }      
+    const chatBox : HTMLHtmlElement = this.refs['chatbox'] as HTMLHtmlElement;
+    if (this.autoScroll && chatBox.lastElementChild) {
+      const lastChild : HTMLHtmlElement = chatBox.lastElementChild as HTMLHtmlElement;
+      lastChild.scrollIntoView(false);
     }
   }
   componentDidUpdate() {
     this.scroll();
+    if (this.lazyLoadTop) {
+      // after a lazy load, reposition the element that was at the top
+      // back at the top
+      this.lazyLoadTop.scrollIntoView(true);
+      this.lazyLoadTop = undefined;
+    }
   }
   componentDidMount() {
     this.scroll();
@@ -56,12 +56,16 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
     el.addEventListener("scroll", this.handleScroll);
   }
   handleScroll(e: MouseEvent) {
+    // auto-scroll is enabled when the scroll bar is at or very near the bottom
+    const chatBox: HTMLDivElement = this.refs['chatbox'] as HTMLDivElement;
+    this.autoScroll = chatBox.scrollHeight - (chatBox.scrollTop + chatBox.offsetHeight) < AUTOSCROLL_FUZZYNESS;
+
+    // if lazy loading is active, and we have scrolled up to where the lazy loaded
+    // content should be then lazy load the next page of content
     const lazy: HTMLDivElement = this.refs['lazyload'] as HTMLDivElement;
     if (lazy) {
-      const el: HTMLDivElement = this.refs['chatbox'] as HTMLDivElement;
-      if (el.scrollTop < lazy.offsetHeight) {
-        // lazy load rest of content
-        this.scrollPosFromBottom = el.scrollHeight - el.scrollTop;
+      if (chatBox.scrollTop < lazy.offsetHeight) {
+        this.lazyLoadTop = lazy.nextElementSibling as HTMLElement;
         this.props.room.nextScrollbackPage();
         this.forceUpdate();
       }
@@ -73,7 +77,7 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
   }
   newRoom() : void {
     this.currentRoom = this.props.room.roomId;
-    this.scrollTop = undefined;
+    this.autoScroll = true;
   }
   render() {
     const room : ChatRoomInfo = this.props.room;
@@ -85,7 +89,7 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
         this.newRoom();
       }
       if (room.scrollback > 0) {
-        lazy = <div ref="lazyload" className="chat-lazyload" style={{ height: room.scrollback + 'em' }}></div>;
+        lazy = <div ref="lazyload" className="chat-lazyload" style={{ height: (room.scrollback * 1.7) + 'em' }}></div>;
       }
       if (room.messages) {
         messages = room.messages.slice(room.scrollback);
