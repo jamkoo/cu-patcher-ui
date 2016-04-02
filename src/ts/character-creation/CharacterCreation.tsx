@@ -112,7 +112,11 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
 
 
   componentWillMount() {
+    this.props.dispatch(resetAttributes());
     this.props.dispatch(resetCharacter());
+    this.props.dispatch(selectRace(null));
+    this.props.dispatch(selectGender(null));
+    this.props.dispatch(selectPlayerClass(null));
     this.props.dispatch(fetchFactions(this.props.apiHost, this.props.shard, this.props.apiVersion));
     this.props.dispatch(fetchRaces(this.props.apiHost, this.props.shard, this.props.apiVersion));
     this.props.dispatch(fetchPlayerClasses(this.props.apiHost, this.props.shard, this.props.apiVersion));
