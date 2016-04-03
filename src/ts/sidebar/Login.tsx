@@ -24,7 +24,7 @@ class Login extends React.Component<LoginProps, LoginState> {
   public name: string = 'cse-patcher-login';
   public intervalHandle: any;
   public intervalCounter: any;
-  
+
   constructor(props: LoginProps) {
     super(props);
     this.state = {
@@ -33,18 +33,31 @@ class Login extends React.Component<LoginProps, LoginState> {
       rememberMe: patcher.hasUserEmail(),
       showModal: false
     };
-    
+
     // because patcherAPI is not ready immediately... hacky, but works enough I think
     setTimeout(() => {
       this.state = {
-      email: patcher.getUserEmail(),
-      password: '',
-      rememberMe: patcher.hasUserEmail(),
-      showModal: false
-    };
+        email: patcher.getUserEmail(),
+        password: '',
+        rememberMe: patcher.hasUserEmail(),
+        showModal: false
+      };
     }, 500);
   }
-  
+
+  componentDidMount() : void {
+    const emailInput: HTMLInputElement = this.refs['email'] as HTMLInputElement;
+    const passwordInput: HTMLInputElement = this.refs['password'] as HTMLInputElement;
+    // without this timeout, the label doesn't animate up above the input box
+    setTimeout(() => {
+      if (emailInput.value.length === 0) {
+        emailInput.focus();
+      } else {
+        passwordInput.focus();
+      }
+    }, 500);
+  }
+
   onEmailChanged = (evt: any) => {
     this.setState({
       email: evt.target.value,
@@ -53,7 +66,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       showModal: false
     });
   }
-  
+
   onPasswordChanged = (evt: any) => {
     this.setState({
       email: this.state.email,
@@ -62,7 +75,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       showModal: false
     });
   }
-  
+
   onRememberMe = (evt: any) => {
     this.setState({
       email: this.state.email,
@@ -71,7 +84,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       showModal: false
     });
   }
-  
+
   logIn = () => {
     this.setState({
       email: this.state.email,
@@ -80,7 +93,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       showModal: true
     });
   }
-  
+
   hideModal = () => {
     this.setState({
       email: this.state.email,
@@ -90,33 +103,33 @@ class Login extends React.Component<LoginProps, LoginState> {
     });
     if (patcher.hasLoginToken()) this.props.onLogIn();
   }
-  
+
   onHelp = () => {
     window.open('https://api.citystateentertainment.com/Account/ForgottenPassword', '_blank');
   }
-  
+
   onKeyDown = (event: any) => {
     if (event.key == 'Enter') {
       this.logIn();
     }
   }
-  
+
   render() {
     let modal: any = null;
     if (this.state.showModal) {
       modal = <LoginStatusModal email={this.state.email} password={this.state.password}
         rememberMe={this.state.rememberMe} closeModal={this.hideModal} />;
     }
-    
+
     return (
       <div id={this.name} className='loginbox card-panel' onKeyDown={this.onKeyDown}>
         <div className='row no-margin-bottom'>
         <div className='input-field col s12'>
-          <input id='email' type='email' className='validate' value={this.state.email || ''} onChange={this.onEmailChanged} tabIndex={1}/>
+          <input id='email' ref='email' type='email' className='validate' value={this.state.email || ''} onChange={this.onEmailChanged} tabIndex={1}/>
           <label htmlFor='email'>Email Address</label>
         </div>
         <div className='input-field col s12'>
-          <input id='password' type='password' className='validate' value={this.state.password || ''} onChange={this.onPasswordChanged} tabIndex={2}/>
+          <input id='password' ref='password' type='password' className='validate' value={this.state.password || ''} onChange={this.onPasswordChanged} tabIndex={2}/>
           <label htmlFor='password'>Password</label>
         </div>
         <div className='col s12 no-padding'>
@@ -132,7 +145,7 @@ class Login extends React.Component<LoginProps, LoginState> {
           <a className='waves-effect btn-flat right sign-in' onClick={this.logIn}  tabIndex={4}>Sign In</a>
         </div>
         </div>
-        
+
         <Animate animationEnter='zoomIn' animationLeave='zommOut'
           durationEnter={500} durationLeave={300}>
           {modal}
