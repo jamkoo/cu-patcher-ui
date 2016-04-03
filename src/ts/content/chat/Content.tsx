@@ -24,7 +24,7 @@ class Content extends React.Component<ContentProps, ContentState> {
   send = (text: string) : void => {
     this.props.send(this.props.room.roomId, text);
   }
-  
+
   render() {
     return (
       <div className="chat-content">
