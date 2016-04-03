@@ -222,7 +222,7 @@ class ChatSession {
 
   findRoom(roomId: RoomId) : ChatRoomInfo {
     for (let i = 0; i < this.rooms.length; i++) {
-      if (this.rooms[i].roomId.same(roomId)) {
+      if (this.rooms[i].roomId && this.rooms[i].roomId.same(roomId)) {
         return this.rooms[i];
       }
     }
