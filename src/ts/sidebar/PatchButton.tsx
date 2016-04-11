@@ -27,7 +27,7 @@ export class Progress {
   public remaining = () => {
     return this.totalDataSize - this.dataCompleted;
   }
-
+  
   static bytesToString(bytes: number): string {
     if (bytes >= 1099511627776) {
       // display as TB
