@@ -27,7 +27,7 @@ export class Progress {
   public remaining = () => {
     return this.totalDataSize - this.dataCompleted;
   }
-
+  
   static bytesToString(bytes: number): string {
     if (bytes >= 1099511627776) {
       // display as TB
@@ -238,12 +238,13 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         const remainingTime : number = percentDone ? ((100/percentDone)*downloadDuration) - downloadDuration : undefined;
         const time: string = percentDone ? Progress.secondsToString(remainingTime) : 'starting';
         const rate: string = Progress.bypsToString(downloadRate);
-        const dataSize: string  = Progress.bytesToString(estimate - downloadRemaining) + '/' + Progress.bytesToString(estimate);
+        const dataSize: string = Progress.bytesToString(estimate - downloadRemaining) + '/' + Progress.bytesToString(estimate);
+        const percentDisplay: string = percentDone ? '(' + Math.round(percentDone * 100) / 100.0 + '%)' : '';
         layer3 = (
           <div className='text'>
             <div className='progress-text'><span className='body'>{time}</span></div>
             <div className='progress-text'><span className='body'>{rate}</span></div>
-            <div className='progress-text'><span className='body'>{dataSize}</span></div>
+            <div className='progress-text'><span className='body'>{dataSize} {percentDisplay}</span></div>
           </div>
         );
         break;
