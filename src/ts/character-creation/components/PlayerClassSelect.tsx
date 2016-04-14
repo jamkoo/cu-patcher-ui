@@ -91,7 +91,7 @@ class PlayerClassSelect extends React.Component<PlayerClassSelectProps, PlayerCl
 
     return (
       <div className='page'>
-        <video src={`../videos/${videoTitle}.webm`} poster={`../videos/${videoTitle}.jpg`} autoPlay loop></video>
+        <video src={`videos/${videoTitle}.webm`} poster={`videos/${videoTitle}.jpg`} autoPlay loop></video>
           {name}
         <div className='selection-box'>
           <h6>Choose your class</h6>

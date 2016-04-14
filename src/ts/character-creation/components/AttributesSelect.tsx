@@ -98,7 +98,7 @@ class AttributesSelect extends React.Component<AttributesSelectProps, Attributes
 
     return (
       <div className='page'>
-        <video src={`../videos/paper-bg.webm`} poster={`../videos/paper-bg.jpg`} autoPlay loop></video>
+        <video src={`videos/paper-bg.webm`} poster={`videos/paper-bg.jpg`} autoPlay loop></video>
         <div className='selection-box'>
           <h6>Distribute attribute points  <span className='points'>(Remaining {this.props.remainingPoints})</span></h6>
           {this.props.attributes.map((a: AttributeInfo) => this.generateAttributeContent(a, offset))}

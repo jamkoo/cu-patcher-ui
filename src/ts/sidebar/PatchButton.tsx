@@ -192,7 +192,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
 
   generateCharacterCreation = () => {
     return (
-      <div id='cu-character-creation' className='cu-patcher-ui__character-creation' key='char-create'>
+      <div className='cu-patcher-ui__character-creation' key='char-create'>
         <CharacterCreation apiHost={'https://api.camelotunchained.com/'}
                            apiVersion={1}
                            shard={this.props.server.shardID}

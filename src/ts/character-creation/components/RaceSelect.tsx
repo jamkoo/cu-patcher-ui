@@ -70,7 +70,7 @@ class RaceSelect extends React.Component<RaceSelectProps, RaceSelectState> {
 
     return (
       <div className='page'>
-        <video src={`../videos/${this.props.selectedFaction.shortName}.webm`} poster={`../videos/${this.props.selectedFaction.shortName}-bg.jpg`} autoPlay loop></video>
+        <video src={`videos/${this.props.selectedFaction.shortName}.webm`} poster={`videos/${this.props.selectedFaction.shortName}-bg.jpg`} autoPlay loop></video>
         {name}
         <div className='selection-box'>
           <h6>Choose your race</h6>
