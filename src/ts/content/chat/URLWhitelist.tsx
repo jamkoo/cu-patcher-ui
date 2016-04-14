@@ -20,6 +20,9 @@ const whitelist = [
  	/dropboxusercontent.com$/,
  	/whicdn.com$/,
  	/smugmug.com$/,
+  /s3.amazonaws.com$/,
+  /camelotunchained.com$/,
+  /citystateentertainment.com$/
 ];
 
 function ok(text: string) {
