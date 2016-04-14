@@ -28,7 +28,7 @@ class AtUserListItem extends React.Component<AtUserListItemProps, AtUserListItem
   render() {
     const classes: string[] = [ 'atuser-name' ];
     if (this.props.selected) classes.push('atuser-name-selected');
-    return ( <div className={classes.join(' ')} id={this.props.selected ? 'selected-atuser' : null} onClick={this.selectUser}>{this.props.user}</div> );
+    return ( <div className={classes.join(' ')} ref={ this.props.selected ? (div) => { if (div) div.scrollIntoView(); } : undefined } onClick={this.selectUser}>{this.props.user}</div> );
   }
 }
 

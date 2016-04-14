@@ -27,7 +27,7 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
   tabUserList: string[] = [];
   tabUserIndex: number = null;
   selectAtUser = (user: string) => {
-    const input: any = this.getInputNode();
+    const input: HTMLInputElement = this.getInputNode();
     const lastWord: RegExpMatchArray = input.value.match(/@([\S]*)$/);
     input.value = input.value.substring(0, lastWord.index + 1) + user + ' ';
     input.focus();
@@ -54,8 +54,8 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
       events.off(this._privateMessageHandler);
     }
   }
-  getInputNode() : any {
-    return this.refs['new-text'];
+  getInputNode() : HTMLInputElement {
+    return this.refs['new-text'] as HTMLInputElement;
   }
   keyDown(e: any) : void {
     // Complete username on tab key (9 = tab)
@@ -145,7 +145,7 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     );
   }
   send() : void {
-    const input: any = this.getInputNode();
+    const input: HTMLInputElement = this.getInputNode();
     const value: string = input.value.trim();
     if (value[0] !== '/' || !this.props.slashCommand(value.substr(1))) {
       // not a recognised / command, send it
@@ -155,7 +155,7 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     input.focus();
   }
   privateMessage(name: string) : void {
-    const input: any = this.getInputNode();
+    const input: HTMLInputElement = this.getInputNode();
     input.value = '/w ' + name + ' ';
     input.focus();
   }

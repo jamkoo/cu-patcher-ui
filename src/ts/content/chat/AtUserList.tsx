@@ -21,11 +21,6 @@ class AtUserList extends React.Component<AtUserListProps, AtUserListState> {
     super(props);
   }
 
-  componentDidUpdate() {
-    const selectedNode: any = document.getElementById('selected-atuser');
-    if (selectedNode) selectedNode.scrollIntoView();
-  }
-
   render() {
     const nameList: JSX.Element[] = [];
     if (this.props.users.length > 0) {
