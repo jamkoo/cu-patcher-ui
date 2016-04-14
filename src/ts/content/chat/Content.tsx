@@ -21,15 +21,20 @@ export interface ContentProps {
 }
 
 class Content extends React.Component<ContentProps, ContentState> {
-  send = (text: string) : void => {
+  send = (text: string): void => {
     this.props.send(this.props.room.roomId, text);
+  }
+
+  scroll = (): void => {
+    const text: ChatText = (this.refs['text'] as ChatText);
+    text.scroll();
   }
 
   render() {
     return (
       <div className="chat-content">
-        <ChatText room={this.props.room}/>
-        <ChatInput label="SEND" send={this.send} slashCommand={this.props.slashCommand}/>
+        <ChatText ref="text" room={this.props.room}/>
+        <ChatInput label="SEND" send={this.send} slashCommand={this.props.slashCommand} scroll={this.scroll}/>
       </div>
     );
   }
