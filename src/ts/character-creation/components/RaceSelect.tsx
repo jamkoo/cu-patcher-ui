@@ -5,11 +5,12 @@
  */
 
 import * as React from 'react';
-
 import {race, faction, gender} from 'camelot-unchained';
 
 import {RaceInfo} from '../redux/modules/races';
 import {FactionInfo} from '../redux/modules/factions';
+
+import Animate from '../utils/Animate';
 
 const raceText: any = {
   'HUMANMALEA': 'Through luck, or perhaps something more, a few Humans managed to escape Veilstorm influence entirely. They did not change into something else, and were untouched by the Veil’s wrath, as though chosen for a special purpose. They may lack the strange powers that some other races possess, but they are also spared the curses that sometimes accompany these powers. Through sheer determination, Humans survive. They refuse to disappear, and prosper even in the most difficult of times, following the noble path of righteous strength that King Arthur lays before them.',
@@ -50,7 +51,7 @@ class RaceSelect extends React.Component<RaceSelectProps, RaceSelectState> {
   generateRaceContent = (info: RaceInfo) => {
     return (
       <a key={info.id}
-         className={`cu-character-creation__race-select__${race[info.id]}__thumbnail ${this.props.selectedRace !== null ? this.props.selectedRace.id == info.id ? 'active' : '' : ''}`}
+         className={`thumb__${race[info.id]}--${gender[this.props.selectedGender]} ${this.props.selectedRace !== null ? this.props.selectedRace.id == info.id ? 'active' : '' : ''}`}
          onClick={this.selectRace.bind(this, info)}></a>
     );
   }
@@ -62,16 +63,16 @@ class RaceSelect extends React.Component<RaceSelectProps, RaceSelectState> {
     let text: any = null;
     let name: any = null;
     if (this.props.selectedRace) {
-      name = <h2 className={`cu-character-creation__race-select_name`}>{this.props.selectedRace.name}</h2>
-      view = <div className={`cu-character-creation__race-select__view-area__${race[this.props.selectedRace.id]}`}></div>
-      text = <div className='cu-character-creation__race-select__text'>{raceText[race[this.props.selectedRace.id]]}</div>
+      name = <h2 className='display-name'>{this.props.selectedRace.name}</h2>
+      view = <div key={`${race[this.props.selectedRace.id]}--${gender[this.props.selectedGender]}`} className={`standing__${race[this.props.selectedRace.id]}--${gender[this.props.selectedGender]}`}></div>
+      text = <div className='selection-description'>{raceText[race[this.props.selectedRace.id]]}</div>
     }
 
     return (
-      <div className='cu-character-creation__race-select'>
-          {name}
-
-        <div className='cu-character-creation__race-select__selection-area'>
+      <div className='page'>
+        <video src={`../videos/${this.props.selectedFaction.shortName}.webm`} poster={`../videos/${this.props.selectedFaction.shortName}-bg.jpg`} autoPlay loop></video>
+        {name}
+        <div className='selection-box'>
           <h6>Choose your race</h6>
           {this.props.races.filter((r: any) => r.faction === this.props.selectedFaction.id).map(this.generateRaceContent)}
           <h6>Choose your gender</h6>
@@ -81,15 +82,15 @@ class RaceSelect extends React.Component<RaceSelectProps, RaceSelectState> {
              onClick={() => this.props.selectGender(gender.FEMALE)}>Female</a>
           {text}
         </div>
-        <div className='cu-character-creation__race-select__view-area'>
+        <div className='view-content'>
+          <Animate className='animate' animationEnter='fadeIn' animationLeave='fadeOut'
+          durationEnter={400} durationLeave={500}>
           {view}
+        </Animate>
         </div>
       </div>
     )
   }
 }
-
-// video disabled
-//<video src={`../videos/${this.props.selectedFaction.shortName}.webm`} poster={`../videos/${this.props.selectedFaction.shortName}-bg.jpg`} autoPlay loop></video>
 
 export default RaceSelect;

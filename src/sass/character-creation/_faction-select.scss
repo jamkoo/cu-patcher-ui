@@ -10,7 +10,7 @@
   flex-direction: row;
 }
 
-h4{
+.cu-character-creation__faction-select h4{
   text-align: center;
   font-size: 1.9rem;
   width: 250px;
@@ -22,17 +22,16 @@ h4{
 }
 
 @mixin faction-select-realm($bg_url) {
-  //background-image: url($bg_url);
-  //background-size: cover;
-  background-image: url('../images/temp.jpg');
+  background-image: url($bg_url);
+  background-size: cover;
   position: relative;
   video {
     position: absolute;
     left: 0;
     top: 0;
     z-index: -3;
-    -webkit-transform: translateX(-30%);
-    transform: translateX(-30%);
+    -webkit-transform: translateX(-10%);
+    transform: translateX(-10%);
     min-width: 100%;
     min-height: 100%;
     width: auto;
@@ -42,6 +41,7 @@ h4{
   transition: all .3s ease-in-out;
   flex-grow: 1;
   outline: 0px solid rgba(255, 255, 255, 0.0);
+  outline-offset: -10px;
   display: inline;
   justify-content: center;
   align-items: center;
@@ -79,10 +79,7 @@ h4{
 
 .cu-character-creation__faction-select__TDD {
   @include faction-select-realm('../images/tdd-bg.png');
-  video{
-    -webkit-transform: translateX(-10%);
-    transform: translateX(-10%);
-  }
+
   .cu-character-creation__faction-select__TDD__shield {
     @include faction-select__shield('../images/tdd-shield.png');
   }

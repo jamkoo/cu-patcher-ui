@@ -4,67 +4,74 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-@mixin class-thumbnail($url) {
-  background-image: url($url);
-  background-size: cover;
-  background-repeat: no-repeat;
-  overflow: hidden;
-  width: 50px;
-  height: 45px;
-  margin: 2.5px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  transition: all .2s ease-in-out;
-  &:hover {
-    border: 1px solid rgba(255,225,78,0.50);
-  }
-  &:active {
-    border: 1px solid rgba(255,225,78,0.80);
-  }
+.thumb__BLACKKNIGHT{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_black-knight.png');
 }
 
-.cu-character-creation__class-select__FIREMAGE {
-    @include class-thumbnail('../images/races/standing/hamadryad.png');
+.thumb__FIANNA{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_fianna.png');
 }
 
-.cu-character-creation__class-select__BLACKKNIGHT {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__MJOLNIR{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_mjolnir.png');
 }
 
-.cu-character-creation__class-select__FIANNA {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__PHYSICIAN{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_physician.png');
 }
 
-.cu-character-creation__class-select__MJOLNIR {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__EMPATH{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_empath.png');
 }
 
-.cu-character-creation__class-select__PHYSICIAN {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__STONEHEALER{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_stonehealer.png');
 }
 
-.cu-character-creation__class-select__EMPATH {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__BLACKGUARD{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_blackguard.png');
 }
 
-.cu-character-creation__class-select__STONEHEALER {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__FORESTSTALKER{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_forest-stalker.png');
 }
 
-.cu-character-creation__class-select__BLACKGUARD {
-    @include class-thumbnail('../images/temp.jpg');
+.thumb__WINTERSSHADOW{
+    @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_winter-shadow.png');
 }
 
-.cu-character-creation__class-select__FORESTSTALKER {
-    @include class-thumbnail('../images/temp.jpg');
+.standing__EMPATH{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/empath.png');
 }
 
-.cu-character-creation__class-select__WINTERSSHADOW {
-    @include class-thumbnail('../images/temp.jpg');
+.standing__BLACKKNIGHT{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/black-knight.png');
 }
 
+.standing__FIANNA{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/fianna.png');
+}
 
-.cu-character-creation__class-select_name {
-  position: absolute;
-  left: 350px;
-  z-index: 2;
+.standing__MJOLNIR{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/mjolnir.png');
+}
+
+.standing__PHYSICIAN{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/physician.png');
+}
+
+.standing__STONEHEALER{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/stonehealer.png');
+}
+
+.standing__BLACKGUARD{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/blackguard.png');
+}
+
+.standing__FORESTSTALKER{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/forest-stalker.png');
+}
+
+.standing__WINTERSSHADOW{
+    @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/winters-shadow.png');
 }

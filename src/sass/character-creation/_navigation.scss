@@ -6,19 +6,35 @@
 
 .cu-character-creation__navigation {
   position: absolute;
-  bottom: 70px;
+  bottom: 0px;
   left: 0px;
   right: 0px;
-  z-index: 101;
+  z-index: 2;
   padding: 50px 0 20px 0;
-  -webkit-user-select: none !important;
   background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.50));
 }
 
 .cu-character-creation__name {
-  width: 300px;
   position: absolute;
-  bottom: 150px;
-  right: 25px;
-  z-index: 102;
+  bottom: 75px;
+  padding: 40px;
+  width: calc(100% - 280px);
+  right: 0;
+  z-index: 10;
+  opacity: .7;
+  transition: opacity .2s ease-in-out;
+  &:focus, &:hover{
+      opacity: 1;
+  }
+
+  input {
+    width: 300px;
+    display: block;
+    margin: auto;
+    background: radial-gradient( at bottom, rgba(0, 0, 0, 0.8) ,transparent 70%);
+    padding: 0px 10px;
+    text-align: center;
+
+
+  }
 }

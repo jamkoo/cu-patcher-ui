@@ -15,7 +15,7 @@ export function selectGender(selected: gender) {
     }
 }
 
-const initialState = 0;
+const initialState = gender.MALE;
 
 export default function reducer(state: gender = initialState, action: any = {}) {
     switch(action.type) {

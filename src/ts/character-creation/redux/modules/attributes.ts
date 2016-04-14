@@ -13,11 +13,11 @@ import ResponseError from '../../utils/ResponseError';
 
 const totalPoints = 30;
 
-export enum AttributeType {
-  None,
-  Primary,        // can adjust during character creation, and can be raised through progression
-  Secondary,      // can set during character creation, locked after creation
-  Derived         // calculated from primary or secondary attributes, player can not directly change
+export enum attributeType {
+  NONE,
+  PRIMARY,        // can adjust during character creation, and can be raised through progression
+  SECONDARY,      // can set during character creation, locked after creation
+  DERIVED         // calculated from primary or secondary attributes, player can not directly change
 }
 
 export interface AttributeInfo {
@@ -25,11 +25,12 @@ export interface AttributeInfo {
   description: string,
   derivedFrom: string, // only on derived attributes
   baseValue: number,
-  type: AttributeType,
-  isPercentage: boolean, // some derived attributes are percentage based
+  type: attributeType,
+  maxOrMultipler: number,
   // Added by patcher -- not in the api response message
   allocatedPoints: number,
   minValue: number, // based on race & gender selections -- filled out when calling
+  units: string,
 }
 
 const FETCH_ATTRIBUTES = 'cu-character-creation/attributes/FETCH_ATTRIBUTES';

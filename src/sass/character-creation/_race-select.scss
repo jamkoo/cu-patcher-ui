@@ -4,37 +4,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.cu-character-creation__race-select, .cu-character-creation__class-select, .cu-character-creation__attribute-select {
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  padding: 20px;
-  background: url('../images/temp.jpg');
-  video {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translateX(-50%) translateY(-50%);
-    background-size: cover;
-  }
-}
-
-.cu-character-creation__race-select_name {
-  position: absolute;
-  left: 350px;
-  z-index: 2;
-}
-
 .gender-btn {
   width: 125px;
   margin: 5px;
   -webkit-user-select: none;
   cursor: pointer !important;
-  padding: 10px 20px;
+  padding: 5px 20px;
   font-weight: 700;
   text-align: center;
   background: $gradient2;
@@ -63,179 +38,98 @@
   }
 }
 
-
-@mixin race-thumbnail($url) {
-  background-image: url($url);
-  background-size: cover;
-  background-repeat: no-repeat;
-  overflow: hidden;
-  width: 50px;
-  height: 45px;
-  margin: 2.5px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  transition: all .2s ease-in-out;
-  &:hover {
-    border: 1px solid rgba(255,225,78,0.50);
-  }
-  &:active {
-    border: 1px solid rgba(255,225,78,0.80);
-  }
+.thumb__PICT--MALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_pict-m.png');
+}
+.thumb__PICT--FEMALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_pict-f.png');
 }
 
-@mixin race-standing($url) {
-  background-image: url($url);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  overflow: hidden;
-  flex-grow: 1;
+.thumb__LUCHORPAN--MALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_luchorpan-m.png');
 }
 
-.cu-character-creation__race-select__selection-area, .cu-character-creation__class-select__selection-area, .cu-character-creation__attribute-select__selection-area {
-  position: absolute;
-  z-index: 10;
-  background: $sidebar-bg;
-  border-width: 1px;
-  border-image: $gradient-border;
-  border-image-slice: 1;
-  width: 300px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  padding: 10px;
-  h6 {
-    width: 100%;
-    text-transform: uppercase;
-  }
-  color: #e2e2e2;
+.thumb__LUCHORPAN--FEMALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_luchorpan-f.png');
 }
 
-.cu-character-creation__race-select__text {
-  color: #e2e2e2;
-  overflow-y: auto;
-  margin-top: 20px;
-  height: 300px;
-  min-width: 100%;
-  border: 1px solid rgba(70, 70, 70, 0.78);
-  padding: 5px;
+.thumb__VALKYRIE--MALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_valkyrie-m.png');
 }
 
-.cu-character-creation__race-select__PICT__thumbnail {
-  @include race-thumbnail('../images/temp.jpg');
+.thumb__VALKYRIE--FEMALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_valkyrie-f.png');
 }
 
-.cu-character-creation__race-select__LUCHORPAN__thumbnail {
-  @include race-thumbnail('../images/races/thumbnail/luchorpan.jpg');
+.thumb__HUMANMALEV--MALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-m-vik.png');
 }
 
-.cu-character-creation__race-select__VALKYRIE__thumbnail {
-  @include race-thumbnail('../images/races/thumbnail/valkyrie.jpg');
+.thumb__HUMANMALEA--MALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-m-art.png');
 }
 
-.cu-character-creation__race-select__HUMANMALEV__thumbnail {
-  @include race-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-m-vik.png');
+.thumb__HUMANMALET--MALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-m-tdd.png');
 }
 
-.cu-character-creation__race-select__HUMANMALEA__thumbnail {
-  @include race-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-m-art.png');
+.thumb__HUMANMALEV--FEMALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-f-vik.png');
 }
 
-.cu-character-creation__race-select__HUMANMALET__thumbnail {
-  @include race-thumbnail('../images/races/thumbnail/humanmalet.jpg');
+.thumb__HUMANMALEA--FEMALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-f-art.png');
 }
 
-.cu-character-creation__race-select__HUMANFEMALEV__thumbnail {
-  @include race-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-f-vik.png');
-}
-
-.cu-character-creation__race-select__HUMANFEMALEA__thumbnail {
-  @include race-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-f-art.png');
-}
-
-.cu-character-creation__race-select__HUMANFEMALET__thumbnail {
-  @include race-thumbnail('../images/races/thumbnail/humanmalet.jpg');
+.thumb__HUMANMALET--FEMALE {
+  @include selection-thumbnail('https://s3.amazonaws.com/camelot-unchained/character-creation/character/icons/icon_humans-f-tdd.png');
 }
 
 
-// -------
-
-.cu-character-creation__race-select__view-area {
-  flex-grow: 1;
-  display: flex;
-  z-index: 1;
-  padding-left: 300px;
+.standing__LUCHORPAN--MALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/luchorpan-m.png');
 }
 
-.cu-character-creation__race-select__view-area__HAMADRYAD {
-  @include race-standing('../images/races/standing/hamadryad.png');
+.standing__LUCHORPAN--FEMALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/luchorpan-f.png');
 }
 
-.cu-character-creation__race-select__view-area__LUCHORPAN {
-  @include race-standing('../images/races/standing/luchorpan.png');
+.standing__VALKYRIE--MALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/valkyrie-m.png');
 }
 
-.cu-character-creation__race-select__view-area__FIRBOG {
-  @include race-standing('../images/races/standing/firbog.png');
+.standing__VALKYRIE--FEMALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/valkyrie-f.png');
 }
 
-.cu-character-creation__race-select__view-area__VALKYRIE {
-  @include race-standing('../images/races/standing/valkyrie.png');
+.standing__PICT--MALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/pict-m.png');
 }
 
-.cu-character-creation__race-select__view-area__HELBOUND {
-  @include race-standing('../images/races/standing/helbound.png');
+.standing__PICT--FEMALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/pict-f.png');
 }
 
-.cu-character-creation__race-select__view-area__FROSTGIANT {
-  @include race-standing('../images/races/standing/frostgiant.png');
+.standing__HUMANMALEV--MALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-m-vik.png');
 }
 
-.cu-character-creation__race-select__view-area__STRM {
-  @include race-standing('../images/races/standing/strm.png');
+.standing__HUMANMALEA--MALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-m-art.png');
 }
 
-.cu-character-creation__race-select__view-area__CAITSITH {
-  @include race-standing('../images/races/standing/caitsith.png');
+.standing__HUMANMALET--MALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-m-tdd.png');
 }
 
-.cu-character-creation__race-select__view-area__GOLEM {
-  @include race-standing('../images/races/standing/golem.png');
+.standing__HUMANMALEV--FEMALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-f-vik.png');
 }
 
-.cu-character-creation__race-select__view-area__STORMRIDERT {
-  @include race-standing('../images/races/standing/stormridert.png');
+.standing__HUMANMALEA--FEMALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-f-art.png');
 }
 
-.cu-character-creation__race-select__view-area__STORMRIDERA {
-  @include race-standing('../images/races/standing/stormridera.png');
+.standing__HUMANMALET--FEMALE {
+  @include view-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-f-tdd.png');
 }
-
-.cu-character-creation__race-select__view-area__STORMRIDERV {
-  @include race-standing('../images/races/standing/stormriderv.png');
-}
-
-.cu-character-creation__race-select__view-area__HUMANMALEV {
-  @include race-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-m-vik.png');
-}
-
-.cu-character-creation__race-select__view-area__HUMANMALEA {
-  @include race-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-m-art.png');
-}
-
-.cu-character-creation__race-select__view-area__HUMANMALET {
-  @include race-standing('../images/races/standing/humans.png');
-}
-
-.cu-character-creation__race-select__view-area__HUMANFEMALEV {
-  @include race-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-f-vik.png');
-}
-
-.cu-character-creation__race-select__view-area__HUMANFEMALEA {
-  @include race-standing('https://s3.amazonaws.com/camelot-unchained/character-creation/character/humans-f-art.png');
-}
-
-.cu-character-creation__race-select__view-area__HUMANFEMALET {
-  @include race-standing('../images/races/standing/humans.png');
-}
-
