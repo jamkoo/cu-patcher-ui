@@ -27,7 +27,7 @@ export class Progress {
   public remaining = () => {
     return this.totalDataSize - this.dataCompleted;
   }
-  
+
   static bytesToString(bytes: number): string {
     if (bytes >= 1099511627776) {
       // display as TB
@@ -106,22 +106,22 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     clearInterval(this.intervalHandle);
   }
 
-  onClicked = (event: React.MouseEvent):void => {
+  onClicked = (event: React.MouseEvent): void => {
     switch (patcher.getAllChannels()[this.props.channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled: this.install();
       case ChannelStatus.Validating: break;
       case ChannelStatus.Updating: break;
       case ChannelStatus.OutOfDate: this.install();
       case ChannelStatus.Ready:
-         if (event.altKey) {
+        if (event.altKey) {
           const serverName: string = this.props.server ? this.props.server.name : 'cube';
           let channelCommand: string = localStorage.getItem('CSE_COMMANDS_' + serverName) || '';
 
-          channelCommand =  window.prompt('Please enter your command line parameters for ' + serverName, channelCommand);
+          channelCommand = window.prompt('Please enter your command line parameters for ' + serverName, channelCommand);
           localStorage.setItem('CSE_COMMANDS_' + serverName, channelCommand);
 
-          if(!channelCommand) {
-              localStorage.removeItem('CSE_COMMANDS_' + serverName);
+          if (!channelCommand) {
+            localStorage.removeItem('CSE_COMMANDS_' + serverName);
           }
           this.commands = channelCommand;
         } else {
@@ -208,11 +208,13 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     let layer2: any = null;
     let layer3: any = null;
 
+    let videoElements: any = document.getElementsByTagName('video');
+
     let channels = patcher.getAllChannels();
     if (typeof(channels) == 'undefined' || channels == null || channels.length == 0) return null;
 
     let channelIndex = this.props.channelIndex != null && this.props.channelIndex >= 0 ? this.props.channelIndex : 0;
-    switch(channels[channelIndex].channelStatus) {
+    switch (channels[channelIndex].channelStatus) {
       case ChannelStatus.NotInstalled:
         layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Install</a>;
         break;
@@ -235,11 +237,11 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         layer2 = <div className='fill' style={{width: percentDone + '%', opacity: 1}} />;
 
         const downloadDuration: number = (Date.now() - this.startDownload) / 1000;
-        const remainingTime : number = percentDone ? ((100/percentDone)*downloadDuration) - downloadDuration : undefined;
+        const remainingTime: number = percentDone ? ((100 / percentDone) * downloadDuration) - downloadDuration : undefined;
         const time: string = percentDone ? Progress.secondsToString(remainingTime) : 'starting';
         const rate: string = Progress.bypsToString(downloadRate);
         const dataSize: string = Progress.bytesToString(estimate - downloadRemaining) + '/' + Progress.bytesToString(estimate);
-        const percentDisplay: string = percentDone ? '(' + Math.round(percentDone*100)/100.0 + '%)' : '';
+        const percentDisplay: string = percentDone ? '(' + Math.round(percentDone * 100) / 100.0 + '%)' : '';
         layer3 = (
           <div className='text'>
             <div className='progress-text'><span className='body'>{time}</span></div>
@@ -253,6 +255,9 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Ready:
         let text: any = 'Play Now';
+        for (let vid: any = 0; vid < videoElements.length; vid++) {
+          videoElements[vid].play();
+        }
         if (typeof this.props.character !== 'undefined' && this.props.character !== null && this.props.character.id == '') {
           if (this.state.showCreation) {
             text = 'Cancel Creation';
@@ -269,6 +274,9 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Running:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Playing</a>;
+        for (let vid: any = 0; vid < videoElements.length; vid++){
+          videoElements[vid].pause();
+        }
         break;
       case ChannelStatus.Uninstalling:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Uninstalling</a>;
