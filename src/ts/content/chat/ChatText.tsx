@@ -28,15 +28,14 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
     this.state = new ChatTextState();
     this.handleScroll = this.handleScroll.bind(this);
   }
-  scroll() : void {
+  autoScrollToBottom() : void {
     const chatBox : HTMLHtmlElement = this.refs['chatbox'] as HTMLHtmlElement;
     if (this.autoScroll && chatBox.lastElementChild) {
-      const lastChild : HTMLHtmlElement = chatBox.lastElementChild as HTMLHtmlElement;
-      lastChild.scrollIntoView(false);
+      chatBox.scrollTop = (chatBox.scrollHeight - chatBox.offsetHeight)
     }
   }
   componentDidUpdate() {
-    this.scroll();
+    this.autoScrollToBottom();
     if (this.lazyLoadTop) {
       // after a lazy load, reposition the element that was at the top
       // back at the top
@@ -45,7 +44,7 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
     }
   }
   componentDidMount() {
-    this.scroll();
+    this.autoScrollToBottom();
     this.watchScroll();
   }
   componentWillUnmount() {
