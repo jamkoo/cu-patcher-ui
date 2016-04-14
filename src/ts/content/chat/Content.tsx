@@ -27,7 +27,7 @@ class Content extends React.Component<ContentProps, ContentState> {
 
   scroll = (): void => {
     const text: ChatText = (this.refs['text'] as ChatText);
-    text.scroll();
+    text.autoScrollToBottom();
   }
 
   render() {
