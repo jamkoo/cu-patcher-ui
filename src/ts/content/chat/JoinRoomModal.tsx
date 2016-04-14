@@ -38,6 +38,10 @@ class JoinRoomModal extends React.Component<JoinRoomModalProps, JoinRoomModalSta
   componentDidMount() : void {
     const input : HTMLInputElement = this.refs['roomInput'] as HTMLInputElement;
     const join : HTMLInputElement = this.refs['join'] as HTMLInputElement;
+    // without this timeout, the label doesn't animate up above the input box
+    setTimeout(() => {
+      input.focus();
+    }, 500);
     join.disabled = true;
     input.addEventListener('keyup', (ev: KeyboardEvent) => {
       join.disabled = input.value.length === 0;
