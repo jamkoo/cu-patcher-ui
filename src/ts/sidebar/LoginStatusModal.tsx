@@ -29,18 +29,18 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
   public name: string = 'login-status-modal';
   public intervalHandle: any;
   public intervalCounter: any;
-  
+
   constructor(props: LoginStatusModalProps) {
     super(props);
     this.state = {
       status: LoginStatus.AUTHENTICATING
     }
   }
-  
+
   componentWillMount() {
     this.checkLogin();
   }
-  
+
   checkLogin = () => {
     this.setState({status: LoginStatus.AUTHENTICATING, error: ''});
     // Do login
@@ -49,8 +49,8 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
       password: this.props.password,
       rememberMe: this.props.rememberMe
     });
-    
-    
+
+
     // start interval to check login status
     this.intervalCounter = 0;
     this.intervalHandle = setInterval(() => {
@@ -72,7 +72,7 @@ class LoginStatusModal extends React.Component<LoginStatusModalProps, LoginStatu
       }
     }, 100)
   }
-  
+
   render() {
     let text = '';
     let className = '';

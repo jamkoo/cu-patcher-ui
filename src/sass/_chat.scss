@@ -503,6 +503,38 @@
           display: none;
         }
 
+        .atuser-list-anchor {
+          position: relative;
+          bottom: 0px;
+          .atuser-list {
+            position: absolute;
+            bottom: 1px;
+            background-color: #222;
+            z-index: 1;
+            border: 1px solid rgba(0,0,0,0.5);
+            max-height: 15em;
+            overflow: auto;
+            &::-webkit-scrollbar {
+              width: 6px;
+            }
+            &::-webkit-scrollbar-thumb {
+              background-color: rgba(128,128,128,0.1);
+            }
+            .atuser-name {
+              color: #FFCC3C;
+              padding: 1em;
+              cursor: pointer;
+              border-bottom: 1px solid rgba(0,0,0,0.2);
+              &:hover {
+                background-color: #444;
+              }
+            }
+            .atuser-name-selected {
+              background-color: #444;
+            }
+          }
+        }
+
       }
 
     }

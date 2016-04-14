@@ -9,8 +9,12 @@ import * as events from '../../core/events';
 import { UserInfo } from './User';
 import ChatSession from './ChatSession';
 import { chatState } from './ChatState';
+import AtUserList from './AtUserList';
 
-export interface ChatInputState {};
+export interface ChatInputState {
+  atUsers: string[];
+  atUsersIndex: number;
+};
 
 export interface ChatInputProps {
   label: string;
@@ -22,35 +26,42 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
   _privateMessageHandler: any;
   tabUserList: string[] = [];
   tabUserIndex: number = null;
+  selectAtUser = (user: string) => {
+    const input: HTMLInputElement = this.getInputNode();
+    const lastWord: RegExpMatchArray = input.value.match(/@([\S]*)$/);
+    input.value = input.value.substring(0, lastWord.index + 1) + user + ' ';
+    input.focus();
+    this.setState({ atUsers: [], atUsersIndex: 0 });
+  }
   constructor(props: ChatInputProps) {
     super(props);
+    this.state = this.initialState();
     this._privateMessageHandler = events.on('cse-chat-private-message', (name: string) => {
       this.privateMessage(name);
     });
     this.keyDown = this.keyDown.bind(this);
     this.keyUp = this.keyUp.bind(this);
+    this.parseInput = this.parseInput.bind(this);
+  }
+  initialState(): ChatInputState {
+    return {
+      atUsers: [],
+      atUsersIndex: 0
+    }
   }
   componentWillUnmount() {
     if (this._privateMessageHandler) {
       events.off(this._privateMessageHandler);
     }
   }
-  getInputNode() : any {
-    return this.refs['new-text'];
-  }
-  render() {
-    return (
-      <div className="chat-input input-field">
-        <label htmlFor="chat-text">Say something!</label>
-        <input id="chat-text" ref="new-text" onKeyDown={this.keyDown} onKeyUp={this.keyUp} onChange={this.parseInput} type="text"/>
-      </div>
-    );
+  getInputNode() : HTMLInputElement {
+    return this.refs['new-text'] as HTMLInputElement;
   }
   keyDown(e: any) : void {
-    // Complete username on tab key (9)
+    // Complete username on tab key (9 = tab)
     if (e.keyCode === 9) {
       e.preventDefault();
-      if (! this.tabUserList.length) {
+      if (!this.tabUserList.length) {
         const chat: ChatSession = chatState.get('chat');
         const lastWord: string = e.target.value.match(/\b([\S]+)$/)[1];
         const endChar: string = lastWord === e.target.value ? ': ' : ' ';
@@ -64,6 +75,7 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
           this.tabUserList = matchingUsers;
           this.tabUserIndex = 0;
           e.target.value = e.target.value + matchingUsers[0].substring(lastWord.length) + endChar;
+          this.setState({ atUsers: [], atUsersIndex: 0 });
         }
       } else {
         const oldTabIndex: number = this.tabUserIndex;
@@ -71,24 +83,69 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
         const endChar: string = e.target.value.slice(-2) === ': ' ? ': ' : ' ';
         e.target.value = e.target.value.replace(new RegExp(this.tabUserList[oldTabIndex] + ':? $'), this.tabUserList[newTabIndex]) + endChar;
         this.tabUserIndex = newTabIndex;
+        this.setState({ atUsers: [], atUsersIndex: 0 });
       }
     } else {
       this.tabUserList = [];
       this.tabUserIndex = null;
     }
+
+    // Allow selection of atUser names with arrow keys (38 = up / 40 = down)
+    if (e.keyCode === 38 && this.state.atUsers.length > 0) {
+      e.preventDefault();
+      const newIndex: number = this.state.atUsersIndex - 1 === -1 ? this.state.atUsers.length - 1 : this.state.atUsersIndex - 1;
+      this.setState(
+        {
+          atUsers: this.state.atUsers,
+          atUsersIndex: newIndex
+        }
+      );
+    }
+    if (e.keyCode === 40 && this.state.atUsers.length > 0) {
+      e.preventDefault();
+      const newIndex: number = this.state.atUsersIndex + 1 > this.state.atUsers.length - 1 ? 0 : this.state.atUsersIndex + 1;
+      this.setState(
+        {
+          atUsers: this.state.atUsers,
+          atUsersIndex: newIndex
+        }
+      );
+    }
   }
   keyUp(e: any) : void {
-    // Send message on enter key (13)
+    // Send message on enter key (13 = enter)
     if (e.keyCode === 13) {
-      this.send();
+      if (this.state.atUsers.length > 0) {
+        e.preventDefault();
+        this.selectAtUser(this.state.atUsers[this.state.atUsersIndex]);
+      } else {
+        this.send();
+      }
     }
   }
   parseInput(e: any) : void {
-    // Need this for color code popup later?
-    // console.log(e.target.value);
+    // Handle @name completion
+    const lastWord: RegExpMatchArray = e.target.value.match(/(?:^|\s)@([\S]*)$/);
+    const userList: string[] = [];
+    const userFilter: string = lastWord && lastWord[1] ? lastWord[1] : '';
+    if (lastWord) {
+      const chat: ChatSession = chatState.get('chat');
+      chat.getRoom(chat.currentRoom).users.forEach((u: JSX.Element) => {
+        if (userFilter.length === 0 || u.props.info.name.toLowerCase().indexOf(userFilter.toLowerCase()) !== -1) {
+          userList.push(u.props.info.name);
+        }
+      });
+      userList.sort();
+    }
+    this.setState(
+      {
+        atUsers: userList,
+        atUsersIndex: this.state.atUsersIndex
+      }
+    );
   }
   send() : void {
-    const input: any = this.getInputNode();
+    const input: HTMLInputElement = this.getInputNode();
     const value: string = input.value.trim();
     if (value[0] !== '/' || !this.props.slashCommand(value.substr(1))) {
       // not a recognised / command, send it
@@ -98,9 +155,18 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     input.focus();
   }
   privateMessage(name: string) : void {
-    const input: any = this.getInputNode();
+    const input: HTMLInputElement = this.getInputNode();
     input.value = '/w ' + name + ' ';
     input.focus();
+  }
+  render() {
+    return (
+      <div className='chat-input input-field'>
+        <AtUserList users={this.state.atUsers} selectedIndex={this.state.atUsersIndex} selectUser={this.selectAtUser}/>
+        <label htmlFor='chat-text'>Say something!</label>
+        <input id='chat-text' ref='new-text' onKeyDown={this.keyDown} onKeyUp={this.keyUp} onChange={this.parseInput} type='text'/>
+      </div>
+    );
   }
 }
 
