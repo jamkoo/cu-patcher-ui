@@ -32,7 +32,7 @@ class ChatSession {
 
   constructor() {
       this.onconnect = this.onconnect.bind(this);
-      this.onconnectfail = this.onconnectfail.bind(this);
+      this.onconnectfailed = this.onconnectfailed.bind(this);
       this.onping = this.onping.bind(this);
       this.onchat = this.onchat.bind(this);
       this.ondisconnect = this.ondisconnect.bind(this);
@@ -66,7 +66,7 @@ class ChatSession {
     if (!this.client) {
       this.client = new ChatClient();
       this.client.on('connect', this.onconnect);
-      this.client.on('connectfail', this.onconnectfail);
+      this.client.on('connectfailed', this.onconnectfailed);
       this.client.on('ping', this.onping);
       this.client.on('presence', this.onchat);
       this.client.on('message', this.onchat);
@@ -97,11 +97,11 @@ class ChatSession {
     this.reconnecting = false;
   }
 
-  onconnectfail() {
+  onconnectfailed() {
     // if failed to connect and we are trying to re-connect, we should
     // retry
     if (this.reconnecting) {
-      // connectFail while reconnecting, try again
+      // connectFailed while reconnecting, try again
       this.reconnect();
     }
   }
@@ -222,7 +222,7 @@ class ChatSession {
 
   findRoom(roomId: RoomId) : ChatRoomInfo {
     for (let i = 0; i < this.rooms.length; i++) {
-      if (this.rooms[i].roomId.same(roomId)) {
+      if (this.rooms[i].roomId && this.rooms[i].roomId.same(roomId)) {
         return this.rooms[i];
       }
     }
