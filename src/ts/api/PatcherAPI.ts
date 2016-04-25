@@ -155,6 +155,7 @@ export class PatcherAPI {
     return this._api.completedFiles;
   }
   login(user :User) :void {
+    this._api.loginError = '';
     this._api.ValidateClient(user.email, user.password, user.rememberMe === true);
   }
   logout() :void {
