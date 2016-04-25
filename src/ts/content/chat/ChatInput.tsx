@@ -214,9 +214,10 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
 
     // add message to temporary history
     this.sentMessageIndex = null;
-    if (value) this.sentMessages.push(value);
-    // Uncomment the following to limit the saved history to 500 messages
-    // if (this.sentMessages.length > 500) this.sentMessages.splice(0, this.sentMessages.length - 500);
+    if (value) {
+      this.sentMessages.push(value);
+      if (this.sentMessages.length > 500) this.sentMessages.shift();
+    }
 
     // reset input field after sending message
     input.value = '';
