@@ -288,6 +288,7 @@ class ChatSession {
       if (roomId.same(this.currentRoom)) {
         if (this.rooms.length) {
           this.currentRoom = this.rooms[0].roomId;
+          this.rooms[0].seen();
           this.rooms[0].startScrollback();
         } else {
           this.currentRoom = undefined;
