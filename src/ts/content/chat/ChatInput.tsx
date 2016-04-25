@@ -216,7 +216,7 @@ class ChatInput extends React.Component<ChatInputProps, ChatInputState> {
     this.sentMessageIndex = null;
     if (value) {
       this.sentMessages.push(value);
-      if (this.sentMessages.length > 500) this.sentMessages.shift();
+      if (this.sentMessages.length > 25) this.sentMessages.shift();
     }
 
     // reset input field after sending message
