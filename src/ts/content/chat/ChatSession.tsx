@@ -260,6 +260,7 @@ class ChatSession {
     const roomId = new RoomId(user, chatType.PRIVATE);
     const message = new ChatMessage(chatType.PRIVATE, user, this.me, text);
     this.getRoom(roomId).add(message);
+    this.joinRoom(roomId);
     events.fire('chat-session-update', this);
   }
 
