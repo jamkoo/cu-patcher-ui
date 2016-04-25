@@ -17,6 +17,7 @@ export class ChatConfig {
   TIMESTAMPS: boolean = false;
   NICK: string = '';
   HIGHLIGHTS: string[] = ['alpha','beta','CSE'];
+  CHATLINE_IMAGE_HEIGHT: number = 100;
 
   constructor() {
     this.refresh();

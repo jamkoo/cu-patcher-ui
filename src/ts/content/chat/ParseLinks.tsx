@@ -45,7 +45,7 @@ function fromText(text: string, keygen:() => number) : JSX.Element[] {
   else if (chatConfig.EMBED_IMAGES && Whitelist.isImage(text) && Whitelist.ok(text)) {
     return [
       <a key={keygen()} className="chat-line-message" target="_blank" href={href}>
-        <img className='chat-line-image' src={text} title={text}/>
+        <img className='chat-line-image' src={text} title={text} height={chatConfig.CHATLINE_IMAGE_HEIGHT}/>
       </a>
     ];
   } 

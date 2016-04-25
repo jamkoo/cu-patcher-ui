@@ -31,7 +31,8 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
   autoScrollToBottom() : void {
     const chatBox : HTMLHtmlElement = this.refs['chatbox'] as HTMLHtmlElement;
     if (this.autoScroll && chatBox.lastElementChild) {
-      chatBox.scrollTop = (chatBox.scrollHeight - chatBox.offsetHeight)
+      const lastChild : HTMLHtmlElement = chatBox.lastElementChild as HTMLHtmlElement;
+      lastChild.scrollIntoView(false);
     }
   }
   componentDidUpdate() {
@@ -81,7 +82,6 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
   render() {
     const room : ChatRoomInfo = this.props.room;
     let messages : JSX.Element[];
-    let content : JSX.Element = undefined;
     let lazy : JSX.Element = undefined;
     if (room) {
       if (!this.currentRoom || !room.roomId.same(this.currentRoom)) {
