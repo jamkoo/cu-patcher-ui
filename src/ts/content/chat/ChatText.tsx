@@ -31,7 +31,7 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
   autoScrollToBottom() : void {
     const chatBox : HTMLHtmlElement = this.refs['chatbox'] as HTMLHtmlElement;
     if (this.autoScroll && chatBox.lastElementChild) {
-      chatBox.scrollTop = (chatBox.scrollHeight - chatBox.offsetHeight)
+      chatBox.scrollTop = (chatBox.scrollHeight - chatBox.offsetHeight);
     }
   }
   componentDidUpdate() {

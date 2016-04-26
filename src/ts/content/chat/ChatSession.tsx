@@ -260,6 +260,7 @@ class ChatSession {
     const roomId = new RoomId(user, chatType.PRIVATE);
     const message = new ChatMessage(chatType.PRIVATE, user, this.me, text);
     this.getRoom(roomId).add(message);
+    this.joinRoom(roomId);
     events.fire('chat-session-update', this);
   }
 
@@ -287,6 +288,7 @@ class ChatSession {
       if (roomId.same(this.currentRoom)) {
         if (this.rooms.length) {
           this.currentRoom = this.rooms[0].roomId;
+          this.rooms[0].seen();
           this.rooms[0].startScrollback();
         } else {
           this.currentRoom = undefined;
