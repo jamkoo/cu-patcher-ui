@@ -48,14 +48,14 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
     this.registerEvents();
   }
   componentWillUnmount() {
-    this.unRegisterEvents();
+    this.unregisterEvents();
   }
   registerEvents() {
     const el: HTMLDivElement = this.refs['chatbox'] as HTMLDivElement;
     el.addEventListener("scroll", this.handleScroll);
     el.addEventListener("auto-scroll", this.handleAutoScroll);
   }
-  unRegisterEvents() {
+  unregisterEvents() {
     const el: HTMLElement = this.refs['chatbox'] as HTMLElement;
     el.removeEventListener("scroll", this.handleScroll);
     el.removeEventListener("auto-scroll", this.handleAutoScroll);
