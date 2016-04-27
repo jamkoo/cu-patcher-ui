@@ -27,6 +27,7 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
     super(props);
     this.state = new ChatTextState();
     this.handleScroll = this.handleScroll.bind(this);
+    this.handleAutoScroll = this.handleAutoScroll.bind(this);
   }
   autoScrollToBottom() : void {
     const chatBox : HTMLHtmlElement = this.refs['chatbox'] as HTMLHtmlElement;
