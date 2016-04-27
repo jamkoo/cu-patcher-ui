@@ -45,14 +45,20 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
   }
   componentDidMount() {
     this.autoScrollToBottom();
-    this.watchScroll();
+    this.registerEvents();
   }
   componentWillUnmount() {
-    this.unwatchScroll();
+    this.unRegisterEvents();
   }
-  watchScroll() {
+  registerEvents() {
     const el: HTMLDivElement = this.refs['chatbox'] as HTMLDivElement;
     el.addEventListener("scroll", this.handleScroll);
+    el.addEventListener("auto-scroll", this.handleAutoScroll);
+  }
+  unRegisterEvents() {
+    const el: HTMLElement = this.refs['chatbox'] as HTMLElement;
+    el.removeEventListener("scroll", this.handleScroll);
+    el.removeEventListener("auto-scroll", this.handleAutoScroll);
   }
   handleScroll(e: MouseEvent) {
     // auto-scroll is enabled when the scroll bar is at or very near the bottom
@@ -70,9 +76,8 @@ class ChatText extends React.Component<ChatTextProps, ChatTextState> {
       }
     }
   }
-  unwatchScroll() {
-    const el: HTMLElement = this.refs['chatbox'] as HTMLElement;
-    el.removeEventListener("scroll", this.handleScroll);
+  handleAutoScroll() {
+    this.autoScrollToBottom();
   }
   newRoom() : void {
     this.currentRoom = this.props.room.roomId;

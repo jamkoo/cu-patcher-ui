@@ -16,6 +16,11 @@ function _fixupLink(url: string) : string {
   return url;
 }
 
+function _triggerAutoScroll() {
+  const event = new Event('auto-scroll');
+  window.dispatchEvent(event);
+}
+
 function fromText(text: string, keygen:() => number) : JSX.Element[] {
 
   const videoMatch: string = chatConfig.EMBED_VIDEOS ? Whitelist.isVideo(text) : null;
@@ -45,7 +50,7 @@ function fromText(text: string, keygen:() => number) : JSX.Element[] {
   else if (chatConfig.EMBED_IMAGES && Whitelist.isImage(text) && Whitelist.ok(text)) {
     return [
       <a key={keygen()} className="chat-line-message" target="_blank" href={href}>
-        <img className='chat-line-image' src={text} title={text}/>
+        <img className='chat-line-image' onLoad={_triggerAutoScroll} src={text} title={text}/>
       </a>
     ];
   } 
