@@ -23,12 +23,12 @@ export interface ActiveServerViewProps {
 export interface ActiveServerViewState {};
 class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServerViewState> {
   render() {
-    let totalPlayers = (this.props.item.arthurians|0) + (this.props.item.tuathaDeDanann|0) + (this.props.item.vikings|0);
-    let status = this.props.item.playerMaximum > 0 ? 'online' : 'offline';
-    let accessLevel = AccessType[this.props.item.accessLevel];
-    return (
-      <div className='server-select quickselect-active'>
-        <h5 className='label'>SELECT SERVER</h5>
+    let content: JSX.Element;
+    if (this.props.item) {
+      let totalPlayers = (this.props.item.arthurians|0) + (this.props.item.tuathaDeDanann|0) + (this.props.item.vikings|0);
+      let status = this.props.item.playerMaximum > 0 ? 'online' : 'offline';
+      let accessLevel = AccessType[this.props.item.accessLevel];
+      content = (
         <div>
           <div className='server-status'><div className={'indicator ' + status} data-position='right'
             data-delay='150' data-tooltip={status} /></div>
@@ -37,6 +37,12 @@ class ActiveServerView extends React.Component<ActiveServerViewProps, ActiveServ
             <h6>{totalPlayers}/{this.props.item.playerMaximum}</h6>
           </div>
         </div>
+      );
+    }
+    return (
+      <div className='server-select quickselect-active'>
+        <h5 className='label'>SELECT SERVER</h5>
+        { content }
       </div>
     );
   }
@@ -69,6 +75,7 @@ class ServerListView extends React.Component<ServerListViewProps, ServerListView
 
 export interface ServerSelectProps {
   servers: Array<Server>;
+  selectedServer: Server;
   onSelectedServerChanged: (server: Server) => void;
 };
 
@@ -94,10 +101,16 @@ class ServerSelect extends React.Component<ServerSelectProps, ServerSelectState>
     return <ServerListView item={server} />
   }
 
+  getSelectedIndex = () : number => {
+    return this.props.servers.indexOf(this.props.selectedServer);
+  }
+
   render() {
     if (this.props.servers.length == 0) return null;
     return (
-        <QuickSelect items={this.props.servers} activeViewComponentGenerator={this.generateActiveView}
+        <QuickSelect items={this.props.servers}
+          selectedItemIndex={this.getSelectedIndex()}
+          activeViewComponentGenerator={this.generateActiveView}
           listViewComponentGenerator={this.generateListView} onSelectedItemChanged={this.onSelectedServerChanged} />
     );
   }

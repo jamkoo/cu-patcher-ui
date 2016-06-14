@@ -197,12 +197,21 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
       let servers = this.props.serversState.servers.filter((s: Server) => s.channelID === selectedChannel.channelID);
       if (servers.length > 0) {
-        activeServer = this.props.serversState.currentServer || this.props.serversState.servers[0];
+        if (this.props.serversState.currentServer) {
+          for (let i: number = 0; i < servers.length; i++) {
+            if (this.props.serversState.currentServer.name == servers[i].name) {
+              activeServer = servers[i];
+            }
+          }
+        }
+        if (!activeServer) activeServer = servers[0];
+
         let characters = this.props.charactersState.characters.filter((c: restAPI.SimpleCharacter) => c.shardID == activeServer.shardID || c.shardID == 0);
         selectedCharacter = this.props.charactersState.selectedCharacter;
         renderServerSection = (
           <div>
             <ServerSelect servers={servers}
+                          selectedServer={activeServer}
                           onSelectedServerChanged={this.onSelectedServerChanged} />
             <CharacterSelect characters={characters}
                              selectedCharacter={selectedCharacter}
