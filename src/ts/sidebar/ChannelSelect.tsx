@@ -40,6 +40,7 @@ class ChannelListView extends React.Component<ChannelListViewProps, ChannelListV
 
 export interface ChannelSelectProps {
   channels: Array<Channel>;
+  selectedChannelIndex?: number;
   onSelectedChannelChanged: (channel: Channel) => void;  
 };
 
@@ -63,12 +64,15 @@ class ChannelSelect extends React.Component<ChannelSelectProps, ChannelSelectSta
   generateListView = (item: any) => {
     return <ChannelListView item={item} />;
   }
-  
+
   render() {
     return (
       <div id={this.name} className='card-panel no-padding'>
-        <QuickSelect items={this.props.channels} activeViewComponentGenerator={this.generateActiveView}
-          listViewComponentGenerator={this.generateListView} onSelectedItemChanged={this.onSelectedChannelChanged} />
+        <QuickSelect items={this.props.channels}
+          selectedItemIndex={this.props.selectedChannelIndex}
+          activeViewComponentGenerator={this.generateActiveView}
+          listViewComponentGenerator={this.generateListView}
+          onSelectedItemChanged={this.onSelectedChannelChanged} />
       </div>
     );
   }

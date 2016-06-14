@@ -111,7 +111,8 @@ class ServerSelect extends React.Component<ServerSelectProps, ServerSelectState>
         <QuickSelect items={this.props.servers}
           selectedItemIndex={this.getSelectedIndex()}
           activeViewComponentGenerator={this.generateActiveView}
-          listViewComponentGenerator={this.generateListView} onSelectedItemChanged={this.onSelectedServerChanged} />
+          listViewComponentGenerator={this.generateListView}
+          onSelectedItemChanged={this.onSelectedServerChanged} />
     );
   }
 }
