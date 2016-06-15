@@ -154,6 +154,17 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   }
 
   playNow = () => {
+    // Save selected channel, server, and character
+    const lastPlay = {
+      channelID: patcher.getAllChannels()[this.props.channelIndex].channelID as number,
+      serverName: null as string,
+      characterID: null as string
+    };
+    if (this.props.server) lastPlay.serverName = this.props.server.name;
+    if (this.props.character) lastPlay.characterID = this.props.character.id;
+    localStorage.setItem('cse-patcher-lastplay',JSON.stringify(lastPlay));
+
+    // Display EULA
     this.setState({showEuala: true, showCreation: false});
   }
 

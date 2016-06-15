@@ -30,6 +30,8 @@ import {muteMusic, unMuteMusic} from '../redux/modules/music';
 import {fetchServers, changeServer, ServersState} from '../redux/modules/servers';
 import {fetchCharacters, selectCharacter, CharactersState} from '../redux/modules/characters';
 
+const lastPlay: any = JSON.parse(localStorage.getItem('cse-patcher-lastplay'));
+
 function select(state: any): any {
   return {
     channelsState: state.channels,
@@ -77,7 +79,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   onLogIn = () => {
     this.fetchCharacters();
     this.props.onLogIn();
-    setTimeout(() => this.props.dispatch(requestChannels()), 500);
+    this.props.dispatch(requestChannels());
   }
 
   onLogOut = () => {
@@ -163,7 +165,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     this.channelInterval = setInterval(() => {
       this.props.dispatch(requestChannels());
     }, 1000 * 60);
-
   }
 
   componentDidUnMount() {
@@ -182,17 +183,48 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       );
     }
 
+    // Load last selected channel, server, and character
+    if (lastPlay && lastPlay.channelID) {
+      for (let i = 0; i < this.props.channelsState.channels.length; i++) {
+        if (this.props.channelsState.channels[i].channelID === lastPlay.channelID) {
+          this.props.dispatch(changeChannel(this.props.channelsState.channels[i]));
+          lastPlay.channelID = null;
+          break;
+        }
+      }
+    }
+
+    if (lastPlay && lastPlay.serverName) {
+      for (let i = 0; i < this.props.serversState.servers.length; i++) {
+        if (this.props.serversState.servers[i].name === lastPlay.serverName) {
+          this.props.dispatch(changeServer(this.props.serversState.servers[i]));
+          lastPlay.serverName = null;
+          break;
+        }
+      }
+    }
+
+    if (lastPlay && lastPlay.characterID) {
+      for (let i = 0; i < this.props.charactersState.characters.length; i++) {
+        if (this.props.charactersState.characters[i].id === lastPlay.characterID) {
+          this.props.dispatch(selectCharacter(this.props.charactersState.characters[i]));
+          lastPlay.characterID = null;
+          break;
+        }
+      }
+    }
+
     setTimeout(this.initjQueryObjects, 100);
 
     let renderServerSection: any = null;
     let activeServer: Server = null;
     let selectedCharacter: restAPI.SimpleCharacter = null;
+    let selectedCharacterIndex: number = -1;
     let selectedChannel: Channel = null;
     let selectedChannelIndex: number = -1;
-    if (this.props.serversState.servers.length > 0 &&  typeof(this.props.channelsState.channels) !== 'undefined' && this.props.channelsState.channels.length > 0) {
+    if (this.props.serversState.servers.length > 0 && typeof(this.props.channelsState.channels) !== 'undefined' && this.props.channelsState.channels.length > 0) {
       selectedChannel = this.props.channelsState.selectedChannel;
       selectedChannelIndex = this.props.channelsState.channels.findIndex(c => c.channelID == selectedChannel.channelID);
-
       if (typeof(selectedChannelIndex) == 'undefined') selectedChannelIndex = 0;
 
       let servers = this.props.serversState.servers.filter((s: Server) => s.channelID === selectedChannel.channelID);
@@ -208,6 +240,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
         let characters = this.props.charactersState.characters.filter((c: restAPI.SimpleCharacter) => c.shardID == activeServer.shardID || c.shardID == 0);
         selectedCharacter = this.props.charactersState.selectedCharacter;
+        selectedCharacterIndex = characters.findIndex(c => c.id == selectedCharacter.id);
         renderServerSection = (
           <div>
             <ServerSelect servers={servers}
@@ -215,6 +248,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                           onSelectedServerChanged={this.onSelectedServerChanged} />
             <CharacterSelect characters={characters}
                              selectedCharacter={selectedCharacter}
+                             selectedCharacterIndex={selectedCharacterIndex}
                              onCharacterSelectionChanged={this.selectCharacter} />
             <ServerCounts artCount={activeServer.arthurians}
                           tddCount={activeServer.tuathaDeDanann}
@@ -227,11 +261,11 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     return (
       <div id={this.name} className=''>
         <Alerts alerts={this.props.patcherAlertsState.alerts} />
-        <ChannelSelect channels={this.props.channelsState.channels} onSelectedChannelChanged={this.onSelectedChannelChanged} />
+        <ChannelSelect channels={this.props.channelsState.channels} selectedChannelIndex={selectedChannelIndex} onSelectedChannelChanged={this.onSelectedChannelChanged} />
         <div className='card-panel no-padding'>
           {renderServerSection}
           <PatchButton server={activeServer}
-                      channelIndex={selectedChannelIndex}
+                       channelIndex={selectedChannelIndex}
                        playSelect={this.playSelect}
                        playLaunch={this.playLaunchGame}
                        playPatchComplete={this.playPatchComplete}
