@@ -321,6 +321,14 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         }
         if (!selectedServer) selectedServer = servers[0];
 
+        // Hide localhost for normal users
+        for (let i: number = 0; i < servers.length; i++) {
+          if (servers[i].name === 'localhost' && patcher.getScreenName().search(/^cse/i) === -1) {
+            servers.splice(i, 1);
+            i--;
+          }
+        }
+
         let characters = this.props.charactersState.characters.filter((c: restAPI.SimpleCharacter) => c.shardID == selectedServer.shardID || c.shardID == 0);
         selectedCharacter = this.props.charactersState.selectedCharacter;
         if (!selectedCharacter) selectedCharacter = characters[0];
