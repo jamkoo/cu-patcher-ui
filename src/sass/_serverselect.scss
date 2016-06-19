@@ -69,6 +69,7 @@
 .server-details {
   display: inline-block;
   color: $color1;
+  max-width: calc(100% - 20px);
 }
 
 .online {
