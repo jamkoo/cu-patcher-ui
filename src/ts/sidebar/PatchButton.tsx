@@ -9,6 +9,7 @@ import {Server} from '../redux/modules/servers';
 import {patcher, Channel, ChannelStatus} from '../api/patcherAPI';
 import {CSENormalizeString} from '../api/CSENormalizeString';
 import {restAPI} from 'camelot-unchained';
+import * as events from '../core/events';
 
 import EualaModal from './EualaModal';
 import CommandLineArgsModal from './CommandLineArgsModal';
@@ -16,7 +17,7 @@ import Animate from '../Animate';
 import UninstallButton from './UninstallButton';
 
 export class Progress {
-  constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) {}
+  constructor(public rate: number = 0, public dataCompleted: number = 0, public totalDataSize: number = 0) { }
 
   public timeEstimate = () => {
     return Progress.secondsToString((this.remaining() * 8) / this.rate);
@@ -70,9 +71,6 @@ export class Progress {
 export interface PatchButtonProps {
   server: Server;
   channelIndex: number;
-  playLaunch: () => void;
-  playPatchComplete: () => void;
-  playSelect: () => void;
   character: restAPI.SimpleCharacter
   fetchCharacters: () => void;
 };
@@ -85,6 +83,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
   public name: string = 'cse-patcher-patch-button';
   private intervalHandle: any;
   private startDownload: number;
+  private unready: boolean;
   private commands: string = '';
 
   constructor(props: PatchButtonProps) {
@@ -143,10 +142,11 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     };
     if (this.props.server) lastPlay.serverName = this.props.server.name;
     if (this.props.character) lastPlay.characterID = this.props.character.id;
-    localStorage.setItem('cse-patcher-lastplay',JSON.stringify(lastPlay));
+    localStorage.setItem('cse-patcher-lastplay', JSON.stringify(lastPlay));
 
     // Display EULA
     this.setState({ showEuala: true });
+    events.fire('play-sound', 'select');
   }
 
   closeEualaModal = () => {
@@ -160,18 +160,17 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
       launchString += ` server=${this.props.server.host} autoconnect=1 character=${CSENormalizeString(this.props.character.name)}`
     }
     patcher.launchChannelfunction(patcher.getAllChannels()[this.props.channelIndex], launchString);
-    this.props.playLaunch();
+    events.fire('play-sound', 'launch-game');
   }
 
   install = () => {
     patcher.installChannel(patcher.getAllChannels()[this.props.channelIndex]);
-    this.props.playSelect();
     this.startDownload = undefined;
   }
 
   uninstall = () => {
     patcher.uninstallChannel(patcher.getAllChannels()[this.props.channelIndex]);
-    this.props.playSelect();
+    events.fire('play-sound', 'select');
   }
 
   generateEualaModal = () => {
@@ -191,7 +190,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
     let videoElements: any = document.getElementsByTagName('video');
 
     let channels = patcher.getAllChannels();
-    if (typeof(channels) == 'undefined' || channels == null || channels.length == 0) return null;
+    if (typeof (channels) == 'undefined' || channels == null || channels.length == 0) return null;
 
     let channelIndex = this.props.channelIndex != null && this.props.channelIndex >= 0 ? this.props.channelIndex : 0;
     switch (channels[channelIndex].channelStatus) {
@@ -203,6 +202,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         this.startDownload = undefined;
         break;
       case ChannelStatus.Updating:
+        this.unready = true;
         layer1 = <a className='waves-effect btn install-download-btn installing'>Installing</a>;
 
         if (this.startDownload === undefined) {
@@ -214,7 +214,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         const estimate: number = patcher.getDownloadEstimate();
 
         const percentDone = estimate ? 100.0 - ((downloadRemaining / estimate) * 100) : 0;
-        layer2 = <div className='fill' style={{width: percentDone + '%', opacity: 1}} />;
+        layer2 = <div className='fill' style={{ width: percentDone + '%', opacity: 1 }} />;
 
         const downloadDuration: number = (Date.now() - this.startDownload) / 1000;
         const remainingTime: number = percentDone ? ((100 / percentDone) * downloadDuration) - downloadDuration : undefined;
@@ -235,11 +235,15 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Ready:
         let text: any = 'Play Now';
+        if (this.unready) {
+          events.fire('play-sound', 'patch-complete');
+          this.unready = false;
+        }
         for (let vid: any = 0; vid < videoElements.length; vid++) {
           videoElements[vid].play();
         }
         if (this.props.character || channels[channelIndex].channelID === 27) {
-          layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>{text}</a>;
+          layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event) }>{text}</a>;
         } else {
           layer1 = <div className='waves-effect btn install-download-btn not-ready'>{text}</div>;
         }
@@ -251,7 +255,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         break;
       case ChannelStatus.Running:
         layer1 = <a className='waves-effect btn install-download-btn installing'>Playing</a>;
-        for (let vid: any = 0; vid < videoElements.length; vid++){
+        for (let vid: any = 0; vid < videoElements.length; vid++) {
           videoElements[vid].pause();
         }
         break;
@@ -260,7 +264,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         this.startDownload = undefined;
         break;
       case ChannelStatus.UpdateFailed:
-        layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Update Failed. Try Again.</a>;
+        layer1 = <a className='waves-effect btn install-download-btn uninstalled' onClick={this.onClicked}>Update Failed.Try Again.</a>;
         this.startDownload = undefined;
         break;
     }

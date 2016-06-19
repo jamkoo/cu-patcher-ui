@@ -8,6 +8,7 @@ import * as React from 'react';
 
 import {Routes} from './redux/modules/locations';
 import {patcher} from './api/PatcherAPI';
+import * as events from './core/events';
 
 export interface HeaderProps {
   changeRoute: (route: Routes) => void;
@@ -28,6 +29,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
 
   externalLink = (url: string) => {
     window.open(url, '_blank');
+    events.fire('play-sound', 'select');
   }
   
   internalLink = (route: Routes) => {

@@ -21,6 +21,7 @@ import CharacterDeleteModal from './CharacterDeleteModal';
 import Alerts from './Alerts';
 import CharacterCreation from '../character-creation/CharacterCreation';
 import Animate from '../Animate';
+import * as events from '../core/events';
 
 import {PatcherAlert} from '../redux/modules/patcherAlerts';
 import {patcher, Channel} from '../api/PatcherAPI';
@@ -121,39 +122,20 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }];
   }
 
-  play = (name: string, volume: number = 0.75) => {
-    const sound: HTMLAudioElement = (this.refs['sound-'+name] as HTMLAudioElement);
-    if (sound && !this.props.soundMuted) {
-      sound.play();
-      sound.volume = volume;
-    }
-  }
-
-  playSelect = () => {
-    this.play('select');
-  }
-
-  playLaunchGame = () => {
-    this.play('launch-game');
-  }
-
-  playPatchComplete = () => {
-    this.play('patch-complete');
-  }
-
   onSelectedServerChanged = (server: Server) => {
     this.props.dispatch(changeServer(server));
-    this.playSelect();
+    events.fire('play-sound', 'select');
   }
 
   onSelectedChannelChanged = (channel: Channel) => {
     this.selectCharacter(null);
     this.props.dispatch(changeChannel(channel));
-    this.playSelect();
+    events.fire('play-sound', 'select');
   }
 
   selectCharacter = (character: restAPI.SimpleCharacter) => {
     this.props.dispatch(selectCharacter(character));
+    events.fire('play-sound', 'select');
   }
 
   generateCharacterButtons = (shardID: any, selectedCharacter: restAPI.SimpleCharacter) : JSX.Element => {
@@ -357,9 +339,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
           {renderServerSection}
           <PatchButton server={selectedServer}
                        channelIndex={selectedChannelIndex}
-                       playSelect={this.playSelect}
-                       playLaunch={this.playLaunchGame}
-                       playPatchComplete={this.playPatchComplete}
                        character={selectedCharacter}
                        fetchCharacters={() => this.props.dispatch(fetchCharacters())} />
         </div>

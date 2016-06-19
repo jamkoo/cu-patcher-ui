@@ -10,6 +10,7 @@ import * as React from 'react';
 import {createStore, applyMiddleware} from 'redux';
 import {connect, Provider} from 'react-redux';
 import * as thunkMiddleware from 'redux-thunk';
+import * as events from '../core/events';
 
 import {gender} from 'camelot-unchained';
 
@@ -78,7 +79,7 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
 
   constructor(props: any) {
     super(props);
-    this.state = {page: pages.FACTION_SELECT}
+    this.state = { page: pages.FACTION_SELECT }
   }
 
   create = () => {
@@ -107,10 +108,77 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
       }),
     }
     this.props.dispatch(createCharacter(model,
-                        this.props.apiKey,
-                        this.props.apiHost,
-                        this.props.shard,
-                        this.props.apiVersion));
+      this.props.apiKey,
+      this.props.apiHost,
+      this.props.shard,
+      this.props.apiVersion));
+    events.fire('play-sound', 'select');
+  }
+
+  factionSelect = (selected: FactionInfo) => {
+    this.props.dispatch(selectFaction(selected));
+
+    let factionRaces = this.props.racesState.races.filter((r: RaceInfo) => r.faction == selected.id);
+    let factionClasses = this.props.playerClassesState.playerClasses.filter((c: PlayerClassInfo) => c.faction == selected.id);
+    this.props.dispatch(selectPlayerClass(factionClasses[0]))
+    this.props.dispatch(selectRace(factionRaces[0]))
+
+    // reset race & class if they are not of the selected faction
+    if (this.props.racesState.selected && this.props.racesState.selected.faction != selected.id) {
+      this.props.dispatch(selectRace(null));
+      this.props.dispatch(selectPlayerClass(null));
+    }
+    events.fire('play-sound', 'select');
+  }
+
+  factionNext = () => {
+    if (this.props.factionsState.selected == null) {
+      Materialize.toast('Choose a faction to continue.', 3000)
+      return;
+    }
+    let factionRaces = this.props.racesState.races.filter((r: RaceInfo) => r.faction == this.props.factionsState.selected.id);
+    let factionClasses = this.props.playerClassesState.playerClasses.filter((c: PlayerClassInfo) => c.faction == this.props.factionsState.selected.id);
+    this.props.dispatch(selectPlayerClass(factionClasses[0]))
+    this.props.dispatch(selectRace(factionRaces[0]))
+    this.setState({ page: this.state.page + 1 });
+    events.fire('play-sound', 'select');
+  }
+
+  raceSelect = (selected: RaceInfo) => {
+    this.props.dispatch(selectRace(selected));
+    events.fire('play-sound', 'select');
+  }
+
+  raceNext = () => {
+    if (this.props.racesState.selected == null) {
+      Materialize.toast('Choose a race to continue.', 3000)
+      return;
+    }
+    if (this.props.gender == 0) {
+      Materialize.toast('Choose a gender to continue.', 3000)
+      return;
+    }
+    this.setState({ page: this.state.page + 1 })
+    events.fire('play-sound', 'select');
+  }
+
+  classSelect = (selected: PlayerClassInfo) => {
+    this.props.dispatch(selectPlayerClass(selected))
+    events.fire('play-sound', 'select');
+  }
+
+  classNext = () => {
+    if (this.props.playerClassesState.selected == null) {
+      Materialize.toast('Choose a class to continue.', 3000)
+      return;
+    }
+    this.setState({ page: this.state.page + 1 });
+    events.fire('play-sound', 'select');
+  }
+
+  previousPage = () => {
+    this.setState({ page: this.state.page - 1 });
+    events.fire('play-sound', 'select');
   }
 
 
@@ -130,21 +198,6 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
     }
   }
 
-  selectFaction = (selected: FactionInfo) => {
-    this.props.dispatch(selectFaction(selected));
-
-    let factionRaces = this.props.racesState.races.filter((r: RaceInfo) => r.faction == selected.id);
-    let factionClasses = this.props.playerClassesState.playerClasses.filter((c: PlayerClassInfo) => c.faction == selected.id);
-    this.props.dispatch(selectPlayerClass(factionClasses[0]))
-    this.props.dispatch(selectRace(factionRaces[0]))
-
-    // reset race & class if they are not of the selected faction
-    if (this.props.racesState.selected && this.props.racesState.selected.faction != selected.id) {
-      this.props.dispatch(selectRace(null));
-      this.props.dispatch(selectPlayerClass(null));
-    }
-  }
-
   render() {
     if (this.props.characterState.success) {
       this.props.created();
@@ -154,61 +207,39 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
 
     let content: any = null;
     let next: any = null;
-    let back : any = null;
+    let back: any = null;
     let name: any = null;
     switch (this.state.page) {
       case pages.FACTION_SELECT:
         content = (
           <FactionSelect factions={this.props.factionsState.factions}
-                         selectedFaction={this.props.factionsState.selected}
-                         selectFaction={this.selectFaction} />
+            selectedFaction={this.props.factionsState.selected}
+            selectFaction={this.factionSelect} />
         );
         next = (
           <a className='cu-btn right'
-             onClick={() => {
-               if (this.props.factionsState.selected == null) {
-                 Materialize.toast('Choose a faction to continue.', 3000)
-                 return;
-               }
-               let factionRaces = this.props.racesState.races.filter((r: RaceInfo) => r.faction == this.props.factionsState.selected.id);
-               let factionClasses = this.props.playerClassesState.playerClasses.filter((c: PlayerClassInfo) => c.faction == this.props.factionsState.selected.id);
-               this.props.dispatch(selectPlayerClass(factionClasses[0]))
-               this.props.dispatch(selectRace(factionRaces[0]))
-               this.setState({page: this.state.page + 1});
-             }}
-             disabled={this.state.page == pages.ATTRIBUTES} >Next</a>
+            onClick={this.factionNext}
+            disabled={this.state.page == pages.ATTRIBUTES} >Next</a>
         );
         break;
       case pages.RACE_SELECT:
         content = (
           <RaceSelect races={this.props.racesState.races}
-                      selectedRace={this.props.racesState.selected}
-                      selectRace={(selected: RaceInfo) => {
-                          this.props.dispatch(selectRace(selected));
-                        }}
-                      selectedGender={this.props.gender}
-                      selectGender={(selected: gender) => this.props.dispatch(selectGender(selected))}
-                      selectedFaction={this.props.factionsState.selected} />
+            selectedRace={this.props.racesState.selected}
+            selectRace={this.raceSelect}
+            selectedGender={this.props.gender}
+            selectGender={(selected: gender) => this.props.dispatch(selectGender(selected)) }
+            selectedFaction={this.props.factionsState.selected} />
         );
         back = (
           <a className='cu-btn left'
-             onClick={() => this.setState({page: this.state.page - 1})}
-             disabled={this.state.page == pages.FACTION_SELECT} >Back</a>
+            onClick={this.previousPage}
+            disabled={this.state.page == pages.FACTION_SELECT} >Back</a>
         );
         next = (
           <a className='cu-btn right'
-             onClick={() => {
-                if (this.props.racesState.selected == null) {
-                  Materialize.toast('Choose a race to continue.', 3000)
-                  return;
-                }
-                if (this.props.gender == 0) {
-                  Materialize.toast('Choose a gender to continue.', 3000)
-                  return;
-                }
-                this.setState({page: this.state.page + 1})
-              }}
-             disabled={this.state.page == pages.ATTRIBUTES} >Next</a>
+            onClick={this.raceNext}
+            disabled={this.state.page == pages.ATTRIBUTES} >Next</a>
         );
         name = (
           <div className='cu-character-creation__name'>
@@ -217,27 +248,21 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
         );
         break;
       case pages.CLASS_SELECT:
-       content = (
+        content = (
           <PlayerClassSelect classes={this.props.playerClassesState.playerClasses}
-                             selectedClass={this.props.playerClassesState.selected}
-                             selectClass={(selected: PlayerClassInfo) => this.props.dispatch(selectPlayerClass(selected))}
-                             selectedFaction={this.props.factionsState.selected} />
+            selectedClass={this.props.playerClassesState.selected}
+            selectClass={this.classSelect}
+            selectedFaction={this.props.factionsState.selected} />
         );
         back = (
           <a className='cu-btn left'
-             onClick={() => this.setState({page: this.state.page - 1})}
-             disabled={this.state.page == pages.FACTION_SELECT} >Back</a>
+            onClick={this.previousPage}
+            disabled={this.state.page == pages.FACTION_SELECT} >Back</a>
         );
         next = (
           <a className='cu-btn right'
-             onClick={() => {
-                if (this.props.playerClassesState.selected == null) {
-                  Materialize.toast('Choose a class to continue.', 3000)
-                  return;
-                }
-                this.setState({page: this.state.page + 1});
-              }}
-             disabled={this.state.page == pages.ATTRIBUTES} >Next</a>
+            onClick={this.classNext}
+            disabled={this.state.page == pages.ATTRIBUTES} >Next</a>
         );
         name = (
           <div className='cu-character-creation__name'>
@@ -248,16 +273,16 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
       case pages.ATTRIBUTES:
         content = (
           <AttributesSelect attributes={this.props.attributesState.attributes}
-                            attributeOffsets={this.props.attributeOffsetsState.offsets}
-                            selectedGender={this.props.gender}
-                            selectedRace={this.props.racesState.selected.id}
-                            allocatePoint={(name: string, value: number) => this.props.dispatch(allocateAttributePoint(name, value))}
-                            remainingPoints={this.props.attributesState.maxPoints - this.props.attributesState.pointsAllocated} />
+            attributeOffsets={this.props.attributeOffsetsState.offsets}
+            selectedGender={this.props.gender}
+            selectedRace={this.props.racesState.selected.id}
+            allocatePoint={(name: string, value: number) => this.props.dispatch(allocateAttributePoint(name, value)) }
+            remainingPoints={this.props.attributesState.maxPoints - this.props.attributesState.pointsAllocated} />
         );
         back = (
           <a className='cu-btn left'
-             onClick={() => this.setState({page: this.state.page - 1})}
-             disabled={this.state.page == pages.FACTION_SELECT} >Back</a>
+            onClick={this.previousPage}
+            disabled={this.state.page == pages.FACTION_SELECT} >Back</a>
         );
         next = (
           <a className='cu-btn right' onClick={this.create} >Create</a>
@@ -301,10 +326,10 @@ class Container extends React.Component<ContainerProps, any> {
       <div id='cu-character-creation'>
         <Provider store={store}>
           <ConnectedCharacterCreation apiKey={this.props.apiKey}
-                                      apiHost={this.props.apiHost}
-                                      apiVersion={this.props.apiVersion}
-                                      shard={this.props.shard}
-                                      created={this.props.created} />
+            apiHost={this.props.apiHost}
+            apiVersion={this.props.apiVersion}
+            shard={this.props.shard}
+            created={this.props.created} />
         </Provider>
         <div className='preloader' ></div>
       </div>

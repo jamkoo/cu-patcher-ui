@@ -8,6 +8,7 @@ import * as React from 'react';
 import {race, gender} from 'camelot-unchained';
 import {AttributeInfo, attributeType} from '../redux/modules/attributes';
 import {AttributeOffsetInfo} from '../redux/modules/attributeOffsets';
+import * as events from '../../core/events';
 
 
 export interface AttributesSelectProps {
@@ -40,6 +41,16 @@ class AttributesSelect extends React.Component<AttributesSelectProps, Attributes
 
   }
 
+  increaseAttribute = (attributeName: string) => {
+    this.props.allocatePoint(attributeName, 1);
+    events.fire('play-sound', 'select');
+  }
+
+  decreaseAttribute = (attributeName: string) => {
+    this.props.allocatePoint(attributeName, -1);
+    events.fire('play-sound', 'select');
+  }
+
   generateAttributeContent = (attributeInfo: AttributeInfo, offset: AttributeOffsetInfo) => {
     if (attributeInfo.type !== attributeType.PRIMARY) return null;
     let allocatedCount = 0;//this.props.allocations[attributeInfo.name]
@@ -47,9 +58,9 @@ class AttributesSelect extends React.Component<AttributesSelectProps, Attributes
     return (
       <div key={attributeInfo.name} className='attribute-row'>
         <span>{attributeInfo.name} </span>
-        <button className='rightarrow right' onClick={() => this.props.allocatePoint(attributeInfo.name, 1)} ></button>
+        <button className='rightarrow right' onClick={() => this.increaseAttribute(attributeInfo.name)} ></button>
         <span className='attribute-points right'>{attributeInfo.baseValue + attributeInfo.allocatedPoints + offsetValue}</span>
-        <button className='leftarrow right' onClick={() => this.props.allocatePoint(attributeInfo.name, -1)}></button>
+        <button className='leftarrow right' onClick={() => this.decreaseAttribute(attributeInfo.name)}></button>
       </div>
     );
   }
@@ -67,7 +78,6 @@ class AttributesSelect extends React.Component<AttributesSelectProps, Attributes
         {info.description}
         </div>
         </div>
-
       </div>
     )
   }

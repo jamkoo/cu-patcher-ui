@@ -6,6 +6,7 @@
 
 import * as React from 'react';
 import {restAPI} from 'camelot-unchained';
+import * as events from "../core/events";
 
 export interface CharacterDeleteModalProps {
   character: restAPI.SimpleCharacter;
@@ -39,7 +40,14 @@ class CharacterDeleteModal extends React.Component<CharacterDeleteModalProps, Ch
 
   deleteCharacter = (): void => {
     this.props.deleteCharacter(this.props.character);
+    events.fire('play-sound', 'select');
   }
+
+  cancelDelete = (): void => {
+    this.props.closeModal();
+    events.fire('play-sound', 'select');
+  }
+
 
   render() {
     return (
@@ -49,7 +57,7 @@ class CharacterDeleteModal extends React.Component<CharacterDeleteModalProps, Ch
           <label htmlFor="name">Confirm name of character to be deleted:</label>
         </div>
         <button className="wave-effects btn-flat" disabled={!this.state.deleteEnabled} onClick={this.deleteCharacter}>DELETE</button>
-        <button className="wave-effects btn-flat" onClick={this.props.closeModal}>CANCEL</button>
+        <button className="wave-effects btn-flat" onClick={this.cancelDelete}>CANCEL</button>
       </div>
     );
   }

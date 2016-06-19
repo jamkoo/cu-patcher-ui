@@ -8,6 +8,7 @@ import * as React from 'react';
 import {patcher, User} from '../api/PatcherAPI';
 import Animate from '../Animate';
 import LoginStatusModal from './LoginStatusModal';
+import * as events from '../core/events';
 
 export interface LoginProps {
   onLogIn: () => void;
@@ -83,6 +84,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       rememberMe: !this.state.rememberMe,
       showModal: false
     });
+    events.fire('play-sound', 'select');
   }
 
   logIn = () => {
@@ -92,6 +94,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       rememberMe: this.state.rememberMe,
       showModal: true
     });
+    events.fire('play-sound', 'select');
   }
 
   hideModal = () => {
@@ -106,6 +109,7 @@ class Login extends React.Component<LoginProps, LoginState> {
 
   onHelp = () => {
     window.open('https://api.citystateentertainment.com/Account/ForgottenPassword', '_blank');
+    events.fire('play-sound', 'select');
   }
 
   onKeyDown = (event: any) => {

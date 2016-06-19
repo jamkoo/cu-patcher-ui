@@ -6,6 +6,7 @@
 
 import * as React from 'react';
 import {race, faction, gender} from 'camelot-unchained';
+import * as events from '../../core/events';
 
 import {RaceInfo} from '../redux/modules/races';
 import {FactionInfo} from '../redux/modules/factions';
@@ -56,6 +57,11 @@ class RaceSelect extends React.Component<RaceSelectProps, RaceSelectState> {
     );
   }
 
+  selectGender = (gender: gender) => {
+    this.props.selectGender(gender);
+    events.fire('play-sound', 'select');
+  }
+
   render() {
     if (!this.props.races) return <div>loading races</div>;
 
@@ -77,9 +83,9 @@ class RaceSelect extends React.Component<RaceSelectProps, RaceSelectState> {
           {this.props.races.filter((r: any) => r.faction === this.props.selectedFaction.id).map(this.generateRaceContent)}
           <h6>Choose your gender</h6>
           <a className={`gender-btn ${this.props.selectedGender == gender.MALE ? 'selected' : ''}`}
-             onClick={() => this.props.selectGender(gender.MALE)}>Male</a>
+             onClick={() => this.selectGender(gender.MALE)}>Male</a>
           <a className={`gender-btn ${this.props.selectedGender == gender.FEMALE ? 'selected' : ''}`}
-             onClick={() => this.props.selectGender(gender.FEMALE)}>Female</a>
+             onClick={() => this.selectGender(gender.FEMALE)}>Female</a>
           {text}
         </div>
         <div className='view-content'>
