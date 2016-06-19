@@ -148,6 +148,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   }
 
   onSelectedChannelChanged = (channel: Channel) => {
+    this.selectCharacter(null);
     this.props.dispatch(changeChannel(channel));
     this.playSelect();
   }
