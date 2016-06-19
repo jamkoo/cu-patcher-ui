@@ -36,6 +36,16 @@ npm run serve
 ### 5. Preview
 Navigate to http://localhost:9000
 
+### 6. Testing with Live Patcher
+1. Make a link (junction) named PatchClient in the local repository folder.
+
+      ```
+      C:
+      CD \path-to\your-git-clone
+      mklink /j PatchClient C:\path-to\game-install
+      ```
+
+2. Build the patcher using `````npm run debug````` to compile the UI and run it in the live patcher.
 
 Software Requirements
 ---------------------
