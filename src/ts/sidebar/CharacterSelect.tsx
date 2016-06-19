@@ -82,7 +82,11 @@ class CharacterSelect extends React.Component<CharacterSelectProps, CharacterSel
   }
 
   render() {
-    if (this.props.characters.length == 0) return <div>Create new character.</div>;
+    if (this.props.characters.length == 0) {
+      return (
+        <div className="character-select-none">CREATE CHARACTER</div>
+      );
+    }
     return (
         <QuickSelect items={this.props.characters}
           selectedItemIndex={this.getSelectedIndex()}
