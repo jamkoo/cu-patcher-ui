@@ -164,3 +164,7 @@
     }
   }
 }
+
+.modal-dialog.character-delete {
+  height: 165px;  /* overrides modal-dialog in modaldialog.scss */
+}

@@ -15,14 +15,6 @@ import {patcher} from '../../api/patcherAPI';
 
 const charactersUrl = 'https://api.camelotunchained.com/characters';
 
-function selectNewCharacter() {
-  return {
-    name: 'create new character',
-    archetype: archetype.NONE,
-    id: '',
-    shardID: 0,
-  } as restAPI.SimpleCharacter;
-}
 
 // action types
 const FETCH_CHARACTERS = 'cse-patcher/characters/FETCH_CHARACTERS';
@@ -38,7 +30,6 @@ export function requestCharacters() {
 }
 
 export function fetchCharactersSuccess(characters: Array<restAPI.SimpleCharacter>) {
-  characters.unshift(selectNewCharacter());
   return {
     type: FETCH_CHARACTERS_SUCCESS,
     characters: characters,
@@ -84,8 +75,7 @@ export interface CharactersState {
 const initialState = {
   isFetching: false,
   lastUpdated: <Date>null,
-  characters: <Array<restAPI.SimpleCharacter>>[selectNewCharacter()],
-  selectedCharacter: selectNewCharacter()
+  characters: <Array<restAPI.SimpleCharacter>>[]
 }
 
 export default function reducer(state: CharactersState = initialState, action: any = {}) {

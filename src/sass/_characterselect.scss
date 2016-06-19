@@ -141,3 +141,25 @@
     background-image: url("../images/character/t-humans.jpg");
     border: 1px $colorT solid;
 }
+
+.character-buttons {
+  button {
+    background: $gradient2;
+    border: solid $colorg2 1px;
+    color: #eaeaea;
+    position: relative;
+    text-align: center;
+    height: 30px;
+    width: 135px;
+    margin: 5px 7px 10px 7px;
+    font-weight: 700;
+    font-size: 16px;
+    &[disabled]{
+      opacity: .5;
+    }
+    &:hover {
+      filter: brightness(1.2);
+      -webkit-filter: brightness(1.2);
+    }
+  }
+}
