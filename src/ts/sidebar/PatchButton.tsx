@@ -238,7 +238,7 @@ class PatchButton extends React.Component<PatchButtonProps, PatchButtonState> {
         for (let vid: any = 0; vid < videoElements.length; vid++) {
           videoElements[vid].play();
         }
-        if (this.props.character) {
+        if (this.props.character || channels[channelIndex].channelID === 27) {
           layer1 = <a className='waves-effect btn install-download-btn ready' onClick={this.onClicked.bind(event)}>{text}</a>;
         } else {
           layer1 = <div className='waves-effect btn install-download-btn not-ready'>{text}</div>;
