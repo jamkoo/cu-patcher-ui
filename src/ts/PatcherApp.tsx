@@ -127,11 +127,16 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
     this.props.dispatch(unMuteMusic());
   }
 
-  playSelect = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-select'] as HTMLAudioElement).play();
-      (this.refs['sound-select'] as HTMLAudioElement).volume = 0.75;
+  play = (name: string, volume: number = 0.75) => {
+    const sound: HTMLAudioElement = (this.refs['sound-'+name] as HTMLAudioElement);
+    if (sound && !this.props.soundMuted) {
+      sound.play();
+      sound.volume = volume;
     }
+  }
+
+  playSelect = () => {
+    this.play('select');
   }
 
   onLogIn = () => {

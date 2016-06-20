@@ -16,7 +16,11 @@ import ServerSelect, {ServerStatus} from './ServerSelect';
 import PatchButton from './PatchButton';
 import ServerCounts from './ServerCounts';
 import CharacterSelect from './CharacterSelect';
+import CharacterButtons from './CharacterButtons';
+import CharacterDeleteModal from './CharacterDeleteModal';
 import Alerts from './Alerts';
+import CharacterCreation from '../character-creation/CharacterCreation';
+import Animate from '../Animate';
 
 import {PatcherAlert} from '../redux/modules/patcherAlerts';
 import {patcher, Channel} from '../api/PatcherAPI';
@@ -55,6 +59,10 @@ export interface SidebarProps {
 }
 
 export interface SidebarState {
+  loggedIn: boolean;
+  activeServer: any
+  showCreation: boolean;
+  characterToDelete: restAPI.SimpleCharacter;
 };
 
 class Sidebar extends React.Component<SidebarProps, SidebarState> {
@@ -72,7 +80,9 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     super(props);
     this.state = {
       loggedIn: false,
-      activeServer: null
+      activeServer: null,
+      showCreation: false,
+      characterToDelete: null
     };
   }
 
@@ -111,25 +121,24 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }];
   }
 
-  playSelect = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-select'] as HTMLAudioElement).play();
-      (this.refs['sound-select'] as HTMLAudioElement).volume = 0.75;
+  play = (name: string, volume: number = 0.75) => {
+    const sound: HTMLAudioElement = (this.refs['sound-'+name] as HTMLAudioElement);
+    if (sound && !this.props.soundMuted) {
+      sound.play();
+      sound.volume = volume;
     }
+  }
+
+  playSelect = () => {
+    this.play('select');
   }
 
   playLaunchGame = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-launch-game'] as HTMLAudioElement).play();
-      (this.refs['sound-launch-game'] as HTMLAudioElement).volume = 0.75;
-    }
+    this.play('launch-game');
   }
 
   playPatchComplete = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-patch-complete'] as HTMLAudioElement).play();
-      (this.refs['sound-patch-complete'] as HTMLAudioElement).volume = 0.75;
-    }
+    this.play('patch-complete');
   }
 
   onSelectedServerChanged = (server: Server) => {
@@ -138,12 +147,87 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
   }
 
   onSelectedChannelChanged = (channel: Channel) => {
+    this.selectCharacter(null);
     this.props.dispatch(changeChannel(channel));
     this.playSelect();
   }
 
   selectCharacter = (character: restAPI.SimpleCharacter) => {
     this.props.dispatch(selectCharacter(character));
+  }
+
+  generateCharacterButtons = (shardID: any, selectedCharacter: restAPI.SimpleCharacter) : JSX.Element => {
+    let creation: JSX.Element;
+    let confirm: JSX.Element;
+    if (this.state.showCreation) {
+      creation = (
+        <div className='cu-patcher-ui__character-creation' key='char-create'>
+          <CharacterCreation apiHost={'https://api.camelotunchained.com/'}
+            apiVersion={1}
+            shard={shardID}
+            apiKey={patcher.getLoginToken()}
+            created={() => this.closeCreation()} />
+        </div>
+      );
+    }
+    if (this.state.characterToDelete) {
+      confirm = (
+        <div className='fullscreen-blackout'>
+          <CharacterDeleteModal
+            character={selectedCharacter}
+            closeModal={this.cancelDeleteCharacter}
+            deleteCharacter={this.deleteCharacter}/>
+        </div>
+      );
+    }
+    return (
+      <div>
+        <Animate
+          animationEnter='slideInRight'  durationEnter={400}
+          animationLeave='slideOutRight' durationLeave={500}>
+          {creation}
+        </Animate>
+        <CharacterButtons
+          creating={creation !== undefined}
+          selectedCharacter={selectedCharacter}
+          onCreate={this.createCharacter}
+          onCancel={this.cancelCreateCharacter}
+          onDelete={this.confirmDelete}/>
+        <Animate animationEnter='slideInUp' animationLeave='slideOutDown'
+          durationEnter={400} durationLeave={500}>
+          {confirm}
+        </Animate>
+      </div>
+    );
+  }
+
+  createCharacter = () : void => {
+    this.setState({ showCreation: true } as any);
+  }
+
+  cancelCreateCharacter = () : void => {
+    this.setState({ showCreation: false } as any);
+  }
+
+  closeCreation = () : void => {
+    this.fetchCharacters();
+    this.setState({ showCreation: false } as any);
+  }
+
+  confirmDelete = (character: restAPI.SimpleCharacter) => {
+    this.setState({ characterToDelete: character } as any);
+  }
+
+  cancelDeleteCharacter = (): void => {
+    this.setState({ characterToDelete: null } as any);
+  }
+
+  deleteCharacter = (character: restAPI.SimpleCharacter) : void => {
+    restAPI.deleteCharacterOnShard(character.shardID, character.id).then(() => {
+      this.selectCharacter(null);
+      this.fetchCharacters();
+    });
+    this.setState({ characterToDelete: null } as any);
   }
 
   componentDidMount() {
@@ -217,9 +301,8 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     setTimeout(this.initjQueryObjects, 100);
 
     let renderServerSection: any = null;
-    let activeServer: Server = null;
+    let selectedServer: Server = null;
     let selectedCharacter: restAPI.SimpleCharacter = null;
-    let selectedCharacterIndex: number = -1;
     let selectedChannel: Channel = null;
     let selectedChannelIndex: number = -1;
     if (this.props.serversState.servers.length > 0 && typeof(this.props.channelsState.channels) !== 'undefined' && this.props.channelsState.channels.length > 0) {
@@ -232,27 +315,35 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         if (this.props.serversState.currentServer) {
           for (let i: number = 0; i < servers.length; i++) {
             if (this.props.serversState.currentServer.name == servers[i].name) {
-              activeServer = servers[i];
+              selectedServer = servers[i];
             }
           }
         }
-        if (!activeServer) activeServer = servers[0];
+        if (!selectedServer) selectedServer = servers[0];
 
-        let characters = this.props.charactersState.characters.filter((c: restAPI.SimpleCharacter) => c.shardID == activeServer.shardID || c.shardID == 0);
+        // Hide localhost for normal users
+        for (let i: number = 0; i < servers.length; i++) {
+          if (servers[i].name === 'localhost' && patcher.getScreenName().search(/^cse/i) === -1) {
+            servers.splice(i, 1);
+            i--;
+          }
+        }
+
+        let characters = this.props.charactersState.characters.filter((c: restAPI.SimpleCharacter) => c.shardID == selectedServer.shardID || c.shardID == 0);
         selectedCharacter = this.props.charactersState.selectedCharacter;
-        selectedCharacterIndex = characters.findIndex(c => c.id == selectedCharacter.id);
+        if (!selectedCharacter) selectedCharacter = characters[0];
         renderServerSection = (
           <div>
             <ServerSelect servers={servers}
-                          selectedServer={activeServer}
+                          selectedServer={selectedServer}
                           onSelectedServerChanged={this.onSelectedServerChanged} />
             <CharacterSelect characters={characters}
                              selectedCharacter={selectedCharacter}
-                             selectedCharacterIndex={selectedCharacterIndex}
                              onCharacterSelectionChanged={this.selectCharacter} />
-            <ServerCounts artCount={activeServer.arthurians}
-                          tddCount={activeServer.tuathaDeDanann}
-                          vikCount={activeServer.vikings} />
+            { this.generateCharacterButtons(selectedServer.shardID, selectedCharacter) }
+            <ServerCounts artCount={selectedServer.arthurians}
+                          tddCount={selectedServer.tuathaDeDanann}
+                          vikCount={selectedServer.vikings} />
           </div>
         );
       }
@@ -264,7 +355,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         <ChannelSelect channels={this.props.channelsState.channels} selectedChannelIndex={selectedChannelIndex} onSelectedChannelChanged={this.onSelectedChannelChanged} />
         <div className='card-panel no-padding'>
           {renderServerSection}
-          <PatchButton server={activeServer}
+          <PatchButton server={selectedServer}
                        channelIndex={selectedChannelIndex}
                        playSelect={this.playSelect}
                        playLaunch={this.playLaunchGame}
