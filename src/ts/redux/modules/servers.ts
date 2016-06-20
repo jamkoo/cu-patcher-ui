@@ -15,13 +15,13 @@ import {fetchJSON} from '../../core/fetchHelpers';
 const serversUrl = 'http://api.camelotunchained.com/servers';
 
 export enum AccessType {
-  Invalid = -1,
+  Offline = -1,
   Public = 0,
   Beta3 = 1,
   Beta2 = 2,
   Beta1 = 3,
   Alpha = 4,
-  InternalTest = 5,
+  IT = 5,
   Employees = 6,
 }
 
@@ -41,7 +41,7 @@ export interface Server {
 
 function OfflineServer(name: string, channel: number, shardID: number) :Server {
   return {
-    accessLevel: AccessType.Invalid,
+    accessLevel: AccessType.Offline,
     host: '',
     name: name,
     playerMaximum: 0,
@@ -75,7 +75,9 @@ export function fetchServersSuccess(servers: Array<Server>) {
   if (!wyrmling) servers.unshift(OfflineServer('Wyrmling', 10, 1))
   return {
     type: FETCH_SERVERS_SUCCESS,
-    servers: servers,
+    servers: servers.sort(function(a,b) {
+      return +(a.accessLevel > b.accessLevel) || +(a.accessLevel === b.accessLevel) -1;
+    }),
     receivedAt: Date.now()
   };
 }
@@ -108,7 +110,6 @@ export function fetchServers() {
     return fetchJSON(serversUrl)
       .then((servers: Array<Server>) => {
         servers.forEach((s: Server) => {
-          if (s.name === 'localhost' && patcher.getScreenName().indexOf('cse') == -1) return;
           fetchJSON(`http://${s.host}:8000/api/game/players`)
             .then((players: any) => {
               s.arthurians = players.arthurians;
