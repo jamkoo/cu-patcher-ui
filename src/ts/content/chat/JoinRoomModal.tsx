@@ -27,7 +27,7 @@ class JoinRoomModal extends React.Component<JoinRoomModalProps, JoinRoomModalSta
     super(props);
     this.state = this.initialState();
   }
-  
+
   initialState(): JoinRoomModalState {
     return {
       rooms: [],
@@ -67,14 +67,14 @@ class JoinRoomModal extends React.Component<JoinRoomModalProps, JoinRoomModalSta
     var input : HTMLInputElement = this.refs['roomInput'] as HTMLInputElement;
     this.props.joinRoom(input.value);
   }
-  
+
   selectRoom = (room: Room) => {
     this.props.joinRoom(room.jid.split('@')[0]);
   }
 
   render() {
     return (
-      <div className="join-room-modal">
+      <div className="modal-dialog join-room-modal">
         <div className="input-field">
           <input id="room" type="text" ref="roomInput"/>
           <label htmlFor="room">Room Name</label>

@@ -52,7 +52,6 @@ class CharacterListView extends React.Component<CharacterListViewProps, Characte
 export interface CharacterSelectProps {
   characters: Array<restAPI.SimpleCharacter>;
   selectedCharacter: restAPI.SimpleCharacter;
-  selectedCharacterIndex?: number;
   onCharacterSelectionChanged: (character: restAPI.SimpleCharacter) => void;
 };
 
@@ -61,28 +60,36 @@ export interface CharacterSelectState {
 
 class CharacterSelect extends React.Component<CharacterSelectProps, CharacterSelectState> {
   public name: string = 'cse-patcher-Character-select';
-  
+
   constructor(props: CharacterSelectProps) {
     super(props);
   }
-  
+
   onSelectedCharacterChanged = (character: restAPI.SimpleCharacter) => {
     this.props.onCharacterSelectionChanged(character);
   }
-  
+
   generateActiveView = (character: restAPI.SimpleCharacter) => {
     return <ActiveCharacterView item={character} />
   }
-  
+
   generateListView = (character: restAPI.SimpleCharacter) => {
     return <CharacterListView item={character} />
   }
 
+  getSelectedIndex = () : number => {
+    return this.props.characters.findIndex((c: restAPI.SimpleCharacter) => c.id === this.props.selectedCharacter.id);
+  }
+
   render() {
-    if (this.props.characters.length == 0) return <div>Create new character.</div>;
+    if (this.props.characters.length == 0) {
+      return (
+        <div className="character-select-none">CREATE CHARACTER</div>
+      );
+    }
     return (
         <QuickSelect items={this.props.characters}
-          selectedItemIndex={this.props.selectedCharacterIndex}
+          selectedItemIndex={this.getSelectedIndex()}
           activeViewComponentGenerator={this.generateActiveView}
           listViewComponentGenerator={this.generateListView}
           onSelectedItemChanged={this.onSelectedCharacterChanged} />

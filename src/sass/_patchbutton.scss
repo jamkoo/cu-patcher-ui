@@ -101,6 +101,12 @@
     }
   }
 
+  .not-ready {
+    background: $gradient2;
+    border: solid $colorg2 1px;
+    color: $colorg2;
+  }
+
   .launching {
     background-color: $color4;
     color: $color1;
