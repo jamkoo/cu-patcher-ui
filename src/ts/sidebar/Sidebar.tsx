@@ -111,25 +111,24 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     }];
   }
 
-  playSelect = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-select'] as HTMLAudioElement).play();
-      (this.refs['sound-select'] as HTMLAudioElement).volume = 0.75;
+  play = (name: string, volume: number = 0.75) => {
+    const sound: HTMLAudioElement = (this.refs['sound-'+name] as HTMLAudioElement);
+    if (sound && !this.props.soundMuted) {
+      sound.play();
+      sound.volume = volume;
     }
+  }
+
+  playSelect = () => {
+    this.play('select');
   }
 
   playLaunchGame = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-launch-game'] as HTMLAudioElement).play();
-      (this.refs['sound-launch-game'] as HTMLAudioElement).volume = 0.75;
-    }
+    this.play('launch-game');
   }
 
   playPatchComplete = () => {
-    if (!this.props.soundMuted) {
-      (this.refs['sound-patch-complete'] as HTMLAudioElement).play();
-      (this.refs['sound-patch-complete'] as HTMLAudioElement).volume = 0.75;
-    }
+    this.play('patch-complete');
   }
 
   onSelectedServerChanged = (server: Server) => {
