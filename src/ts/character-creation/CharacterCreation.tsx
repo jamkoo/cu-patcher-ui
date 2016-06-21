@@ -29,6 +29,8 @@ import {AttributeOffsetsState, fetchAttributeOffsets, AttributeOffsetInfo} from 
 import {CharacterState, createCharacter, CharacterCreationModel, resetCharacter} from './redux/modules/character';
 import {selectGender} from './redux/modules/genders';
 
+export {CharacterCreationModel} from './redux/modules/character';
+
 declare var Materialize: any;
 
 const createStoreWithMiddleware = applyMiddleware(
@@ -61,7 +63,7 @@ export interface CharacterCreationProps {
   apiHost: string;
   apiVersion: number;
   shard: number;
-  created: () => void;
+  created: (character: CharacterCreationModel) => void;
   dispatch?: (action: any) => void;
   racesState?: RacesState;
   playerClassesState?: PlayerClassesState;
@@ -194,17 +196,13 @@ class CharacterCreation extends React.Component<CharacterCreationProps, any> {
 
   componentDidUpdate() {
     if (this.props.characterState.success) {
-      this.props.created();
+      this.props.created(this.props.characterState.created);
+      this.props.dispatch(resetAttributes());
+      this.props.dispatch(resetCharacter());
     }
   }
 
   render() {
-    if (this.props.characterState.success) {
-      this.props.created();
-      this.props.dispatch(resetAttributes());
-      this.props.dispatch(resetCharacter());
-    }
-
     let content: any = null;
     let next: any = null;
     let back: any = null;
@@ -317,7 +315,7 @@ export interface ContainerProps {
   apiHost: string;
   apiVersion: number;
   shard: number;
-  created: () => void;
+  created: (created: CharacterCreationModel) => void;
 }
 
 class Container extends React.Component<ContainerProps, any> {

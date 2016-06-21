@@ -6,7 +6,7 @@
 
 import * as React from 'react';
 import {connect} from 'react-redux';
-import {components, race, restAPI} from 'camelot-unchained';
+import {components, race, restAPI, archetype, faction} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 declare let $: any;
 
@@ -19,7 +19,7 @@ import CharacterSelect from './CharacterSelect';
 import CharacterButtons from './CharacterButtons';
 import CharacterDeleteModal from './CharacterDeleteModal';
 import Alerts from './Alerts';
-import CharacterCreation from '../character-creation/CharacterCreation';
+import CharacterCreation, {CharacterCreationModel} from '../character-creation/CharacterCreation';
 import Animate from '../Animate';
 import * as events from '../core/events';
 
@@ -33,7 +33,7 @@ import {changeChannel, requestChannels, ChannelState} from '../redux/modules/cha
 import {muteSounds, unMuteSounds} from '../redux/modules/sounds';
 import {muteMusic, unMuteMusic} from '../redux/modules/music';
 import {fetchServers, changeServer, ServersState} from '../redux/modules/servers';
-import {fetchCharacters, selectCharacter, CharactersState} from '../redux/modules/characters';
+import {fetchCharacters, selectCharacter, characterCreated, CharactersState} from '../redux/modules/characters';
 
 const lastPlay: any = JSON.parse(localStorage.getItem('cse-patcher-lastplay'));
 
@@ -148,7 +148,20 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
             apiVersion={1}
             shard={shardID}
             apiKey={patcher.getLoginToken()}
-            created={() => this.closeCreation()} />
+            created={(created: CharacterCreationModel) => {
+              this.closeCreation();
+              let simpleCharacter = {
+                archetype: created.archetype,
+                faction: created.faction,
+                gender: created.gender,
+                id: null,
+                lastLogin: Date.now(),
+                name: created.name,
+                race: created.race,
+                shardID: created.shardID,
+              } as any;
+              this.props.dispatch(characterCreated(simpleCharacter));
+            }} />
         </div>
       );
     }
@@ -270,7 +283,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
       }
     }
 
-    if (lastPlay && lastPlay.characterID) {
+    if (lastPlay && lastPlay.characterID && !this.props.charactersState.isFetching) {
       for (let i = 0; i < this.props.charactersState.characters.length; i++) {
         if (this.props.charactersState.characters[i].id === lastPlay.characterID) {
           this.props.dispatch(selectCharacter(this.props.charactersState.characters[i]));
