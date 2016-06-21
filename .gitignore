@@ -11,6 +11,7 @@ npm-debug.log
 /.vs
 /lib
 /dist
+/PatchClient
 **/*node_modules
 *.csproj
 /user-cu-build.config.js
