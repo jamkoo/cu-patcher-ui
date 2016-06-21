@@ -31,7 +31,9 @@ import News from './content/News';
 import PatchNotes from './content/PatchNotes';
 import Support from './content/Support';
 import Animate from './Animate';
+import Sound from './Sound';
 
+import * as events from './core/events';
 import {patcher, Channel} from './api/PatcherAPI';
 import {CSENormalizeString} from './api/CSENormalizeString';
 
@@ -81,7 +83,6 @@ export interface PatcherState {};
 
 export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
   public name = 'cse-patcher';
-  private playOnce = false;
   private heroContentInterval: any = null;
 
   static propTypes = {
@@ -92,19 +93,22 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
 
   onRouteChanged = (route: Routes) => {
     this.props.dispatch(changeRoute(route));
-    this.playSelect();
+    events.fire('play-sound', 'select');
   }
 
   hideChat = () => {
     this.props.dispatch(hideChat());
+    events.fire('play-sound', 'select');
   }
 
   showChat = () => {
     this.props.dispatch(showChat());
+    events.fire('play-sound', 'select');
   }
 
   fetchNewsPage = (page: number) => {
     this.props.dispatch(fetchPage(page));
+    events.fire('play-sound', 'select');
   }
 
   onPatcherAPIUpdate = () => {
@@ -127,31 +131,11 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
     this.props.dispatch(unMuteMusic());
   }
 
-  play = (name: string, volume: number = 0.75) => {
-    const sound: HTMLAudioElement = (this.refs['sound-'+name] as HTMLAudioElement);
-    if (sound && !this.props.soundMuted) {
-      sound.play();
-      sound.volume = volume;
-    }
-  }
-
-  playSelect = () => {
-    this.play('select');
-  }
-
   onLogIn = () => {
     setTimeout(() => this.setState({}), 500);
   }
 
   componentDidUpdate() {
-    if (this.props.musicMuted && !(this.refs['sound-bg'] as HTMLAudioElement).paused) {
-      console.log('pausing bg');
-      (this.refs['sound-bg'] as HTMLAudioElement).pause();
-    } else if (!this.props.musicMuted && (this.refs['sound-bg'] as HTMLAudioElement).paused && !this.playOnce) {
-      console.log('playing bg');
-      (this.refs['sound-bg'] as HTMLAudioElement).play();
-      (this.refs['sound-bg'] as HTMLAudioElement).volume = 0.5;
-    }
   }
 
   componentDidMount() {
@@ -161,11 +145,6 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
       this.props.dispatch(validateHeroContent());
       if (!this.props.heroContent.isFetching) this.props.dispatch(fetchHeroContent());
     }, 60000 * 30);
-
-    if (!this.props.musicMuted) {
-      (this.refs['sound-bg'] as HTMLAudioElement).play();
-    }
-    (this.refs['sound-bg'] as HTMLAudioElement).onended = () => this.playOnce = true;
   }
 
   componentDidUnMount() {
@@ -233,11 +212,7 @@ export class PatcherApp extends React.Component<PatcherAppProps, PatcherState> {
           durationEnter={400} durationLeave={500}>
           {chat}
         </Animate>
-        // Audio
-        <audio src='sounds/select.ogg' ref='sound-select' />
-        <audio src='sounds/launch-game.ogg' ref='sound-launch-game' />
-        <audio src='sounds/patch-complete.ogg' ref='sound-patch-complete' />
-        <audio src='sounds/patcher-theme-v0.1.ogg' ref='sound-bg' />
+        <Sound/>
       </div>
     );
   }

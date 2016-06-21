@@ -6,6 +6,7 @@
 
 import * as React from 'react';
 import {components, race, restAPI} from 'camelot-unchained';
+import * as events from '../core/events'
 
 export interface CharacterButtonsProps {
   creating: boolean;
@@ -26,7 +27,13 @@ class CharacterButtons extends React.Component<CharacterButtonsProps, CharacterB
   }
 
   createClicked = (): void => {
+    events.fire('play-sound', 'select');
     this.props.creating ? this.props.onCancel() : this.props.onCreate();
+  }
+
+  deleteClicked = (): void => {
+    events.fire('play-sound', 'select');
+    this.props.onDelete(this.props.selectedCharacter);
   }
 
   render() {
@@ -36,7 +43,7 @@ class CharacterButtons extends React.Component<CharacterButtonsProps, CharacterB
           onClick={this.createClicked}>{ this.props.creating ? 'Cancel Creation' : 'Create' }</button>
         <button
           className={this.props.selectedCharacter && !this.props.creating ? 'delete' : 'disabled'}
-          onClick={() => this.props.onDelete(this.props.selectedCharacter)}
+          onClick={this.deleteClicked}
           disabled={!this.props.selectedCharacter || this.props.creating}>Delete</button>
       </div>
     );
