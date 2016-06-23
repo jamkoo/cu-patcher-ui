@@ -8,6 +8,8 @@ import * as React from 'react';
 import {components, race, restAPI} from 'camelot-unchained';
 let QuickSelect = components.QuickSelect;
 
+import * as moment from 'moment';
+
 export interface ActiveCharacterViewProps {
   item: restAPI.SimpleCharacter;
 };
@@ -35,6 +37,7 @@ export interface CharacterListViewProps {
 export interface CharacterListViewState {};
 class CharacterListView extends React.Component<CharacterListViewProps, CharacterListViewState> {
   render() {
+    const lastLogin: string = this.props.item.lastLogin === '0001-01-01T00:00:00Z' ? 'Never' : moment(this.props.item.lastLogin).fromNow(true);
     return (
       <div className='character-select quickselect-list'>
         <div>
@@ -42,6 +45,9 @@ class CharacterListView extends React.Component<CharacterListViewProps, Characte
             data-delay='150' data-tooltip={status} /></div>
           <div className='character-details'>
             <h6 className={`character char-${race[this.props.item.race]}`}>{this.props.item.name}</h6>
+          </div>
+          <div className='character-details'>
+            <h6 className='character-lastlogin'>Last: {lastLogin}</h6>
           </div>
         </div>
       </div>

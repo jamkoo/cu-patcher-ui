@@ -13,6 +13,8 @@ import {fetchJSON} from '../../core/fetchHelpers';
 import {restAPI, archetype, faction} from 'camelot-unchained';
 import {patcher} from '../../api/patcherAPI';
 
+import * as moment from 'moment';
+
 const charactersUrl = 'https://api.camelotunchained.com/characters';
 
 
@@ -21,6 +23,7 @@ const FETCH_CHARACTERS = 'cse-patcher/characters/FETCH_CHARACTERS';
 const FETCH_CHARACTERS_SUCCESS = 'cse-patcher/characters/FETCH_CHARACTERS_SUCCESS';
 const FETCH_CHARACTERS_FAILED = 'cse-patcher/characters/FETCH_CHARACTERS_FAILED';
 const SELECT_CHARACTER = 'cse-patcher/characters/SELECT_CHARACTER';
+const CHARACTER_CREATED = 'cse-patcher/characters/CHARACTER_CREATED';
 
 // sync actions
 export function requestCharacters() {
@@ -30,6 +33,7 @@ export function requestCharacters() {
 }
 
 export function fetchCharactersSuccess(characters: Array<restAPI.SimpleCharacter>) {
+
   return {
     type: FETCH_CHARACTERS_SUCCESS,
     characters: characters,
@@ -51,6 +55,13 @@ export function selectCharacter(character: restAPI.SimpleCharacter) {
   };
 }
 
+export function characterCreated(character: restAPI.SimpleCharacter) {
+  return {
+    type: CHARACTER_CREATED,
+    character: character
+  }
+}
+
 // async actions
 export function fetchCharacters() {
   return (dispatch: (action: any) => any) => {
@@ -69,6 +80,7 @@ export interface CharactersState {
   lastUpdated?: Date;
   characters?: Array<restAPI.SimpleCharacter>;
   selectedCharacter?: restAPI.SimpleCharacter;
+  newCharacterName?: string;
   error?: string;
 }
 
@@ -78,6 +90,19 @@ const initialState = {
   characters: <Array<restAPI.SimpleCharacter>>[]
 }
 
+function compareCharacterLogin(a: restAPI.SimpleCharacter, b: restAPI.SimpleCharacter): number {
+  if (a.lastLogin !== '0001-01-01T00:00:00Z') {
+    if (b.lastLogin === '0001-01-01T00:00:00Z') return -1;
+  } else {
+    if (b.lastLogin !== '0001-01-01T00:00:00Z') return 1;
+  }
+  if (moment(a.lastLogin).isBefore(b.lastLogin)) return 1;
+  if (moment(b.lastLogin).isBefore(a.lastLogin)) return -1;
+  if (a.name.toUpperCase() > b.name.toUpperCase()) return 1;
+  if (a.name.toUpperCase() < b.name.toUpperCase()) return -1;
+  return 0;
+}
+
 export default function reducer(state: CharactersState = initialState, action: any = {}) {
   switch(action.type) {
     case FETCH_CHARACTERS:
@@ -85,10 +110,19 @@ export default function reducer(state: CharactersState = initialState, action: a
         isFetching: true
       });
     case FETCH_CHARACTERS_SUCCESS:
+      let characters: Array<restAPI.SimpleCharacter> = action.characters.slice();
+      characters.sort(compareCharacterLogin);
+      let selected: restAPI.SimpleCharacter = null;
+      if (state.newCharacterName) {
+        const charIndex: number = characters.findIndex((char: restAPI.SimpleCharacter) => char.name == state.newCharacterName);
+        if (charIndex && charIndex > -1) selected = characters[charIndex];
+      }
       return Object.assign({}, state, {
         isFetching: false,
         lastUpdated: action.receivedAt,
-        characters: action.characters
+        characters: characters,
+        newCharacterName: null,
+        selectedCharacter: selected
       });
     case FETCH_CHARACTERS_FAILED:
       return Object.assign({}, state, {
@@ -99,6 +133,11 @@ export default function reducer(state: CharactersState = initialState, action: a
       return Object.assign({}, state, {
         selectedCharacter: action.character
       });
+    case CHARACTER_CREATED:
+      return Object.assign({}, state, {
+        newCharacterName: action.character.name
+      });
+
     default: return state;
   }
 }

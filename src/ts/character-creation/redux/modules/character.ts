@@ -68,7 +68,7 @@ export function createCharacter(model: CharacterCreationModel,
           'loginToken': apiKey
         }
       })
-      .then(checkStatus).then(() => dispatch(createCharacterSuccess()))
+      .then(checkStatus).then(() => dispatch(createCharacterSuccess(model)) )
       .catch((error: ResponseError) => (error as any).response.json().then((error: any) => dispatch(createCharacterFailed(error))))
   }
 }
@@ -79,9 +79,10 @@ export function createCharacterStarted() {
   }
 }
 
-export function createCharacterSuccess() {
+export function createCharacterSuccess(model: CharacterCreationModel) {
   return {
     type: CREATE_CHARACTER_SUCCESS,
+    model: model,
   }
 }
 
@@ -96,12 +97,14 @@ export interface CharacterState {
   isFetching?: boolean,
   success?: boolean,
   error?: string,
+  created?: CharacterCreationModel,
 }
 
 const initialState: CharacterState = {
   isFetching: false,
   success: false,
   error: null,
+  created: null,
 }
 
 export default function reducer(state: CharacterState = initialState, action: any = {}) {
@@ -114,6 +117,7 @@ export default function reducer(state: CharacterState = initialState, action: an
       return Object.assign({}, state, {
         isFetching: false,
         success: true,
+        created: action.model,
       });
     case CREATE_CHARACTER_FAILED:
       let errors: any =  action.error.Errors;
