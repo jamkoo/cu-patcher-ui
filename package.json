@@ -55,7 +55,7 @@
     "launch:patcher": "cd Patchclient && start CamelotUnchained.exe canPatchSelf=0 outputUI=0"
   },
   "dependencies": {
-    "camelot-unchained": "^0.2.17",
+    "camelot-unchained": "^0.2.25",
     "es6-promise": "^3.0.2",
     "eventemitter3": "^1.1.1",
     "isomorphic-fetch": "^2.2.1",
