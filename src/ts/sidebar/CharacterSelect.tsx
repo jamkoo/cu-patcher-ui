@@ -24,7 +24,8 @@ class ActiveCharacterView extends React.Component<ActiveCharacterViewProps, Acti
           <div className='character-status'><div className={'indicator tooltipped ' + status} data-position='right'
             data-delay='150' data-tooltip={status} /></div>
           <div className='character-details'>
-            <h6 className={`character char-${race[this.props.item.race]}`}>{this.props.item.name}<br />
+            <h6 className={`character char-${race[this.props.item.race]}`}>
+              <div>{this.props.item.name}</div>
               <div className='character-lastlogin'>Last Login: {lastLogin}</div>
             </h6>
           </div>
